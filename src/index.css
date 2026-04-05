@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sami-blue: #004a99;
+  --color-sami-dark: #003366;
+  --color-sami-light: #e6f0ff;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+}
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+.news-card-shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+@media print {
+  @page {
+    margin: 1cm;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .print-header {
+    display: block !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

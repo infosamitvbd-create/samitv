@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: news
+    // Fields:
+    //   - title: string (required)
+    //   - content: string (required)
+    //   - imageUrl: string (required)
+    //   - category: string (required)
+    //   - createdAt: timestamp (required)
+    //   - authorUid: string (required)
+    //
+    // Collection: reporters
+    // Fields:
+    //   - name: string (required)
+    //   - designation: string (required)
+    //   - imageUrl: string (required)
+    //   - location: string (required)
+    //   - division: string (required)
+    //   - phone: string (optional)
+    //   - email: string (optional)
+    //   - order: integer (optional)
+    //
+    // Collection: media
+    // Fields:
+    //   - title: string (required)
+    //   - imageUrl: string (required)
+    //   - type: string (required, 'image' or 'video')
+    //   - videoUrl: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: settings
+    // Fields:
+    //   - text: string (required)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required)
+    //   - role: string (required, 'admin' or 'user')
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+         (request.auth.token.email == "info.samitv.bd@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidNews(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 10000 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 &&
+             data.category is string && data.category.size() > 0 &&
+             data.createdAt is timestamp &&
+             data.authorUid is string && data.authorUid == request.auth.uid;
+    }
+
+    function isValidReporter(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.designation is string && data.designation.size() > 0 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 &&
+             data.location is string && data.location.size() > 0 &&
+             data.division is string && data.division.size() > 0;
+    }
+
+    function isValidMedia(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 &&
+             data.type in ['image', 'video'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidTicker(data) {
+      return data.text is string && data.text.size() > 0 &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidUser(data) {
+      return data.email is string && data.email.size() > 0 &&
+             data.role in ['admin', 'user'];
+    }
+
+    function isValidAd(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 &&
+             data.position in ['sidebar', 'content', 'popup'] &&
+             data.active is bool &&
+             data.createdAt is timestamp;
+    }
+
+    // Rules
+    match /news/{newsId} {
+      allow read: if true; // Publicly readable
+      allow create: if isAdmin() && isValidNews(request.resource.data);
+      allow update: if isAdmin() && isValidNews(request.resource.data) && 
+                      request.resource.data.authorUid == resource.data.authorUid;
+      allow delete: if isAdmin();
+    }
+
+    match /reporters/{reporterId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidReporter(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /media/{mediaId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidMedia(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /ads/{adId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidAd(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(userId) && request.resource.data.role == 'user';
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
