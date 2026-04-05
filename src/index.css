@@ -28,16 +28,33 @@
 
 @media print {
   @page {
-    margin: 1cm;
+    size: A4;
+    margin: 1.5cm;
   }
   body {
     background: white !important;
     color: black !important;
+    font-size: 12pt;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   .print-header {
     display: block !important;
   }
   .no-print {
     display: none !important;
+  }
+  /* Ensure full news content is visible and not cut off */
+  .prose {
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+  .news-card-shadow {
+    box-shadow: none !important;
   }
 }

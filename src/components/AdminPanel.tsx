@@ -1,20 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../lib/firebase';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload } from 'lucide-react';
+import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'সারাদেশ', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
+const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
 const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
 
-type AdminTab = 'news' | 'reporters' | 'media' | 'ticker' | 'ads';
+type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads';
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+  }
+}
 
 export const AdminPanel: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<AdminTab>('news');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+
+  const handleFirestoreError = (error: any, operationType: OperationType, path: string | null) => {
+    const errInfo: FirestoreErrorInfo = {
+      error: error instanceof Error ? error.message : String(error),
+      authInfo: {
+        userId: auth.currentUser?.uid,
+        email: auth.currentUser?.email,
+        emailVerified: auth.currentUser?.emailVerified,
+        isAnonymous: auth.currentUser?.isAnonymous,
+      },
+      operationType,
+      path
+    };
+    console.error('Firestore Error: ', JSON.stringify(errInfo));
+    return errInfo;
+  };
   
   // News State
   const [newsList, setNewsList] = useState<any[]>([]);
@@ -73,6 +110,14 @@ export const AdminPanel: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ collection: string; id: string } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const stats = {
+    news: newsList.length,
+    reporters: reporters.length,
+    media: mediaList.length,
+    ads: adsList.length
+  };
 
   const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
     setNotification({ message, type });
@@ -167,18 +212,34 @@ export const AdminPanel: React.FC = () => {
         finalImageUrl = await uploadFile(newsImageFile, 'news');
       }
 
-      await addDoc(collection(db, 'news'), {
-        ...newsForm,
-        imageUrl: finalImageUrl,
-        authorUid: user.uid,
-        createdAt: serverTimestamp()
-      });
+      if (!finalImageUrl) {
+        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editingId) {
+        await updateDoc(doc(db, 'news', editingId), {
+          ...newsForm,
+          imageUrl: finalImageUrl,
+          updatedAt: serverTimestamp()
+        });
+        showNotification('নিউজ সফলভাবে আপডেট হয়েছে!');
+      } else {
+        await addDoc(collection(db, 'news'), {
+          ...newsForm,
+          imageUrl: finalImageUrl,
+          authorUid: user.uid,
+          createdAt: serverTimestamp()
+        });
+        showNotification('নিউজ সফলভাবে আপলোড হয়েছে!');
+      }
       setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
       setNewsImageFile(null);
-      showNotification('নিউজ সফলভাবে আপলোড হয়েছে!');
+      setEditingId(null);
     } catch (error) {
-      console.error("Upload Error: ", error);
-      showNotification('নিউজ আপলোড করতে সমস্যা হয়েছে।', 'error');
+      handleFirestoreError(error, OperationType.CREATE, 'news');
+      showNotification('নিউজ আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -193,16 +254,33 @@ export const AdminPanel: React.FC = () => {
         finalImageUrl = await uploadFile(reporterImageFile, 'reporters');
       }
 
-      await addDoc(collection(db, 'reporters'), {
-        ...reporterForm,
-        imageUrl: finalImageUrl
-      });
+      if (!finalImageUrl) {
+        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editingId) {
+        await updateDoc(doc(db, 'reporters', editingId), {
+          ...reporterForm,
+          imageUrl: finalImageUrl,
+          updatedAt: serverTimestamp()
+        });
+        showNotification('রিপোর্টার সফলভাবে আপডেট হয়েছে!');
+      } else {
+        await addDoc(collection(db, 'reporters'), {
+          ...reporterForm,
+          imageUrl: finalImageUrl,
+          createdAt: serverTimestamp()
+        });
+        showNotification('রিপোর্টার সফলভাবে যোগ করা হয়েছে!');
+      }
       setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
       setReporterImageFile(null);
-      showNotification('রিপোর্টার সফলভাবে যোগ করা হয়েছে!');
+      setEditingId(null);
     } catch (error) {
-      console.error("Reporter Error: ", error);
-      showNotification('রিপোর্টার যোগ করতে সমস্যা হয়েছে।', 'error');
+      handleFirestoreError(error, OperationType.CREATE, 'reporters');
+      showNotification('রিপোর্টার যোগ/আপডেট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -217,17 +295,33 @@ export const AdminPanel: React.FC = () => {
         finalImageUrl = await uploadFile(mediaImageFile, 'media');
       }
 
-      await addDoc(collection(db, 'media'), {
-        ...mediaForm,
-        imageUrl: finalImageUrl,
-        createdAt: serverTimestamp()
-      });
+      if (!finalImageUrl) {
+        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editingId) {
+        await updateDoc(doc(db, 'media', editingId), {
+          ...mediaForm,
+          imageUrl: finalImageUrl,
+          updatedAt: serverTimestamp()
+        });
+        showNotification('মিডিয়া সফলভাবে আপডেট হয়েছে!');
+      } else {
+        await addDoc(collection(db, 'media'), {
+          ...mediaForm,
+          imageUrl: finalImageUrl,
+          createdAt: serverTimestamp()
+        });
+        showNotification('মিডিয়া সফলভাবে আপলোড হয়েছে!');
+      }
       setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
       setMediaImageFile(null);
-      showNotification('মিডিয়া সফলভাবে আপলোড হয়েছে!');
+      setEditingId(null);
     } catch (error) {
-      console.error("Media Error: ", error);
-      showNotification('মিডিয়া আপলোড করতে সমস্যা হয়েছে।', 'error');
+      handleFirestoreError(error, OperationType.CREATE, 'media');
+      showNotification('মিডিয়া আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -242,7 +336,7 @@ export const AdminPanel: React.FC = () => {
       });
       showNotification('স্ক্রলিং নিউজ আপডেট হয়েছে!');
     } catch (error) {
-      console.error("Ticker Error: ", error);
+      handleFirestoreError(error, OperationType.WRITE, 'settings/ticker');
       showNotification('স্ক্রলিং নিউজ আপডেট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setIsUpdatingTicker(false);
@@ -258,20 +352,89 @@ export const AdminPanel: React.FC = () => {
         finalImageUrl = await uploadFile(adImageFile, 'ads');
       }
 
-      await addDoc(collection(db, 'ads'), {
-        ...adForm,
-        imageUrl: finalImageUrl,
-        createdAt: serverTimestamp()
-      });
+      if (!finalImageUrl) {
+        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (editingId) {
+        await updateDoc(doc(db, 'ads', editingId), {
+          ...adForm,
+          imageUrl: finalImageUrl,
+          updatedAt: serverTimestamp()
+        });
+        showNotification('বিজ্ঞাপন সফলভাবে আপডেট হয়েছে!');
+      } else {
+        await addDoc(collection(db, 'ads'), {
+          ...adForm,
+          imageUrl: finalImageUrl,
+          createdAt: serverTimestamp()
+        });
+        showNotification('বিজ্ঞাপন সফলভাবে আপলোড হয়েছে!');
+      }
       setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
       setAdImageFile(null);
-      showNotification('বিজ্ঞাপন সফলভাবে আপলোড হয়েছে!');
+      setEditingId(null);
     } catch (error) {
-      console.error("Ad Error: ", error);
-      showNotification('বিজ্ঞাপন আপলোড করতে সমস্যা হয়েছে।', 'error');
+      handleFirestoreError(error, OperationType.CREATE, 'ads');
+      showNotification('বিজ্ঞাপন আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const startEditing = (item: any, type: AdminTab) => {
+    setEditingId(item.id);
+    setActiveTab(type);
+    if (type === 'news') {
+      setNewsForm({
+        title: item.title,
+        content: item.content,
+        imageUrl: item.imageUrl,
+        category: item.category,
+        journalistName: item.journalistName || '',
+        location: item.location || ''
+      });
+      setNewsUploadMode('url');
+    } else if (type === 'reporters') {
+      setReporterForm({
+        name: item.name,
+        designation: item.designation,
+        imageUrl: item.imageUrl,
+        location: item.location,
+        division: item.division,
+        phone: item.phone || '',
+        email: item.email || ''
+      });
+      setReporterUploadMode('url');
+    } else if (type === 'media') {
+      setMediaForm({
+        title: item.title,
+        imageUrl: item.imageUrl,
+        type: item.type,
+        videoUrl: item.videoUrl || ''
+      });
+      setMediaUploadMode('url');
+    } else if (type === 'ads') {
+      setAdForm({
+        title: item.title,
+        imageUrl: item.imageUrl,
+        link: item.link || '',
+        position: item.position,
+        active: item.active
+      });
+      setAdUploadMode('url');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
+    setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
+    setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
+    setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
   };
 
   const handleDelete = async () => {
@@ -280,7 +443,7 @@ export const AdminPanel: React.FC = () => {
       await deleteDoc(doc(db, confirmDelete.collection, confirmDelete.id));
       showNotification('সফলভাবে ডিলিট হয়েছে!');
     } catch (error) {
-      console.error("Delete Error: ", error);
+      handleFirestoreError(error, OperationType.DELETE, `${confirmDelete.collection}/${confirmDelete.id}`);
       showNotification('ডিলিট করতে সমস্যা হয়েছে।', 'error');
     } finally {
       setConfirmDelete(null);
@@ -330,31 +493,125 @@ export const AdminPanel: React.FC = () => {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-          <button onClick={() => setActiveTab('news')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'news' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Layout size={18} /> নিউজ
+        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+          <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <Layout size={18} /> ড্যাশবোর্ড
           </button>
-          <button onClick={() => setActiveTab('reporters')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'reporters' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('news')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'news' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <Send size={18} /> নিউজ
+          </button>
+          <button onClick={() => setActiveTab('reporters')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'reporters' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Users size={18} /> আওয়ার ফ্যামিলি
           </button>
-          <button onClick={() => setActiveTab('media')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'media' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('media')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Film size={18} /> মিডিয়া
           </button>
-          <button onClick={() => setActiveTab('ticker')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'ticker' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('ticker')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ticker' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <MessageSquare size={18} /> স্ক্রলিং নিউজ
           </button>
-          <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${activeTab === 'ads' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ads' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <ImageIcon size={18} /> বিজ্ঞাপন
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {activeTab === 'dashboard' ? (
+          <div className="space-y-8">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                  <Layout size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold">মোট নিউজ</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.news}</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
+                  <Users size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold">রিপোর্টার</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.reporters}</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
+                  <Film size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold">মিডিয়া ফাইল</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.media}</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
+                  <ImageIcon size={24} />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold">বিজ্ঞাপন</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.ads}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                  <Send size={20} className="text-sami-blue" /> সাম্প্রতিক নিউজ
+                </h3>
+                <div className="space-y-4">
+                  {newsList.slice(0, 5).map(news => (
+                    <div key={news.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all">
+                      <img src={news.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 truncate text-sm">{news.title}</p>
+                        <p className="text-[10px] text-gray-500">{new Date(news.createdAt?.toDate()).toLocaleDateString('bn-BD')}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-blue font-bold text-sm hover:underline">সব নিউজ দেখুন</button>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                  <Users size={20} className="text-sami-blue" /> নতুন রিপোর্টার
+                </h3>
+                <div className="space-y-4">
+                  {reporters.slice(0, 5).map(rep => (
+                    <div key={rep.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all">
+                      <img src={rep.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-900 text-sm">{rep.name}</p>
+                        <p className="text-[10px] text-sami-blue">{rep.designation}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-blue font-bold text-sm hover:underline">সব রিপোর্টার দেখুন</button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Forms */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-lg sticky top-24">
               {activeTab === 'news' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-blue" /> নতুন নিউজ</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? 'নিউজ আপডেট করুন' : 'নতুন নিউজ'}
+                    </h2>
+                    {editingId && (
+                      <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <XCircle size={20} />
+                      </button>
+                    )}
+                  </div>
                   <form onSubmit={handleNewsSubmit} className="space-y-4">
                     <input type="text" required value={newsForm.title} onChange={(e) => setNewsForm({...newsForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="নিউজ টাইটেল" />
                     <div className="grid grid-cols-2 gap-4">
@@ -387,7 +644,17 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'reporters' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-blue" /> নতুন রিপোর্টার</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? 'রিপোর্টার আপডেট করুন' : 'নতুন রিপোর্টার'}
+                    </h2>
+                    {editingId && (
+                      <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <XCircle size={20} />
+                      </button>
+                    )}
+                  </div>
                   <form onSubmit={handleReporterSubmit} className="space-y-4">
                     <input type="text" required value={reporterForm.name} onChange={(e) => setReporterForm({...reporterForm, name: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="নাম" />
                     <input type="text" required value={reporterForm.designation} onChange={(e) => setReporterForm({...reporterForm, designation: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="পদবী" />
@@ -421,7 +688,17 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'media' && (
                 <>
-                  <h2 className="text-xl font-bold mb-1 flex items-center gap-2"><Plus size={20} className="text-sami-blue" /> নতুন মিডিয়া</h2>
+                  <div className="flex items-center justify-between mb-1">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? 'মিডিয়া আপডেট করুন' : 'নতুন মিডিয়া'}
+                    </h2>
+                    {editingId && (
+                      <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <XCircle size={20} />
+                      </button>
+                    )}
+                  </div>
                   <p className="text-[10px] text-gray-500 mb-6">এখানে আপলোড করা ছবি ও ভিডিও সরাসরি "মিডিয়া" পেজে দেখা যাবে।</p>
                   <form onSubmit={handleMediaSubmit} className="space-y-4">
                     <input type="text" required value={mediaForm.title} onChange={(e) => setMediaForm({...mediaForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="টাইটেল" />
@@ -518,13 +795,22 @@ export const AdminPanel: React.FC = () => {
                       <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{news.title}</h3>
                       <p className="text-xs text-gray-500 line-clamp-2">{news.content}</p>
                     </div>
-                    <button 
-                      onClick={() => setConfirmDelete({ collection: 'news', id: news.id })} 
-                      className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
-                    >
-                      <Trash2 size={16} />
-                      <span>ডিলিট</span>
-                    </button>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button 
+                        onClick={() => startEditing(news, 'news')} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Edit size={14} />
+                        <span>এডিট</span>
+                      </button>
+                      <button 
+                        onClick={() => setConfirmDelete({ collection: 'news', id: news.id })} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Trash2 size={14} />
+                        <span>ডিলিট</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -536,13 +822,22 @@ export const AdminPanel: React.FC = () => {
                       <p className="text-sm text-sami-blue font-medium">{reporter.designation}</p>
                       <p className="text-xs text-gray-500">{reporter.location} | {reporter.division}</p>
                     </div>
-                    <button 
-                      onClick={() => setConfirmDelete({ collection: 'reporters', id: reporter.id })} 
-                      className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
-                    >
-                      <Trash2 size={16} />
-                      <span>ডিলিট</span>
-                    </button>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button 
+                        onClick={() => startEditing(reporter, 'reporters')} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Edit size={14} />
+                        <span>এডিট</span>
+                      </button>
+                      <button 
+                        onClick={() => setConfirmDelete({ collection: 'reporters', id: reporter.id })} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Trash2 size={14} />
+                        <span>ডিলিট</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -556,13 +851,22 @@ export const AdminPanel: React.FC = () => {
                       <h3 className="font-bold text-gray-900 line-clamp-1">{media.title}</h3>
                       <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{media.type === 'image' ? 'ছবি' : 'ভিডিও'}</p>
                     </div>
-                    <button 
-                      onClick={() => setConfirmDelete({ collection: 'media', id: media.id })} 
-                      className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
-                    >
-                      <Trash2 size={16} />
-                      <span>ডিলিট</span>
-                    </button>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button 
+                        onClick={() => startEditing(media, 'media')} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Edit size={14} />
+                        <span>এডিট</span>
+                      </button>
+                      <button 
+                        onClick={() => setConfirmDelete({ collection: 'media', id: media.id })} 
+                        className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Trash2 size={14} />
+                        <span>ডিলিট</span>
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -600,7 +904,8 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
+      )}
+    </main>
 
       {/* Custom Notification */}
       <AnimatePresence>

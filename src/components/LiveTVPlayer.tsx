@@ -1,46 +1,78 @@
-import React from 'react';
-import { Play, Radio, Maximize2, Volume2 } from 'lucide-react';
+import React, { useState } from 'react';
+import ReactPlayer from 'react-player';
+import { Radio, Loader2, AlertCircle } from 'lucide-react';
 
 export const LiveTVPlayer: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const liveUrl = "https://padmaonline.duckdns.org:8088/SamiTV/index.m3u8";
+  const Player = ReactPlayer as any;
+
   return (
-    <div className="bg-black rounded-sm overflow-hidden relative group aspect-video shadow-2xl">
-      {/* Live Indicator */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-2 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase animate-pulse">
-        <Radio size={12} />
+    <div className="bg-black rounded-sm overflow-hidden relative aspect-video shadow-2xl border border-white/10 group">
+      {/* Live Indicator Overlay */}
+      <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-sm text-xs font-bold uppercase animate-pulse shadow-lg">
+        <Radio size={14} />
         সরাসরি
       </div>
 
-      {/* Video Overlay / Placeholder */}
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform cursor-pointer border border-white/30">
-            <Play size={32} className="text-white fill-white ml-1" />
-          </div>
-          <p className="text-white font-bold text-sm drop-shadow-lg">সামি টিভি লাইভ দেখুন</p>
+      {/* Loading State */}
+      {loading && !error && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900/90 backdrop-blur-sm">
+          <Loader2 size={48} className="text-sami-blue animate-spin mb-4" />
+          <p className="text-white font-medium animate-pulse">লাইভ স্ট্রিম লোড হচ্ছে...</p>
         </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gray-900 p-6 text-center">
+          <AlertCircle size={48} className="text-red-500 mb-4" />
+          <h3 className="text-white font-bold text-lg mb-2">স্ট্রিম লোড করতে সমস্যা হয়েছে</h3>
+          <p className="text-gray-400 text-sm max-w-xs">
+            সার্ভার ডাউন থাকতে পারে অথবা আপনার ইন্টারনেট সংযোগ চেক করুন। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।
+          </p>
+          <button 
+            onClick={() => { setError(false); setLoading(true); }}
+            className="mt-6 bg-sami-blue text-white px-6 py-2 rounded-lg font-bold hover:bg-sami-dark transition-all"
+          >
+            আবার চেষ্টা করুন
+          </button>
+        </div>
+      )}
+
+      {/* Actual Player */}
+      <div className="w-full h-full">
+        {Player && (
+          <Player
+            url={liveUrl}
+            playing={true}
+            controls={true}
+            width="100%"
+            height="100%"
+            onReady={() => setLoading(false)}
+            onError={() => {
+              setError(true);
+              setLoading(false);
+            }}
+            config={{
+              file: {
+                forceHLS: true,
+                attributes: {
+                  controlsList: 'nodownload',
+                  referrerPolicy: 'no-referrer'
+                }
+              }
+            }}
+          />
+        )}
       </div>
 
-      {/* Controls Bar (Visual only for now) */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 flex items-center justify-between bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="flex items-center gap-3">
-          <Play size={16} className="text-white fill-white cursor-pointer" />
-          <Volume2 size={16} className="text-white cursor-pointer" />
-          <div className="w-24 h-1 bg-white/30 rounded-full overflow-hidden">
-            <div className="w-1/2 h-full bg-sami-blue"></div>
-          </div>
-        </div>
-        <Maximize2 size={16} className="text-white cursor-pointer" />
+      {/* Branding Overlay (Hidden when playing, or subtle) */}
+      <div className="absolute bottom-12 right-4 pointer-events-none opacity-30 group-hover:opacity-60 transition-opacity">
+        <img src="/logo.png" alt="Sami TV" className="h-8 w-auto grayscale brightness-200" />
       </div>
-
-      {/* Actual Iframe (Placeholder for real stream) */}
-      {/* In a real scenario, replace with actual stream URL */}
-      <iframe 
-        src="https://www.youtube.com/embed/live_stream?channel=UC_YOUR_CHANNEL_ID_HERE&autoplay=0&mute=1" 
-        className="w-full h-full opacity-40"
-        title="SAMI TV Live"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
     </div>
   );
 };

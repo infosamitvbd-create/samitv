@@ -94,17 +94,17 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
         style={{ scaleX }}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-6 print:block">
         {/* Main Content */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          className="lg:col-span-8 bg-white rounded-sm news-card-shadow overflow-hidden print:shadow-none"
+          className="lg:col-span-8 bg-white rounded-sm news-card-shadow overflow-hidden print:shadow-none print:p-0"
         >
           {/* Print Header */}
           <div className="hidden print:block border-b-2 border-sami-blue pb-4 mb-6 text-center">
-            <h1 className="text-2xl font-bold text-sami-blue">সামি টিভি (SAMI TV)</h1>
-            <p className="text-[10px] text-gray-500">দিগপাইত, জামালপুর | www.samitv.com</p>
+            <h1 className="text-3xl font-bold text-sami-blue">সামি টিভি (SAMI TV)</h1>
+            <p className="text-sm text-gray-500">দিগপাইত, জামালপুর | www.samitv.com</p>
           </div>
 
           {/* Header */}

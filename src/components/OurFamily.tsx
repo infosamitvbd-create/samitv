@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, User, Phone, Mail, Filter, ChevronRight } from 'lucide-react';
+import { MapPin, User, Phone, Mail, Filter, ChevronRight, Users, Search, Globe } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 
@@ -10,6 +10,7 @@ export const OurFamily: React.FC = () => {
   const [reporters, setReporters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDivision, setSelectedDivision] = useState('সব');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'reporters'), orderBy('name', 'asc'));
@@ -23,100 +24,200 @@ export const OurFamily: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  const filteredReporters = selectedDivision === 'সব' 
-    ? reporters 
-    : reporters.filter(r => r.division === selectedDivision);
+  const filteredReporters = reporters.filter(rep => {
+    const matchesDivision = selectedDivision === 'সব' || rep.division === selectedDivision;
+    const matchesSearch = rep.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         rep.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         rep.designation.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesDivision && matchesSearch;
+  });
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      className="bg-white p-6 rounded-sm news-card-shadow"
+      initial={{ opacity: 0, y: 20 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      className="bg-white rounded-sm news-card-shadow overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-8 border-b-2 border-sami-blue pb-2">
-        <h2 className="text-2xl font-bold text-sami-blue">আওয়ার ফ্যামিলি (SAMI TV Parivar)</h2>
-        <span className="text-xs text-gray-400">মোট সদস্য: {filteredReporters.length} জন</span>
+      {/* Professional Header Section */}
+      <div className="relative bg-gradient-to-r from-sami-dark to-sami-blue py-20 px-8 text-center overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-red-600 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+        </div>
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-blue-100 text-xs font-bold uppercase tracking-widest mb-6 border border-white/10">
+            <Users size={14} /> আমাদের পরিবার
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">সামী টিভি পরিবার</h1>
+          <div className="w-24 h-1.5 bg-red-600 mx-auto rounded-full mb-6"></div>
+          <p className="text-blue-100 max-w-2xl mx-auto text-lg font-medium">
+            সারাদেশে ছড়িয়ে থাকা আমাদের সাহসী ও দক্ষ সংবাদকর্মীদের তালিকা। বস্তুনিষ্ঠ সংবাদ সংগ্রহে যারা দিনরাত নিরলস কাজ করে যাচ্ছেন।
+          </p>
+        </div>
       </div>
 
-      {/* Filter Section */}
-      <div className="mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-        <div className="flex items-center gap-2 mb-4 text-gray-700 font-bold">
-          <Filter size={18} className="text-sami-blue" />
-          <span>বিভাগ অনুযায়ী খুঁজুন:</span>
+      <div className="p-6 lg:p-10">
+        {/* Filter & Search Controls */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-12 items-end">
+          <div className="flex-1 w-full">
+            <div className="flex items-center gap-2 mb-3 text-gray-700 font-bold text-sm uppercase tracking-wider">
+              <Filter size={16} className="text-sami-blue" />
+              <span>বিভাগ অনুযায়ী ফিল্টার করুন</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {divisions.map((division) => (
+                <button
+                  key={division}
+                  onClick={() => setSelectedDivision(division)}
+                  className={`px-5 py-2.5 rounded-xl font-bold transition-all text-sm border ${
+                    selectedDivision === division
+                      ? 'bg-sami-blue text-white border-sami-blue shadow-lg shadow-sami-blue/20 scale-105'
+                      : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200'
+                  }`}
+                >
+                  {division}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="w-full lg:w-80">
+            <div className="flex items-center gap-2 mb-3 text-gray-700 font-bold text-sm uppercase tracking-wider">
+              <Search size={16} className="text-sami-blue" />
+              <span>সদস্য খুঁজুন</span>
+            </div>
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="নাম বা এলাকা দিয়ে খুঁজুন..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all text-sm"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {divisions.map((division) => (
-            <button
-              key={division}
-              onClick={() => setSelectedDivision(division)}
-              className={`px-4 py-2 rounded-xl font-bold transition-all text-sm ${
-                selectedDivision === division
-                  ? 'bg-sami-blue text-white shadow-md scale-105'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-              }`}
+
+        <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-2 text-gray-900 font-bold">
+            <Globe size={20} className="text-sami-blue" />
+            <span className="text-lg">সংবাদকর্মী তালিকা</span>
+          </div>
+          <div className="bg-sami-light text-sami-blue px-4 py-1 rounded-full text-xs font-bold">
+            মোট সদস্য: {filteredReporters.length} জন
+          </div>
+        </div>
+        
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 gap-4">
+            <div className="w-12 h-12 border-4 border-sami-blue/20 border-t-sami-blue rounded-full animate-spin"></div>
+            <p className="text-gray-500 font-medium animate-pulse">তথ্য লোড হচ্ছে...</p>
+          </div>
+        ) : filteredReporters.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <AnimatePresence mode="popLayout">
+              {filteredReporters.map((rep) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  key={rep.id}
+                  className="group relative bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col items-center text-center p-8"
+                >
+                  {/* Decorative Background Element */}
+                  <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-gray-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  
+                  <div className="relative z-10 w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl mb-6 group-hover:border-sami-blue transition-all duration-500 transform group-hover:scale-105">
+                    <img 
+                      src={rep.imageUrl || "https://picsum.photos/seed/user/200/200"} 
+                      alt={rep.name} 
+                      className="w-full h-full object-cover" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  </div>
+                  
+                  <div className="relative z-10">
+                    <h3 className="font-bold text-gray-900 text-xl mb-1 group-hover:text-sami-blue transition-colors">{rep.name}</h3>
+                    <div className="inline-block px-3 py-1 bg-sami-light text-sami-blue text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">
+                      {rep.designation}
+                    </div>
+                    
+                    <div className="flex flex-col gap-3 w-full mt-2 pt-6 border-t border-gray-50">
+                      <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
+                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-sami-blue">
+                          <MapPin size={14} />
+                        </div>
+                        <span className="font-medium">{rep.location}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
+                        <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-red-500">
+                          <Globe size={14} />
+                        </div>
+                        <span className="font-medium">বিভাগ: {rep.division}</span>
+                      </div>
+
+                      {rep.phone && (
+                        <a 
+                          href={`tel:${rep.phone}`}
+                          className="flex items-center justify-center gap-2 text-gray-600 text-sm hover:text-green-600 transition-colors"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-green-600">
+                            <Phone size={14} />
+                          </div>
+                          <span className="font-medium">{rep.phone}</span>
+                        </a>
+                      )}
+                      
+                      {rep.email && (
+                        <a 
+                          href={`mailto:${rep.email}`}
+                          className="flex items-center justify-center gap-2 text-gray-600 text-sm hover:text-red-500 transition-colors"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-red-500">
+                            <Mail size={14} />
+                          </div>
+                          <span className="truncate max-w-[150px] font-medium">{rep.email}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <div className="text-center py-32 text-gray-400 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center gap-4">
+            <Users size={48} className="text-gray-200" />
+            <div>
+              <p className="text-lg font-bold text-gray-500">কোনো সদস্য পাওয়া যায়নি</p>
+              <p className="text-sm">অনুগ্রহ করে অন্য কোনো বিভাগ বা নাম দিয়ে চেষ্টা করুন।</p>
+            </div>
+            <button 
+              onClick={() => { setSelectedDivision('সব'); setSearchTerm(''); }}
+              className="mt-2 text-sami-blue font-bold hover:underline"
             >
-              {division}
+              সব সদস্য দেখুন
             </button>
-          ))}
+          </div>
+        )}
+
+        {/* Recruitment Call to Action */}
+        <div className="mt-20 p-10 bg-gray-900 rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-sami-blue/10 rounded-full translate-x-1/2 -translate-y-1/2"></div>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold mb-2">আপনি কি আমাদের সাথে কাজ করতে চান?</h3>
+            <p className="text-gray-400 max-w-xl">
+              সামী টিভি পরিবারে যোগ দিন এবং আপনার এলাকার সংবাদ তুলে ধরুন। আমরা সবসময় দক্ষ ও সাহসী সংবাদকর্মী খুঁজছি।
+            </p>
+          </div>
+          <button className="relative z-10 bg-sami-blue hover:bg-sami-dark text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-sami-blue/20 flex items-center gap-2 group">
+            আবেদন করুন <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
       </div>
-      
-      {loading ? (
-        <div className="text-center py-20 text-gray-500">লোডিং...</div>
-      ) : filteredReporters.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <AnimatePresence mode="popLayout">
-            {filteredReporters.map((rep) => (
-              <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                key={rep.id}
-                className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all p-6 flex flex-col items-center text-center group"
-              >
-                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-sami-light mb-4 group-hover:border-sami-blue transition-colors">
-                  <img 
-                    src={rep.imageUrl} 
-                    alt={rep.name} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                    referrerPolicy="no-referrer" 
-                  />
-                </div>
-                <h3 className="font-bold text-gray-900 text-lg mb-1">{rep.name}</h3>
-                <p className="text-sami-blue text-sm font-bold mb-3">{rep.designation}</p>
-                
-                <div className="flex flex-col gap-2 w-full mt-2 pt-4 border-t border-gray-50">
-                  <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
-                    <MapPin size={14} className="text-sami-blue" />
-                    <span>{rep.location}</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2 text-gray-400 text-[10px]">
-                    <ChevronRight size={12} className="text-sami-blue" />
-                    <span>বিভাগ: {rep.division}</span>
-                  </div>
-                  {rep.phone && (
-                    <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
-                      <Phone size={14} className="text-green-600" />
-                      <span>{rep.phone}</span>
-                    </div>
-                  )}
-                  {rep.email && (
-                    <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
-                      <Mail size={14} className="text-red-500" />
-                      <span className="truncate max-w-[150px]">{rep.email}</span>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      ) : (
-        <div className="text-center py-20 text-gray-400 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-          বর্তমানে কোনো সদস্য তালিকাভুক্ত নেই।
-        </div>
-      )}
     </motion.div>
   );
 };

@@ -12,6 +12,7 @@ import { NewsDetail } from './components/NewsDetail';
 import { AdminPanel } from './components/AdminPanel';
 import { Home } from './components/Home';
 import { LiveTV } from './components/LiveTV';
+import { ContactUs } from './components/ContactUs';
 import { motion, AnimatePresence } from 'motion/react';
 import { Download, Phone, Info, ShieldAlert, ArrowLeft, Lock, Facebook, Youtube } from 'lucide-react';
 
@@ -43,6 +44,7 @@ export default function App() {
       case '/family': return <OurFamily key="family" />;
       case '/media': return <Media key="media" />;
       case '/live': return <LiveTV key="live" />;
+      case '/contact': return <ContactUs key="contact" />;
       case '/admin': return <AdminPanel />;
       case '/news-detail': return <NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />;
       case '/category': return <NewsCategory key={currentCategory} category={currentCategory} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />;
@@ -90,21 +92,25 @@ export default function App() {
       <footer className="mt-auto print:hidden">
         <BreakingNews />
         
-        {/* App Download Section */}
-        <div className="bg-sami-light py-8 border-t border-sami-blue/20">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+        {/* App Download Section (Footer) */}
+        <div className="bg-sami-light py-6 border-t border-sami-blue/20">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 max-w-7xl">
             <div className="flex items-center gap-4">
-              <div className="bg-sami-blue p-3 rounded-xl text-white">
-                <Download size={32} />
+              <div className="bg-sami-blue p-3 rounded-xl text-white shadow-lg shadow-sami-blue/20">
+                <Download size={28} />
               </div>
               <div>
-                <h3 className="font-bold text-xl text-sami-dark">সামি টিভি অ্যাপ ডাউনলোড করুন</h3>
-                <p className="text-sm text-gray-600">সরাসরি লাইভ টিভি এবং লেটেস্ট নিউজ পেতে আজই ডাউনলোড করুন</p>
+                <h3 className="font-bold text-lg text-sami-dark">সামি টিভি অ্যাপ ডাউনলোড করুন</h3>
+                <p className="text-xs text-gray-600">লাইভ টিভি এবং লেটেস্ট নিউজ পেতে আজই ডাউনলোড করুন</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <button className="bg-black text-white px-6 py-3 rounded-lg flex items-center gap-3 hover:bg-gray-800 transition-colors">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store" className="h-8" />
+              <button className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-3 hover:bg-gray-800 transition-all hover:scale-105 shadow-md">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store" className="h-6" />
+                <div className="text-left">
+                  <p className="text-[8px] uppercase font-bold opacity-70">Get it on</p>
+                  <p className="text-sm font-bold">Google Play</p>
+                </div>
               </button>
             </div>
           </div>
@@ -122,8 +128,7 @@ export default function App() {
                 />
               </div>
               <p className="text-sm text-gray-400 leading-relaxed">
-                সামি টেলিভিশন, দিগপাইত জামালপুর।<br />
-                একটি আধুনিক ও নিরপেক্ষ সংবাদ মাধ্যম।
+                দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার নীতি মেনে সংবাদ সংগ্রহ ও প্রচারে বিশ্বাসী আমরা। এতে কোনো দল, গোষ্ঠী বা মতবাদের প্রতি পক্ষপাত করা হয় না। থাকে, বাংলায় কথা বলে । খবরের ভেতরের খবর ও বিশ্লেষণে সর্বোচ্চ উৎকর্ষতা বজায় রাখার চেষ্টা করে সামী টিভি ।
               </p>
               <div className="mt-6 flex gap-3">
                 <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-blue transition-all">
@@ -149,7 +154,6 @@ export default function App() {
               <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">দ্রুত লিঙ্ক</h3>
               <ul className="text-sm text-gray-400 space-y-3">
                 <li><button onClick={() => handleNavigate('/live')} className="hover:text-white transition-colors">লাইভ টিভি</button></li>
-                <li><button onClick={() => handleNavigate('/download')} className="hover:text-white transition-colors">ডাউনলোডিং প্যারামিটার</button></li>
                 <li><button onClick={() => handleNavigate('/terms')} className="hover:text-white transition-colors">শর্ত ও নিয়মাবলী</button></li>
                 <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-white transition-colors">গোপনীয়তা নীতি</button></li>
               </ul>
@@ -157,7 +161,7 @@ export default function App() {
 
             <div>
               <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">বিভাগসমূহ</h3>
-              <ul className="text-sm text-gray-400 grid grid-cols-2 gap-3">
+              <ul className="text-sm font-bold text-gray-400 grid grid-cols-2 gap-3">
                 <li><button onClick={() => handleNavigate('/category/জাতীয়')} className="hover:text-white transition-colors">জাতীয়</button></li>
                 <li><button onClick={() => handleNavigate('/category/রাজনীতি')} className="hover:text-white transition-colors">রাজনীতি</button></li>
                 <li><button onClick={() => handleNavigate('/category/সারাদেশ')} className="hover:text-white transition-colors">সারাদেশ</button></li>
@@ -165,6 +169,7 @@ export default function App() {
                 <li><button onClick={() => handleNavigate('/family')} className="hover:text-white transition-colors">আওয়ার ফ্যামিলি</button></li>
                 <li><button onClick={() => handleNavigate('/media')} className="hover:text-white transition-colors">মিডিয়া</button></li>
                 <li><button onClick={() => handleNavigate('/about')} className="hover:text-white transition-colors">আমাদের সম্পর্কে</button></li>
+                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-white transition-colors text-sami-blue">যোগাযোগ</button></li>
               </ul>
             </div>
 
@@ -182,6 +187,7 @@ export default function App() {
           </div>
 
           <div className="container mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center">
+            <p className="text-sm text-gray-400 mb-2">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
             <p className="text-xs text-gray-500">
               Website Developer by Emran Hasan Sami | &copy; {new Date().getFullYear()} SAMI TV. All rights reserved.
             </p>
