@@ -33,7 +33,14 @@ export const Sidebar: React.FC = () => {
   return (
     <div className="flex flex-col gap-6">
       {/* National Anthem Player */}
-      <div className="bg-white rounded-sm news-card-shadow overflow-hidden border-t-4 border-green-600">
+      <div 
+        onClick={() => {
+          const audio = document.getElementById('anthem-audio') as HTMLAudioElement;
+          if (isPlaying) audio.pause();
+          else audio.play();
+        }}
+        className="bg-white rounded-sm news-card-shadow overflow-hidden border-t-4 border-green-600 cursor-pointer hover:bg-green-50/30 transition-colors"
+      >
         <div className="bg-green-50 px-4 py-2 flex items-center justify-between border-b border-green-100">
           <div className="flex items-center gap-2">
             <Music size={16} className="text-green-700" />
@@ -49,16 +56,11 @@ export const Sidebar: React.FC = () => {
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
           />
-          <button 
-            onClick={() => {
-              const audio = document.getElementById('anthem-audio') as HTMLAudioElement;
-              if (isPlaying) audio.pause();
-              else audio.play();
-            }}
+          <div 
             className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-colors"
           >
             {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} className="ml-1" fill="currentColor" />}
-          </button>
+          </div>
           <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
             <motion.div 
               animate={isPlaying ? { x: ["-100%", "100%"] } : { x: "-100%" }}

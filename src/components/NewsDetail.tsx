@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring } from 'motion/react';
-import { ArrowLeft, Clock, User, Share2, Tag, Printer, MapPin, Facebook, Twitter, MessageCircle, Copy, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Clock, User, Share2, Tag, Printer, MapPin, Facebook, Twitter, MessageCircle, Copy, Check, ChevronRight, Download } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
+import html2canvas from 'html2canvas';
 
 interface NewsDetailProps {
   news: any;
@@ -15,6 +16,8 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
   const [sidebarAds, setSidebarAds] = useState<any[]>([]);
   const [contentAds, setContentAds] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const newsRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -51,6 +54,27 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownload = async () => {
+    if (!newsRef.current) return;
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(newsRef.current, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
+      const link = document.createElement('a');
+      link.download = `${news.title || 'news'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error("Download Error: ", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleCopyLink = () => {
@@ -94,6 +118,14 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
               </button>
               <div className="flex items-center gap-2">
                 <button 
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="p-2 text-gray-500 hover:text-sami-blue hover:bg-gray-50 rounded-full transition-all disabled:opacity-50"
+                  title="ডাউনলোড করুন"
+                >
+                  <Download size={20} className={isDownloading ? 'animate-bounce' : ''} />
+                </button>
+                <button 
                   onClick={handlePrint}
                   className="p-2 text-gray-500 hover:text-sami-blue hover:bg-gray-50 rounded-full transition-all"
                   title="প্রিন্ট করুন"
@@ -103,7 +135,22 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
               </div>
             </div>
             
-            <div className="flex flex-wrap items-center gap-3 mb-6">
+            <div ref={newsRef} className="bg-white">
+              {/* Logo for Download/Print */}
+              <div className="hidden print:block mb-6 text-center border-b-2 border-sami-blue pb-4">
+                <h1 className="text-3xl font-bold text-sami-blue">সামি টিভি (SAMI TV)</h1>
+                <p className="text-xs text-gray-500">দিগপাইত, জামালপুর | www.samitv.com</p>
+              </div>
+              
+              {/* Also show logo during download capture */}
+              {isDownloading && (
+                <div className="mb-6 text-center border-b-2 border-sami-blue pb-4">
+                  <h1 className="text-3xl font-bold text-sami-blue">সামি টিভি (SAMI TV)</h1>
+                  <p className="text-xs text-gray-500">দিগপাইত, জামালপুর | www.samitv.com</p>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3 mb-6">
               <span className="bg-sami-blue text-white px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-wider">
                 {news.category}
               </span>
@@ -168,24 +215,27 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news, onBack, onNewsClic
                 </button>
               </div>
             </div>
+
+            {/* Content */}
+            <div className="p-4 sm:p-6 lg:p-8">
+              <div className="aspect-video w-full rounded-sm overflow-hidden mb-8 shadow-lg">
+                <img 
+                  src={news.imageUrl} 
+                  alt={news.title} 
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+
+              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap font-sans text-lg">
+                {news.content}
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-4 sm:p-6 lg:p-8">
-            <div className="aspect-video w-full rounded-sm overflow-hidden mb-8 shadow-lg">
-              <img 
-                src={news.imageUrl} 
-                alt={news.title} 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-
-            <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap font-sans text-lg">
-              {news.content}
-            </div>
-
-            {/* Content Ad */}
+        <div className="p-4 sm:p-6 lg:p-8">
+          {/* Content Ad */}
             {contentAds.length > 0 && (
               <div className="my-10">
                 <a 
