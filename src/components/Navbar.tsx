@@ -28,7 +28,7 @@ const otherNavItems: NavItem[] = [
   { label: 'মিডিয়া', href: '/media' },
   { label: 'আমাদের সম্পর্কে', href: '/about' },
   { label: 'যোগাযোগ', href: '/contact' },
-  { label: 'ডাউনলোড', href: '/download' },
+  { label: 'ডাউনলিংক প্যারামিটার', href: '/downlink' },
 ];
 
 export const Navbar: React.FC<{ 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
 import { BreakingNews } from './components/BreakingNews';
@@ -13,64 +14,36 @@ import { AdminPanel } from './components/AdminPanel';
 import { Home } from './components/Home';
 import { LiveTV } from './components/LiveTV';
 import { ContactUs } from './components/ContactUs';
+import { DownlinkParameters } from './components/DownlinkParameters';
+import { TermsAndConditions } from './components/TermsAndConditions';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { motion, AnimatePresence } from 'motion/react';
 import { Download, Phone, Info, ShieldAlert, ArrowLeft, Lock, Facebook, Youtube } from 'lucide-react';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('/');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentCategory, setCurrentCategory] = useState('');
   const [selectedNews, setSelectedNews] = useState<any>(null);
 
   const handleNavigate = (page: string) => {
-    if (page.startsWith('/category/')) {
-      setCurrentCategory(page.replace('/category/', ''));
-      setCurrentPage('/category');
-    } else {
-      setCurrentPage(page);
-    }
+    navigate(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNewsClick = (news: any) => {
     setSelectedNews(news);
-    setCurrentPage('/news-detail');
+    navigate(`/news/${news.id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case '/': return <Home onNavigate={handleNavigate} onNewsClick={handleNewsClick} />;
-      case '/about': return <AboutUs key="about" />;
-      case '/family': return <OurFamily key="family" />;
-      case '/media': return <Media key="media" />;
-      case '/live': return <LiveTV key="live" />;
-      case '/contact': return <ContactUs key="contact" />;
-      case '/admin': return <AdminPanel />;
-      case '/news-detail': return <NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />;
-      case '/category': return <NewsCategory key={currentCategory} category={currentCategory} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />;
-      default: return (
-        <motion.div 
-          key="placeholder"
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          className="bg-white p-12 rounded-sm news-card-shadow text-center"
-        >
-          <Info size={48} className="mx-auto text-sami-blue mb-4" />
-          <h2 className="text-2xl font-bold mb-2">{currentPage.replace('/', '').toUpperCase()} Page</h2>
-          <p className="text-gray-500">This section is coming soon...</p>
-          <button onClick={() => handleNavigate('/')} className="mt-6 bg-sami-blue text-white px-6 py-2 rounded-md">Back to Home</button>
-        </motion.div>
-      );
-    }
   };
 
   return (
     <div className="min-h-screen flex flex-col font-sans selection:bg-sami-blue selection:text-white">
       <div className="print:hidden">
-        <Header onNavigate={handleNavigate} currentPage={currentPage} />
+        <Header onNavigate={handleNavigate} currentPage={location.pathname} />
         <Navbar 
           onNavigate={handleNavigate} 
-          currentPage={currentPage} 
+          currentPage={location.pathname} 
           currentCategory={currentCategory} 
         />
       </div>
@@ -78,13 +51,39 @@ export default function App() {
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentPage + currentCategory}
+            key={location.pathname}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
           >
-            {renderPage()}
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<Home onNavigate={handleNavigate} onNewsClick={handleNewsClick} />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/family" element={<OurFamily />} />
+              <Route path="/media" element={<Media />} />
+              <Route path="/live" element={<LiveTV />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/downlink" element={<DownlinkParameters />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/news/:newsId" element={<NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />} />
+              <Route path="/category/:category" element={<CategoryWrapper onNavigate={handleNavigate} onNewsClick={handleNewsClick} setCurrentCategory={setCurrentCategory} />} />
+              <Route path="*" element={
+                <motion.div 
+                  key="placeholder"
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  className="bg-white p-12 rounded-sm news-card-shadow text-center"
+                >
+                  <Info size={48} className="mx-auto text-sami-blue mb-4" />
+                  <h2 className="text-2xl font-bold mb-2">Page Not Found</h2>
+                  <p className="text-gray-500">The page you are looking for does not exist.</p>
+                  <button onClick={() => handleNavigate('/')} className="mt-6 bg-sami-blue text-white px-6 py-2 rounded-md">Back to Home</button>
+                </motion.div>
+              } />
+            </Routes>
           </motion.div>
         </AnimatePresence>
       </main>
@@ -154,6 +153,7 @@ export default function App() {
               <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">দ্রুত লিঙ্ক</h3>
               <ul className="text-sm text-gray-400 space-y-3">
                 <li><button onClick={() => handleNavigate('/live')} className="hover:text-white transition-colors">লাইভ টিভি</button></li>
+                <li><button onClick={() => handleNavigate('/downlink')} className="hover:text-white transition-colors">ডাউনলিংক প্যারামিটার</button></li>
                 <li><button onClick={() => handleNavigate('/terms')} className="hover:text-white transition-colors">শর্ত ও নিয়মাবলী</button></li>
                 <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-white transition-colors">গোপনীয়তা নীতি</button></li>
               </ul>
@@ -187,7 +187,7 @@ export default function App() {
           </div>
 
           <div className="container mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center">
-            <p className="text-sm text-gray-400 mb-2">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
+            <p className="text-sm text-gray-400 mb-2 font-bold">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
             <p className="text-xs text-gray-500">
               Website Developer by Emran Hasan Sami | &copy; {new Date().getFullYear()} SAMI TV. All rights reserved.
             </p>
@@ -206,4 +206,13 @@ export default function App() {
       </button>
     </div>
   );
+}
+
+function CategoryWrapper({ onNavigate, onNewsClick, setCurrentCategory }: any) {
+  const { category } = useParams();
+  useEffect(() => {
+    if (category) setCurrentCategory(category);
+  }, [category, setCurrentCategory]);
+  
+  return <NewsCategory key={category} category={category || ''} onBack={() => onNavigate('/')} onNewsClick={onNewsClick} />;
 }

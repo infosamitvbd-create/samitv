@@ -40,12 +40,12 @@ export const Header: React.FC<{
               লাইভ টিভি
             </button>
             <button 
-              onClick={() => onNavigate('/download')} 
+              onClick={() => onNavigate('/downlink')} 
               className={`text-[9px] sm:text-[10px] px-2 py-1 rounded transition-all shadow-sm font-bold ${
-                currentPage === '/download' ? 'bg-black text-white' : 'bg-sami-blue text-white hover:bg-sami-dark'
+                currentPage === '/downlink' ? 'bg-black text-white' : 'bg-sami-blue text-white hover:bg-sami-dark'
               }`}
             >
-              ডাউনলোড
+              ডাউনলিংক প্যারামিটার
             </button>
             <button 
               onClick={() => onNavigate('/terms')} 

@@ -1,12 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone, MapPin, Clock, Send, Facebook, Youtube, Twitter, Globe, MessageSquare } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, Facebook, Youtube, Twitter, Globe, MessageSquare, CheckCircle } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export const ContactUs: React.FC = () => {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    subject: 'সাধারণ জিজ্ঞাসা',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    alert('আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।');
+    setIsSubmitting(true);
+    try {
+      await addDoc(collection(db, 'messages'), {
+        ...formData,
+        createdAt: serverTimestamp(),
+        status: 'unread'
+      });
+      setIsSuccess(true);
+      setFormData({ name: '', phone: '', email: '', subject: 'সাধারণ জিজ্ঞাসা', message: '' });
+      setTimeout(() => setIsSuccess(false), 5000);
+    } catch (error) {
+      console.error("Error sending message: ", error);
+      alert('দুঃখিত, বার্তাটি পাঠানো সম্ভব হয়নি। আবার চেষ্টা করুন।');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,64 +99,95 @@ export const ContactUs: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900">আমাদের বার্তা পাঠান</h2>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {isSuccess ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+                <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center shadow-xl">
+                  <CheckCircle size={48} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">বার্তাটি পাঠানো হয়েছে!</h3>
+                  <p className="text-gray-500">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব। ধন্যবাদ।</p>
+                </div>
+                <button 
+                  onClick={() => setIsSuccess(false)}
+                  className="mt-4 px-8 py-2 bg-sami-blue text-white font-bold rounded-lg hover:bg-sami-dark transition-all"
+                >
+                  আরেকটি বার্তা পাঠান
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700">আপনার নাম</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      placeholder="পুরো নাম লিখুন"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700">মোবাইল নম্বর</label>
+                    <input 
+                      type="tel" 
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      placeholder="আপনার মোবাইল নম্বর"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">আপনার নাম</label>
+                  <label className="text-sm font-bold text-gray-700">ইমেইল ঠিকানা (ঐচ্ছিক)</label>
                   <input 
-                    type="text" 
-                    required
-                    placeholder="পুরো নাম লিখুন"
+                    type="email" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    placeholder="আপনার ইমেইল"
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all"
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700">মোবাইল নম্বর</label>
-                  <input 
-                    type="tel" 
-                    required
-                    placeholder="আপনার মোবাইল নম্বর"
+                  <label className="text-sm font-bold text-gray-700">বার্তার বিষয়</label>
+                  <select 
+                    value={formData.subject}
+                    onChange={(e) => setFormData({...formData, subject: e.target.value})}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all"
-                  />
+                  >
+                    <option>সাধারণ জিজ্ঞাসা</option>
+                    <option>বিজ্ঞাপন সংক্রান্ত</option>
+                    <option>অভিযোগ বা পরামর্শ</option>
+                    <option>নিউজ টিপস</option>
+                  </select>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700">ইমেইল ঠিকানা (ঐচ্ছিক)</label>
-                <input 
-                  type="email" 
-                  placeholder="আপনার ইমেইল"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all"
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700">আপনার বার্তা</label>
+                  <textarea 
+                    required
+                    rows={5}
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    placeholder="আপনার বার্তাটি এখানে বিস্তারিত লিখুন..."
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all resize-none"
+                  ></textarea>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700">বার্তার বিষয়</label>
-                <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all">
-                  <option>সাধারণ জিজ্ঞাসা</option>
-                  <option>বিজ্ঞাপন সংক্রান্ত</option>
-                  <option>অভিযোগ বা পরামর্শ</option>
-                  <option>নিউজ টিপস</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700">আপনার বার্তা</label>
-                <textarea 
-                  required
-                  rows={5}
-                  placeholder="আপনার বার্তাটি এখানে বিস্তারিত লিখুন..."
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sami-blue/20 focus:border-sami-blue transition-all resize-none"
-                ></textarea>
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full bg-sami-blue text-white py-4 rounded-lg font-bold text-lg hover:bg-sami-dark transition-all shadow-xl shadow-sami-blue/20 flex items-center justify-center gap-2 group"
-              >
-                বার্তা পাঠান <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </button>
-            </form>
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-sami-blue text-white py-4 rounded-lg font-bold text-lg hover:bg-sami-dark transition-all shadow-xl shadow-sami-blue/20 flex items-center justify-center gap-2 group disabled:opacity-50"
+                >
+                  {isSubmitting ? 'পাঠানো হচ্ছে...' : 'বার্তা পাঠান'} <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Radio, Signal, Globe, Satellite, Clock, Info, ShieldCheck } from 'lucide-react';
+import { Radio, Signal, Globe, Satellite, Clock, Info, ShieldCheck, Zap, Cpu, Activity } from 'lucide-react';
 
 export const DownlinkParameters: React.FC = () => {
   return (
@@ -9,110 +9,144 @@ export const DownlinkParameters: React.FC = () => {
       animate={{ opacity: 1, y: 0 }} 
       className="max-w-7xl mx-auto"
     >
-      {/* Header Section */}
-      <div className="relative bg-gradient-to-br from-sami-dark to-sami-blue py-20 px-8 text-center overflow-hidden rounded-sm news-card-shadow mb-12">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-red-600 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
+      {/* Hero Section */}
+      <div className="relative bg-sami-dark py-24 px-8 text-center overflow-hidden rounded-sm news-card-shadow mb-12 border-b-4 border-red-600">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-sami-blue rounded-full blur-[120px] opacity-30 animate-pulse"></div>
         </div>
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-blue-100 text-xs font-bold uppercase tracking-widest mb-6 border border-white/10">
-            <Satellite size={14} /> স্যাটেলাইট সম্প্রচার
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">ডাউনলিংক প্যারামিটার</h1>
-          <div className="w-24 h-1.5 bg-red-600 mx-auto rounded-full mb-6"></div>
-          <p className="text-blue-100 max-w-2xl mx-auto text-lg font-medium">
-            সামী টিভি শীঘ্রই স্যাটেলাইটের মাধ্যমে আপনার ড্রয়িং রুমে পৌঁছে যাচ্ছে। আমাদের ডাউনলিংক প্যারামিটার সংক্রান্ত সকল তথ্য এখানে পাওয়া যাবে।
-          </p>
-        </div>
-      </div>
-
-      {/* Coming Soon Section */}
-      <div className="bg-white p-12 rounded-sm news-card-shadow text-center border-t-4 border-sami-blue mb-12 relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-sami-light rounded-full opacity-50"></div>
         
         <div className="relative z-10">
-          <div className="w-24 h-24 bg-sami-light text-sami-blue rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
-            <Signal size={48} />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">স্যাটেলাইট ডাউনলিংক প্যারামিটার</h2>
-          <div className="inline-block px-6 py-2 bg-red-600 text-white font-bold rounded-full text-sm uppercase tracking-widest mb-8 shadow-lg shadow-red-600/20">
-            শীঘ্রই আসছে (Coming Soon)
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 bg-red-600/20 backdrop-blur-md px-4 py-1.5 rounded-full text-red-400 text-xs font-bold uppercase tracking-widest mb-8 border border-red-600/30"
+          >
+            <Satellite size={14} className="animate-bounce" /> ব্রডকাস্ট ইঞ্জিনিয়ারিং বিভাগ
+          </motion.div>
+          
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter uppercase italic">
+            স্যাটেলাইট ডাউনলিংক <span className="text-red-600">প্যারামিটার</span>
+          </h1>
+          
+          <p className="text-gray-400 max-w-2xl mx-auto text-lg font-medium leading-relaxed">
+            সামী টিভি (SAMI TV) বঙ্গবন্ধু স্যাটেলাইট-১ এর মাধ্যমে নিরবিচ্ছিন্ন সম্প্রচারের জন্য প্রস্তুত হচ্ছে। কারিগরি তথ্যের জন্য আমাদের সাথেই থাকুন।
+          </p>
+        </div>
+      </div>
+
+      {/* Technical Specs Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="lg:col-span-2 bg-white rounded-sm news-card-shadow overflow-hidden border border-gray-100">
+          <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <Activity size={18} className="text-sami-blue" /> টেকনিক্যাল স্পেসিফিকেশন
+            </h2>
+            <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded font-bold uppercase">Pending Verification</span>
           </div>
           
-          <p className="text-gray-600 max-w-xl mx-auto leading-relaxed mb-12">
-            আমরা আমাদের স্যাটেলাইট সম্প্রচার কার্যক্রমের চূড়ান্ত পর্যায়ে রয়েছি। খুব শীঘ্রই বঙ্গবন্ধু স্যাটেলাইট-১ এর মাধ্যমে সামী টিভি সম্প্রচারিত হবে। ডাউনলিংক ফ্রিকোয়েন্সি, সিম্বল রেট এবং অন্যান্য টেকনিক্যাল প্যারামিটার এখানে আপডেট করা হবে।
-          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/50 text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+                  <th className="px-6 py-4">প্যারামিটার</th>
+                  <th className="px-6 py-4">মান (Value)</th>
+                  <th className="px-6 py-4">স্ট্যাটাস</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {[
+                  { label: 'স্যাটেলাইট নাম', value: 'Bangabandhu Satellite-1 (BS-1)', status: 'Confirmed' },
+                  { label: 'অরবিটাল পজিশন', value: '119.1° East', status: 'Confirmed' },
+                  { label: 'ডাউনলিংক ফ্রিকোয়েন্সি', value: 'TBA (To Be Announced)', status: 'Processing' },
+                  { label: 'পোলারাইজেশন', value: 'Horizontal / Vertical', status: 'Testing' },
+                  { label: 'সিম্বল রেট', value: 'TBA', status: 'Processing' },
+                  { label: 'মড্যুলেশন', value: 'DVB-S2, 8PSK', status: 'Testing' },
+                  { label: 'ভিডিও ফরম্যাট', value: 'MPEG-4 / H.264', status: 'Confirmed' },
+                  { label: 'রেজোলিউশন', value: '1080i (Full HD)', status: 'Confirmed' },
+                ].map((row, i) => (
+                  <tr key={i} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{row.label}</td>
+                    <td className="px-6 py-4 text-sm font-mono text-sami-blue">{row.value}</td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                        row.status === 'Confirmed' ? 'bg-green-100 text-green-700' : 
+                        row.status === 'Testing' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-              <Globe size={32} className="text-sami-blue mx-auto mb-4" />
-              <h3 className="font-bold text-gray-900 mb-2">স্যাটেলাইট</h3>
-              <p className="text-sm text-gray-500">বঙ্গবন্ধু স্যাটেলাইট-১ (BS-1)</p>
+        <div className="space-y-6">
+          <div className="bg-sami-blue text-white p-8 rounded-sm news-card-shadow relative overflow-hidden group">
+            <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+              <Zap size={120} />
             </div>
-            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-              <Radio size={32} className="text-sami-blue mx-auto mb-4" />
-              <h3 className="font-bold text-gray-900 mb-2">কভারেজ</h3>
-              <p className="text-sm text-gray-500">বাংলাদেশ ও দক্ষিণ এশিয়া</p>
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Cpu size={24} /> ডিজিটাল সিগন্যাল
+            </h3>
+            <p className="text-blue-100 text-sm leading-relaxed mb-6">
+              আমরা অত্যাধুনিক ডিজিটাল সিগন্যাল প্রসেসিং প্রযুক্তি ব্যবহার করছি যা প্রতিকূল আবহাওয়ায়ও নিরবিচ্ছিন্ন সম্প্রচার নিশ্চিত করবে।
+            </p>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-white/10 w-fit px-3 py-1 rounded">
+              <ShieldCheck size={12} /> High Availability
             </div>
-            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-              <ShieldCheck size={32} className="text-sami-blue mx-auto mb-4" />
-              <h3 className="font-bold text-gray-900 mb-2">কোয়ালিটি</h3>
-              <p className="text-sm text-gray-500">ফুল এইচডি (Full HD)</p>
+          </div>
+
+          <div className="bg-white p-8 rounded-sm news-card-shadow border border-gray-100">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Info size={20} className="text-red-600" /> কেবল অপারেটরদের জন্য
+            </h3>
+            <p className="text-sm text-gray-500 leading-relaxed mb-6">
+              আপনার কেবল নেটওয়ার্কে সামী টিভি যুক্ত করতে আমাদের টেকনিক্যাল টিমের সাথে যোগাযোগ করুন। 
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 text-sm font-bold text-gray-700">
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-sami-blue">
+                  <Activity size={16} />
+                </div>
+                01912618994
+              </div>
+              <div className="flex items-center gap-3 text-sm font-bold text-gray-700">
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-sami-blue">
+                  <Globe size={16} />
+                </div>
+                info@samitv.com
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Info Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <div className="bg-sami-dark text-white p-10 rounded-sm news-card-shadow flex flex-col justify-center">
-          <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-            <Info size={28} className="text-red-600" />
-            কেবল অপারেটরদের জন্য
-          </h3>
-          <p className="text-gray-300 leading-relaxed mb-8">
-            আপনি যদি একজন কেবল অপারেটর হন এবং আপনার নেটওয়ার্কে সামী টিভি যুক্ত করতে চান, তবে আমাদের টেকনিক্যাল টিমের সাথে যোগাযোগ করুন। সম্প্রচার শুরু হওয়ার সাথে সাথেই আপনাকে প্যারামিটারগুলো ইমেইলের মাধ্যমে পাঠিয়ে দেওয়া হবে।
-          </p>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-              <Clock size={24} className="text-sami-blue" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase font-bold tracking-widest">আপডেটের সময়</p>
-              <p className="font-bold">খুব শীঘ্রই ঘোষণা করা হবে</p>
+      {/* Coverage Map Placeholder */}
+      <div className="bg-white p-10 rounded-sm news-card-shadow border border-gray-100 mb-12 relative overflow-hidden">
+        <div className="flex flex-col md:flex-row items-center gap-10">
+          <div className="flex-1">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">স্যাটেলাইট কভারেজ এরিয়া</h2>
+            <p className="text-gray-500 leading-relaxed mb-6">
+              বঙ্গবন্ধু স্যাটেলাইট-১ এর মাধ্যমে আমরা সমগ্র বাংলাদেশ ছাড়াও ভারত, নেপাল, ভুটান, শ্রীলঙ্কা এবং দক্ষিণ এশিয়ার বিভিন্ন দেশে আমাদের সম্প্রচার পৌঁছে দিচ্ছি। আমাদের সিগন্যাল কভারেজ ম্যাপ শীঘ্রই এখানে প্রকাশ করা হবে।
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {['বাংলাদেশ', 'ভারত', 'নেপাল', 'ভুটান', 'শ্রীলঙ্কা'].map(country => (
+                <span key={country} className="px-4 py-1.5 bg-gray-50 text-gray-600 text-xs font-bold rounded-full border border-gray-100">
+                  {country}
+                </span>
+              ))}
             </div>
           </div>
-        </div>
-
-        <div className="bg-white p-10 rounded-sm news-card-shadow border border-gray-100">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">প্রয়োজনীয় তথ্য</h3>
-          <ul className="space-y-4">
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-sami-light text-sami-blue flex items-center justify-center shrink-0 mt-1">
-                <Signal size={14} />
-              </div>
-              <p className="text-gray-600 text-sm">সম্প্রচার শুরু হলে এখানে ফ্রিকোয়েন্সি (Frequency) আপডেট করা হবে।</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-sami-light text-sami-blue flex items-center justify-center shrink-0 mt-1">
-                <Signal size={14} />
-              </div>
-              <p className="text-gray-600 text-sm">পোলারাইজেশন (Polarization) এবং সিম্বল রেট (Symbol Rate) প্রদান করা হবে।</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-sami-light text-sami-blue flex items-center justify-center shrink-0 mt-1">
-                <Signal size={14} />
-              </div>
-              <p className="text-gray-600 text-sm">মড্যুলেশন (Modulation) এবং FEC সংক্রান্ত তথ্য পাওয়া যাবে।</p>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-sami-light text-sami-blue flex items-center justify-center shrink-0 mt-1">
-                <Signal size={14} />
-              </div>
-              <p className="text-gray-600 text-sm">অডিও ও ভিডিও পিআইডি (PID) তালিকাভুক্ত করা হবে।</p>
-            </li>
-          </ul>
+          <div className="w-full md:w-1/3 aspect-square bg-gray-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-200 group">
+            <div className="text-center group-hover:scale-110 transition-transform duration-500">
+              <Globe size={64} className="text-gray-300 mx-auto mb-4" />
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Map Loading...</p>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>

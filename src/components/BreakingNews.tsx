@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 export const BreakingNews: React.FC = () => {
+  const navigate = useNavigate();
   const [newsList, setNewsList] = useState<any[]>([]);
   const [tickerText, setTickerText] = useState<string | null>(null);
 
@@ -41,7 +43,11 @@ export const BreakingNews: React.FC = () => {
               </span>
             ) : newsList.length > 0 ? (
               newsList.map((news) => (
-                <span key={news.id} className="flex items-center gap-3 text-sm font-medium">
+                <span 
+                  key={news.id} 
+                  onClick={() => navigate(`/news/${news.id}`)}
+                  className="flex items-center gap-3 text-sm font-medium cursor-pointer hover:text-yellow-300 transition-colors"
+                >
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></span>
                   {news.title}
                 </span>

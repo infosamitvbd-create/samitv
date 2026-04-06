@@ -3,13 +3,13 @@ import { auth, db, storage } from '../lib/firebase';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle } from 'lucide-react';
+import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
 const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
 
-type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads';
+type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads' | 'applications' | 'messages';
 
 enum OperationType {
   CREATE = 'create',
@@ -107,6 +107,10 @@ export const AdminPanel: React.FC = () => {
   const [adImageFile, setAdImageFile] = useState<File | null>(null);
   const [adUploadMode, setAdUploadMode] = useState<'url' | 'file'>('url');
 
+  // Applications & Messages State
+  const [applications, setApplications] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ collection: string; id: string } | null>(null);
@@ -175,6 +179,22 @@ export const AdminPanel: React.FC = () => {
       showNotification("বিজ্ঞাপন লোড করতে সমস্যা হয়েছে।", "error");
     });
 
+    // Applications Subscription
+    const qApps = query(collection(db, 'applications'), orderBy('createdAt', 'desc'));
+    const unsubscribeApps = onSnapshot(qApps, (snapshot) => {
+      setApplications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Applications Subscription Error: ", error);
+    });
+
+    // Messages Subscription
+    const qMessages = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+    const unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
+      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Messages Subscription Error: ", error);
+    });
+
     return () => {
       unsubscribeAuth();
       unsubscribeNews();
@@ -182,6 +202,8 @@ export const AdminPanel: React.FC = () => {
       unsubscribeMedia();
       unsubscribeTicker();
       unsubscribeAds();
+      unsubscribeApps();
+      unsubscribeMessages();
     };
   }, []);
 
@@ -511,6 +533,12 @@ export const AdminPanel: React.FC = () => {
           </button>
           <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ads' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <ImageIcon size={18} /> বিজ্ঞাপন
+          </button>
+          <button onClick={() => setActiveTab('applications')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'applications' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <Users size={18} /> আবেদনসমূহ
+          </button>
+          <button onClick={() => setActiveTab('messages')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'messages' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <MessageSquare size={18} /> মেসেজ
           </button>
         </div>
 
@@ -898,6 +926,70 @@ export const AdminPanel: React.FC = () => {
                       <Trash2 size={16} />
                       <span>ডিলিট</span>
                     </button>
+                  </div>
+                ))}
+
+                {activeTab === 'applications' && applications.map((app) => (
+                  <div key={app.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <img src={app.imageUrl} alt="" className="w-24 h-24 rounded-2xl object-cover shadow-md" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-bold text-gray-900">{app.name}</h3>
+                          <span className="text-[10px] bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Pending</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-600 mb-4">
+                          <p className="flex items-center gap-2"><Phone size={14} className="text-sami-blue" /> {app.phone}</p>
+                          <p className="flex items-center gap-2"><Mail size={14} className="text-sami-blue" /> {app.email || 'N/A'}</p>
+                          <p className="flex items-center gap-2"><MapPin size={14} className="text-sami-blue" /> {app.location} ({app.division})</p>
+                          <p className="flex items-center gap-2"><Clock size={14} className="text-sami-blue" /> {app.createdAt?.toDate()?.toLocaleString('bn-BD')}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-gray-100 text-sm text-gray-700 italic">
+                          <p className="font-bold text-gray-900 not-italic mb-1">পূর্ব অভিজ্ঞতা:</p>
+                          {app.experience || 'কোনো অভিজ্ঞতা উল্লেখ করা হয়নি।'}
+                        </div>
+                      </div>
+                      <div className="flex md:flex-col gap-2">
+                        <button 
+                          onClick={() => setConfirmDelete({ collection: 'applications', id: app.id })}
+                          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold text-xs hover:bg-red-100 transition-all"
+                        >
+                          <Trash2 size={16} /> ডিলিট
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {activeTab === 'messages' && messages.map((msg) => (
+                  <div key={msg.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-sami-light text-sami-blue rounded-full flex items-center justify-center font-bold text-xl">
+                          {msg.name.charAt(0)}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900">{msg.name}</h3>
+                          <p className="text-xs text-gray-500">{msg.createdAt?.toDate()?.toLocaleString('bn-BD')}</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">{msg.subject}</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
+                      <p className="flex items-center gap-2"><Phone size={14} className="text-sami-blue" /> {msg.phone}</p>
+                      <p className="flex items-center gap-2"><Mail size={14} className="text-sami-blue" /> {msg.email || 'N/A'}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-gray-100 text-sm text-gray-700 leading-relaxed">
+                      {msg.message}
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <button 
+                        onClick={() => setConfirmDelete({ collection: 'messages', id: msg.id })}
+                        className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
+                      >
+                        <Trash2 size={16} /> ডিলিট করুন
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
