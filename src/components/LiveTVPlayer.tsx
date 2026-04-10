@@ -71,7 +71,12 @@ export const LiveTVPlayer: React.FC = () => {
 
       {/* Branding Overlay (Hidden when playing, or subtle) */}
       <div className="absolute bottom-12 right-4 pointer-events-none opacity-30 group-hover:opacity-60 transition-opacity">
-        <img src="/logo.png" alt="Sami TV" className="h-8 w-auto grayscale brightness-200" />
+        <img 
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
+          alt="Sami TV" 
+          className="h-8 w-auto grayscale brightness-200" 
+          referrerPolicy="no-referrer"
+        />
       </div>
     </div>
   );

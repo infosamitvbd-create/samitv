@@ -65,7 +65,7 @@ export const Navbar: React.FC<{
   };
 
   return (
-    <nav className="bg-sami-blue text-white sticky top-0 z-50 shadow-lg">
+    <nav className="bg-sami-teal text-white sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 max-w-7xl">
         {/* Desktop Menu */}
         <ul className="hidden lg:flex items-center gap-1 font-bold text-[14px] h-full">
@@ -77,9 +77,9 @@ export const Navbar: React.FC<{
                   onClick={() => handleNavClick(item.href)}
                   className={`px-3 h-full flex items-center gap-1 transition-all duration-200 ${
                     isActive 
-                      ? 'bg-white text-sami-blue font-bold' 
+                      ? 'bg-white text-sami-teal font-bold' 
                       : item.isSpecial 
-                        ? 'bg-red-600 hover:bg-red-700 animate-pulse' 
+                        ? 'bg-sami-red hover:bg-red-700 animate-pulse' 
                         : 'hover:bg-white/10'
                   }`}
                 >
@@ -104,13 +104,13 @@ export const Navbar: React.FC<{
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 w-48 bg-white text-gray-800 shadow-2xl rounded-b-sm py-2 border-t-2 border-sami-blue"
+                  className="absolute top-full left-0 w-48 bg-white text-gray-800 shadow-2xl rounded-b-sm py-2 border-t-2 border-sami-red"
                 >
                   {otherNavItems.map((item) => (
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item.href)}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-between ${isItemActive(item.href) ? 'text-sami-blue bg-sami-light/30' : ''}`}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-between ${isItemActive(item.href) ? 'text-sami-red bg-sami-light/30' : ''}`}
                     >
                       {item.label}
                     </button>
@@ -146,7 +146,7 @@ export const Navbar: React.FC<{
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-sami-dark border-t border-sami-blue/20 overflow-hidden"
+            className="lg:hidden bg-sami-dark border-t border-white/10 overflow-hidden"
           >
             <ul className="flex flex-col p-4 gap-2">
               {[...mainNavItems, ...otherNavItems].map((item) => {
@@ -157,10 +157,10 @@ export const Navbar: React.FC<{
                       onClick={() => handleNavClick(item.href)}
                       className={`w-full text-left py-3 px-4 rounded transition-all font-bold ${
                         isActive 
-                          ? 'bg-white text-sami-blue font-bold' 
+                          ? 'bg-white text-sami-teal font-bold' 
                           : item.isSpecial 
-                            ? 'bg-red-600 text-white' 
-                            : 'text-white hover:bg-sami-blue'
+                            ? 'bg-sami-red text-white' 
+                            : 'text-white hover:bg-sami-teal'
                       }`}
                     >
                       {item.label}

@@ -39,17 +39,17 @@ export const Sidebar: React.FC = () => {
           if (isPlaying) audio.pause();
           else audio.play();
         }}
-        className="bg-white rounded-sm news-card-shadow overflow-hidden border-t-4 border-green-600 cursor-pointer hover:bg-green-50/30 transition-colors"
+        className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 cursor-pointer hover:shadow-md transition-all group"
       >
-        <div className="bg-green-50 px-4 py-2 flex items-center justify-between border-b border-green-100">
+        <div className="bg-red-50 px-5 py-3 flex items-center justify-between border-b border-red-100">
           <div className="flex items-center gap-2">
-            <Music size={16} className="text-green-700" />
-            <span className="font-bold text-sm text-green-800">জাতীয় সঙ্গীত</span>
+            <Music size={16} className="text-sami-red" />
+            <span className="font-black text-xs text-sami-red uppercase tracking-wider">জাতীয় সঙ্গীত</span>
           </div>
-          <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-sami-red rounded-full animate-pulse"></div>
         </div>
-        <div className="p-4 flex flex-col items-center gap-3">
-          <p className="text-[10px] text-gray-500 font-medium">আমার সোনার বাংলা</p>
+        <div className="p-6 flex flex-col items-center gap-4">
+          <p className="text-xs text-gray-500 font-bold">আমার সোনার বাংলা</p>
           <audio 
             id="anthem-audio"
             src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Amar_Shonar_Bangla_instrumental.ogg"
@@ -57,63 +57,65 @@ export const Sidebar: React.FC = () => {
             onPause={() => setIsPlaying(false)}
           />
           <div 
-            className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-green-700 transition-colors"
+            className="w-14 h-14 bg-sami-red text-white rounded-full flex items-center justify-center shadow-lg shadow-sami-red/20 group-hover:scale-110 transition-transform"
           >
             {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} className="ml-1" fill="currentColor" />}
           </div>
-          <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+          <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
             <motion.div 
               animate={isPlaying ? { x: ["-100%", "100%"] } : { x: "-100%" }}
               transition={isPlaying ? { repeat: Infinity, duration: 2, ease: "linear" } : {}}
-              className="w-1/2 h-full bg-red-600"
+              className="w-1/2 h-full bg-sami-red"
             />
           </div>
         </div>
       </div>
 
       {/* Live TV Player Widget */}
-      <div className="bg-white rounded-sm news-card-shadow overflow-hidden border-t-4 border-red-600">
-        <div className="bg-red-50 px-4 py-2 flex items-center justify-between border-b border-red-100">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="bg-red-50 px-5 py-3 flex items-center justify-between border-b border-red-100">
           <div className="flex items-center gap-2">
-            <Radio size={16} className="text-red-600" />
-            <span className="font-bold text-sm text-red-800 uppercase tracking-wider">লাইভ টিভি</span>
+            <Radio size={16} className="text-sami-red" />
+            <span className="font-black text-xs text-sami-red uppercase tracking-wider">লাইভ টিভি</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
-            <span className="text-[10px] font-bold text-red-600 uppercase">সরাসরি</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 bg-sami-red rounded-full animate-ping"></div>
+            <span className="text-[10px] font-black text-sami-red uppercase tracking-tighter">সরাসরি</span>
           </div>
         </div>
-        <div className="p-2">
-          <LiveTVPlayer />
+        <div className="p-3">
+          <div className="rounded-xl overflow-hidden shadow-inner bg-black">
+            <LiveTVPlayer />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-sm news-card-shadow overflow-hidden">
-        <div className="flex border-b border-gray-200">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100">
+        <div className="flex border-b border-gray-100">
           <button 
             onClick={() => setActiveTab('latest')}
-            className={`flex-1 py-3 font-bold text-sm transition-colors ${activeTab === 'latest' ? 'bg-sami-blue text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`flex-1 py-4 font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'latest' ? 'bg-sami-red text-white shadow-lg' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
           >
             সর্বশেষ
           </button>
           <button 
             onClick={() => setActiveTab('popular')}
-            className={`flex-1 py-3 font-bold text-sm transition-colors ${activeTab === 'popular' ? 'bg-sami-blue text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`flex-1 py-4 font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'popular' ? 'bg-sami-red text-white shadow-lg' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
           >
             সর্বোচ্চ পঠিত
           </button>
         </div>
-        <div className="p-4 flex flex-col gap-4">
+        <div className="p-5 flex flex-col gap-5">
           {latestNews.map((news, index) => (
-            <div key={news.id} className="flex gap-3 group cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm shrink-0">
+            <div key={news.id} className="flex gap-4 group cursor-pointer">
+              <div className="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 group-hover:bg-sami-red group-hover:text-white flex items-center justify-center font-black text-xs shrink-0 transition-all">
                 {index + 1}
               </div>
-              <div className="flex-1 flex gap-2">
-                <div className="w-16 h-12 shrink-0 overflow-hidden rounded-sm">
-                  <img src={news.img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              <div className="flex-1 flex gap-3">
+                <div className="w-16 h-12 shrink-0 overflow-hidden rounded-lg shadow-sm">
+                  <img src={news.img} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
                 </div>
-                <p className="text-xs font-bold leading-tight group-hover:text-sami-blue transition-colors line-clamp-2">
+                <p className="text-xs font-bold leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
                   {news.title}
                 </p>
               </div>
@@ -130,22 +132,22 @@ export const Sidebar: React.FC = () => {
             href={ad.link || '#'} 
             target={ad.link ? "_blank" : "_self"} 
             rel="noopener noreferrer"
-            className="block bg-white rounded-sm news-card-shadow overflow-hidden group"
+            className="block bg-white rounded-2xl shadow-sm overflow-hidden group border border-gray-100 hover:shadow-md transition-all"
           >
             <div className="relative">
               <img 
                 src={ad.imageUrl} 
                 alt={ad.title} 
-                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" 
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
                 referrerPolicy="no-referrer" 
               />
-              <div className="absolute top-1 right-1 bg-black/50 text-white text-[8px] px-1 rounded uppercase">বিজ্ঞাপন</div>
+              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest">বিজ্ঞাপন</div>
             </div>
           </a>
         ))
       ) : (
-        <div className="bg-gray-100 aspect-[3/4] flex flex-col items-center justify-center text-gray-400 font-bold rounded-sm border-2 border-dashed border-gray-200">
-          <span className="text-xs uppercase tracking-widest mb-2">বিজ্ঞাপন</span>
+        <div className="bg-gray-50 aspect-[3/4] flex flex-col items-center justify-center text-gray-300 font-black rounded-2xl border-2 border-dashed border-gray-200">
+          <span className="text-[10px] uppercase tracking-widest mb-2">বিজ্ঞাপন</span>
           <span className="text-[10px]">এখানে বিজ্ঞাপন দিন</span>
         </div>
       )}

@@ -3,8 +3,9 @@ import { auth, db, storage } from '../lib/firebase';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X } from 'lucide-react';
+import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { SAMILogo } from './SAMILogo';
 
 const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
 const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
@@ -34,8 +35,11 @@ interface FirestoreErrorInfo {
 
 export const AdminPanel: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const [isLocalAdmin, setIsLocalAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [loginInput, setLoginInput] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
 
   const handleFirestoreError = (error: any, operationType: OperationType, path: string | null) => {
     const errInfo: FirestoreErrorInfo = {
@@ -216,7 +220,30 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const handleLogout = () => signOut(auth);
+  const handleCustomLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginInput.username === 'samitv' && loginInput.password === 'samitv') {
+      setIsLocalAdmin(true);
+      setLoginError('');
+      // Persist session for current tab
+      sessionStorage.setItem('sami_admin_auth', 'true');
+    } else {
+      setLoginError('ভুল ইউজারনেম অথবা পাসওয়ার্ড!');
+    }
+  };
+
+  const handleLogout = () => {
+    signOut(auth);
+    setIsLocalAdmin(false);
+    sessionStorage.removeItem('sami_admin_auth');
+  };
+
+  useEffect(() => {
+    const savedAuth = sessionStorage.getItem('sami_admin_auth');
+    if (savedAuth === 'true') {
+      setIsLocalAdmin(true);
+    }
+  }, []);
 
   const uploadFile = async (file: File, path: string) => {
     const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
@@ -474,23 +501,110 @@ export const AdminPanel: React.FC = () => {
 
   if (loading) return <div className="flex items-center justify-center h-screen">লোডিং...</div>;
 
-  if (!user) {
+  if (!isLocalAdmin && (!user || user.email !== 'info.samitv.bd@gmail.com')) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-sami-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <LogIn size={40} className="text-sami-blue" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sami-dark to-sami-red p-4 relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white p-8 sm:p-12 rounded-3xl shadow-2xl max-w-md w-full text-center relative z-10 border border-white/20"
+        >
+          <div className="mb-8">
+            <SAMILogo className="scale-125 mb-4" />
+            <div className="h-1 w-20 bg-sami-red mx-auto rounded-full mt-4"></div>
           </div>
-          <h1 className="text-2xl font-bold mb-2">অ্যাডমিন লগইন</h1>
-          <p className="text-gray-500 mb-8">অ্যাডমিন প্যানেল অ্যাক্সেস করতে লগইন করুন।</p>
-          <button 
-            onClick={handleLogin}
-            className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all"
-          >
-            <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
-            গুগল দিয়ে লগইন করুন
-          </button>
-        </div>
+
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-sami-red/10 text-sami-red rounded-full text-xs font-bold uppercase tracking-widest">
+              <ShieldCheck size={14} />
+              Secure Admin Access
+            </div>
+            
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">অ্যাডমিন লগইন</h1>
+            
+            <form onSubmit={handleCustomLogin} className="space-y-4 text-left">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">ইউজারনেম</label>
+                <input 
+                  type="text" 
+                  required
+                  value={loginInput.username}
+                  onChange={(e) => setLoginInput({...loginInput, username: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-sami-red transition-all font-bold"
+                  placeholder="Username"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড</label>
+                <input 
+                  type="password" 
+                  required
+                  value={loginInput.password}
+                  onChange={(e) => setLoginInput({...loginInput, password: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-sami-red transition-all font-bold"
+                  placeholder="Password"
+                />
+              </div>
+              
+              {loginError && (
+                <p className="text-red-500 text-xs font-bold text-center animate-shake">{loginError}</p>
+              )}
+
+              <button 
+                type="submit"
+                className="w-full bg-sami-red text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-sami-dark transition-all shadow-lg shadow-sami-red/20 hover:shadow-xl active:scale-[0.98]"
+              >
+                <LogIn size={20} />
+                লগইন করুন
+              </button>
+            </form>
+
+            <div className="relative py-4">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400 font-bold">অথবা</span></div>
+            </div>
+            
+            {user ? (
+              <div className="space-y-6">
+                <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
+                  <p className="text-red-600 font-bold text-sm leading-relaxed">
+                    দুঃখিত, আপনার এই প্যানেল অ্যাক্সেস করার অনুমতি নেই।
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-2">Logged in as: {user.email}</p>
+                </div>
+                <button 
+                  onClick={handleLogout}
+                  className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-black transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                >
+                  <LogOut size={20} />
+                  লগ আউট করুন
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <button 
+                  onClick={handleLogin}
+                  className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-[0.98]"
+                >
+                  <div className="bg-white p-1 rounded-full shadow-sm">
+                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
+                  </div>
+                  গুগল দিয়ে লগইন করুন
+                </button>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-12 pt-8 border-t border-gray-100">
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+              &copy; {new Date().getFullYear()} SAMI MULTIMEDIA LTD.
+            </p>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -501,10 +615,10 @@ export const AdminPanel: React.FC = () => {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-sami-blue rounded-lg flex items-center justify-center text-white font-bold">A</div>
+            <div className="w-10 h-10 bg-sami-red rounded-lg flex items-center justify-center text-white font-bold">A</div>
             <div>
               <h1 className="font-bold text-gray-900">অ্যাডমিন প্যানেল</h1>
-              <p className="text-[10px] text-gray-500">{user.email}</p>
+              <p className="text-[10px] text-gray-500">{user?.email || 'Local Admin'}</p>
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 text-red-600 font-bold text-sm hover:bg-red-50 px-4 py-2 rounded-lg transition-all">
@@ -516,28 +630,28 @@ export const AdminPanel: React.FC = () => {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-          <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Layout size={18} /> ড্যাশবোর্ড
           </button>
-          <button onClick={() => setActiveTab('news')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'news' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('news')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'news' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Send size={18} /> নিউজ
           </button>
-          <button onClick={() => setActiveTab('reporters')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'reporters' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('reporters')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'reporters' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Users size={18} /> আওয়ার ফ্যামিলি
           </button>
-          <button onClick={() => setActiveTab('media')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('media')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Film size={18} /> মিডিয়া
           </button>
-          <button onClick={() => setActiveTab('ticker')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ticker' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('ticker')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ticker' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <MessageSquare size={18} /> স্ক্রলিং নিউজ
           </button>
-          <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ads' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ads' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <ImageIcon size={18} /> বিজ্ঞাপন
           </button>
-          <button onClick={() => setActiveTab('applications')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'applications' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('applications')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'applications' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <Users size={18} /> আবেদনসমূহ
           </button>
-          <button onClick={() => setActiveTab('messages')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'messages' ? 'bg-sami-blue text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+          <button onClick={() => setActiveTab('messages')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'messages' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <MessageSquare size={18} /> মেসেজ
           </button>
         </div>
@@ -587,7 +701,7 @@ export const AdminPanel: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Send size={20} className="text-sami-blue" /> সাম্প্রতিক নিউজ
+                  <Send size={20} className="text-sami-red" /> সাম্প্রতিক নিউজ
                 </h3>
                 <div className="space-y-4">
                   {newsList.slice(0, 5).map(news => (
@@ -600,12 +714,12 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-blue font-bold text-sm hover:underline">সব নিউজ দেখুন</button>
+                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব নিউজ দেখুন</button>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Users size={20} className="text-sami-blue" /> নতুন রিপোর্টার
+                  <Users size={20} className="text-sami-red" /> নতুন রিপোর্টার
                 </h3>
                 <div className="space-y-4">
                   {reporters.slice(0, 5).map(rep => (
@@ -613,12 +727,12 @@ export const AdminPanel: React.FC = () => {
                       <img src={rep.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-gray-900 text-sm">{rep.name}</p>
-                        <p className="text-[10px] text-sami-blue">{rep.designation}</p>
+                        <p className="text-[10px] text-sami-red">{rep.designation}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-blue font-bold text-sm hover:underline">সব রিপোর্টার দেখুন</button>
+                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব রিপোর্টার দেখুন</button>
               </div>
             </div>
           </div>
@@ -631,7 +745,7 @@ export const AdminPanel: React.FC = () => {
                 <>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
-                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
                       {editingId ? 'নিউজ আপডেট করুন' : 'নতুন নিউজ'}
                     </h2>
                     {editingId && (
@@ -652,8 +766,8 @@ export const AdminPanel: React.FC = () => {
                     
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setNewsUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'url' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
-                        <button type="button" onClick={() => setNewsUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'file' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
+                        <button type="button" onClick={() => setNewsUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
+                        <button type="button" onClick={() => setNewsUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {newsUploadMode === 'url' ? (
                         <input type="url" required value={newsForm.imageUrl} onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ইমেজ ইউআরএল" />
@@ -663,7 +777,7 @@ export const AdminPanel: React.FC = () => {
                     </div>
 
                     <textarea required rows={6} value={newsForm.content} onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="নিউজ কন্টেন্ট" />
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
                       <Send size={18} /> {isSubmitting ? 'আপলোড হচ্ছে...' : 'পাবলিশ করুন'}
                     </button>
                   </form>
@@ -674,7 +788,7 @@ export const AdminPanel: React.FC = () => {
                 <>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
-                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
                       {editingId ? 'রিপোর্টার আপডেট করুন' : 'নতুন রিপোর্টার'}
                     </h2>
                     {editingId && (
@@ -695,8 +809,8 @@ export const AdminPanel: React.FC = () => {
                     
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setReporterUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'url' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
-                        <button type="button" onClick={() => setReporterUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'file' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
+                        <button type="button" onClick={() => setReporterUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
+                        <button type="button" onClick={() => setReporterUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {reporterUploadMode === 'url' ? (
                         <input type="url" required value={reporterForm.imageUrl} onChange={(e) => setReporterForm({...reporterForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবি ইউআরএল" />
@@ -707,7 +821,7 @@ export const AdminPanel: React.FC = () => {
 
                     <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ফোন (ঐচ্ছিক)" />
                     <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ইমেইল (ঐচ্ছিক)" />
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
                       <Send size={18} /> যোগ করুন
                     </button>
                   </form>
@@ -718,7 +832,7 @@ export const AdminPanel: React.FC = () => {
                 <>
                   <div className="flex items-center justify-between mb-1">
                     <h2 className="text-xl font-bold flex items-center gap-2">
-                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-blue" />}
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
                       {editingId ? 'মিডিয়া আপডেট করুন' : 'নতুন মিডিয়া'}
                     </h2>
                     {editingId && (
@@ -737,8 +851,8 @@ export const AdminPanel: React.FC = () => {
                     
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setMediaUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'url' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
-                        <button type="button" onClick={() => setMediaUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'file' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
+                        <button type="button" onClick={() => setMediaUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
+                        <button type="button" onClick={() => setMediaUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {mediaUploadMode === 'url' ? (
                         <input type="url" required value={mediaForm.imageUrl} onChange={(e) => setMediaForm({...mediaForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="থাম্বনেইল ইমেজ ইউআরএল" />
@@ -750,7 +864,7 @@ export const AdminPanel: React.FC = () => {
                     {mediaForm.type === 'video' && (
                       <input type="url" required value={mediaForm.videoUrl} onChange={(e) => setMediaForm({...mediaForm, videoUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ভিডিও ইউআরএল (Youtube/Direct)" />
                     )}
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
                       <Send size={18} /> আপলোড করুন
                     </button>
                   </form>
@@ -759,10 +873,10 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'ticker' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MessageSquare size={20} className="text-sami-blue" /> স্ক্রলিং নিউজ এডিট</h2>
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MessageSquare size={20} className="text-sami-red" /> স্ক্রলিং নিউজ এডিট</h2>
                   <div className="space-y-4">
                     <textarea rows={4} value={tickerText} onChange={(e) => setTickerText(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="ব্রেকিং নিউজ টেক্সট লিখুন..." />
-                    <button onClick={handleTickerUpdate} disabled={isUpdatingTicker} className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                    <button onClick={handleTickerUpdate} disabled={isUpdatingTicker} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
                       <Save size={18} /> {isUpdatingTicker ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
                     </button>
                   </div>
@@ -771,7 +885,7 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'ads' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-blue" /> নতুন বিজ্ঞাপন</h2>
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-red" /> নতুন বিজ্ঞাপন</h2>
                   <form onSubmit={handleAdSubmit} className="space-y-4">
                     <input type="text" required value={adForm.title} onChange={(e) => setAdForm({...adForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="বিজ্ঞাপন টাইটেল" />
                     <input type="url" value={adForm.link} onChange={(e) => setAdForm({...adForm, link: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="লিঙ্ক (ঐচ্ছিক)" />
@@ -784,8 +898,8 @@ export const AdminPanel: React.FC = () => {
 
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setAdUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'url' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
-                        <button type="button" onClick={() => setAdUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'file' ? 'bg-sami-blue text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
+                        <button type="button" onClick={() => setAdUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>URL</button>
+                        <button type="button" onClick={() => setAdUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {adUploadMode === 'url' ? (
                         <input type="url" required value={adForm.imageUrl} onChange={(e) => setAdForm({...adForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ব্যানার ইমেজ ইউআরএল" />
@@ -794,7 +908,7 @@ export const AdminPanel: React.FC = () => {
                       )}
                     </div>
 
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-blue text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
                       <Send size={18} /> {isSubmitting ? 'আপলোড হচ্ছে...' : 'বিজ্ঞাপন পাবলিশ করুন'}
                     </button>
                   </form>
@@ -807,7 +921,7 @@ export const AdminPanel: React.FC = () => {
           <div className="lg:col-span-2">
             <div className="bg-white p-6 rounded-2xl shadow-lg min-h-[600px]">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Layout size={20} className="text-sami-blue" /> 
+                <Layout size={20} className="text-sami-red" /> 
                 {activeTab === 'news' && 'আপলোড করা নিউজসমূহ'}
                 {activeTab === 'reporters' && 'রিপোর্টার তালিকা'}
                 {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
@@ -819,7 +933,7 @@ export const AdminPanel: React.FC = () => {
                   <div key={news.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
                     <img src={news.imageUrl} alt="" className="w-24 h-20 shrink-0 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[10px] bg-sami-blue/10 text-sami-blue px-2 py-0.5 rounded-full font-bold uppercase">{news.category}</span>
+                      <span className="text-[10px] bg-sami-red/10 text-sami-red px-2 py-0.5 rounded-full font-bold uppercase">{news.category}</span>
                       <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{news.title}</h3>
                       <p className="text-xs text-gray-500 line-clamp-2">{news.content}</p>
                     </div>

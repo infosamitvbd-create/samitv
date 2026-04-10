@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-sami-blue: #004a99;
-  --color-sami-dark: #003366;
-  --color-sami-light: #e6f0ff;
+  --color-sami-red: #e31e24;
+  --color-sami-teal: #e31e24;
+  --color-sami-blue: #e31e24;
+  --color-sami-dark: #8b0000;
+  --color-sami-light: #fff5f5;
+  --color-sami-accent: #ffcc00;
+  --color-red-600: #e31e24;
+  --color-teal-600: #e31e24;
 }
 
 @layer base {

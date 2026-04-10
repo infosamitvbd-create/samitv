@@ -22,11 +22,11 @@ export const Header: React.FC<{
         <div className="flex flex-col items-center gap-3 w-full lg:w-auto">
           <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600">
             <div className="flex items-center gap-1">
-              <MapPin size={14} className="text-sami-blue" />
+              <MapPin size={14} className="text-sami-red" />
               <span>দিগপাইত, জামালপুর</span>
             </div>
             <div className="flex items-center gap-1">
-              <Calendar size={14} className="text-sami-blue" />
+              <Calendar size={14} className="text-sami-red" />
               <span>{dateString}</span>
             </div>
           </div>
@@ -34,7 +34,7 @@ export const Header: React.FC<{
             <button 
               onClick={() => onNavigate('/live')} 
               className={`text-[9px] sm:text-[10px] px-2 py-1 rounded transition-all shadow-sm font-bold ${
-                currentPage === '/live' ? 'bg-black text-white' : 'bg-red-600 text-white hover:bg-red-700'
+                currentPage === '/live' ? 'bg-sami-teal text-white' : 'bg-sami-red text-white hover:bg-red-700'
               }`}
             >
               লাইভ টিভি
@@ -42,7 +42,7 @@ export const Header: React.FC<{
             <button 
               onClick={() => onNavigate('/downlink')} 
               className={`text-[9px] sm:text-[10px] px-2 py-1 rounded transition-all shadow-sm font-bold ${
-                currentPage === '/downlink' ? 'bg-black text-white' : 'bg-sami-blue text-white hover:bg-sami-dark'
+                currentPage === '/downlink' ? 'bg-sami-teal text-white' : 'bg-sami-red text-white hover:bg-red-700'
               }`}
             >
               ডাউনলিংক প্যারামিটার

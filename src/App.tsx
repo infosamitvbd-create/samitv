@@ -38,7 +38,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-sami-blue selection:text-white">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-sami-red selection:text-white">
       <div className="print:hidden">
         <Header onNavigate={handleNavigate} currentPage={location.pathname} />
         <Navbar 
@@ -77,10 +77,10 @@ export default function App() {
                   animate={{ opacity: 1 }} 
                   className="bg-white p-12 rounded-sm news-card-shadow text-center"
                 >
-                  <Info size={48} className="mx-auto text-sami-blue mb-4" />
+                  <Info size={48} className="mx-auto text-sami-red mb-4" />
                   <h2 className="text-2xl font-bold mb-2">Page Not Found</h2>
                   <p className="text-gray-500">The page you are looking for does not exist.</p>
-                  <button onClick={() => handleNavigate('/')} className="mt-6 bg-sami-blue text-white px-6 py-2 rounded-md">Back to Home</button>
+                  <button onClick={() => handleNavigate('/')} className="mt-6 bg-sami-red text-white px-6 py-2 rounded-md">Back to Home</button>
                 </motion.div>
               } />
             </Routes>
@@ -92,10 +92,10 @@ export default function App() {
         <BreakingNews />
         
         {/* App Download Section (Footer) */}
-        <div className="bg-sami-light py-6 border-t border-sami-blue/20">
+        <div className="bg-sami-light py-6 border-t border-sami-red/20">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 max-w-7xl">
             <div className="flex items-center gap-4">
-              <div className="bg-sami-blue p-3 rounded-xl text-white shadow-lg shadow-sami-blue/20">
+              <div className="bg-sami-red p-3 rounded-xl text-white shadow-lg shadow-sami-red/20">
                 <Download size={28} />
               </div>
               <div>
@@ -120,7 +120,7 @@ export default function App() {
             <div className="col-span-1 md:col-span-1">
               <div className="bg-white p-2 rounded inline-block mb-4">
                 <img 
-                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEherA1uXsmj4szGD1Fd-xiaMEiSWfMScY0dtSUBJ0EtbJJgGJ3g685mlKguqkyD1hlqBdecqT_3VT2evjJ-pAoUHTUAxEb9xndqYCFbXxq9YR89dIfzFBHogTf8CyryGgvbOYvnhFsgu5ugqCm9ngBLAv6EqTSBoY8siT7Di4N_mpZG0LRYCiGpheph7_jc/s320/mmmm.png" 
+                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
                   alt="Sami TV" 
                   className="h-16"
                   referrerPolicy="no-referrer"
@@ -130,16 +130,16 @@ export default function App() {
                 দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার নীতি মেনে সংবাদ সংগ্রহ ও প্রচারে বিশ্বাসী আমরা। এতে কোনো দল, গোষ্ঠী বা মতবাদের প্রতি পক্ষপাত করা হয় না। থাকে, বাংলায় কথা বলে । খবরের ভেতরের খবর ও বিশ্লেষণে সর্বোচ্চ উৎকর্ষতা বজায় রাখার চেষ্টা করে সামী টিভি ।
               </p>
               <div className="mt-6 flex gap-3">
-                <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-blue transition-all">
+                <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-red transition-all">
                   <Facebook size={16} />
                 </a>
-                <a href="https://www.youtube.com/@stv2026Banglades" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-600 transition-all">
+                <a href="https://www.youtube.com/@stv2026Banglades" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-red transition-all">
                   <Youtube size={16} />
                 </a>
               </div>
               <div className="mt-6 flex flex-col gap-2">
                 <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Phone size={16} className="text-sami-blue" />
+                  <Phone size={16} className="text-sami-red" />
                   <span>01912618994 / 01939080605</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-300">
@@ -150,7 +150,7 @@ export default function App() {
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">দ্রুত লিঙ্ক</h3>
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">দ্রুত লিঙ্ক</h3>
               <ul className="text-sm text-gray-400 space-y-3">
                 <li><button onClick={() => handleNavigate('/live')} className="hover:text-white transition-colors">লাইভ টিভি</button></li>
                 <li><button onClick={() => handleNavigate('/downlink')} className="hover:text-white transition-colors">ডাউনলিংক প্যারামিটার</button></li>
@@ -160,7 +160,7 @@ export default function App() {
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">বিভাগসমূহ</h3>
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">বিভাগসমূহ</h3>
               <ul className="text-sm font-bold text-gray-400 grid grid-cols-2 gap-3">
                 <li><button onClick={() => handleNavigate('/category/জাতীয়')} className="hover:text-white transition-colors">জাতীয়</button></li>
                 <li><button onClick={() => handleNavigate('/category/রাজনীতি')} className="hover:text-white transition-colors">রাজনীতি</button></li>
@@ -169,19 +169,19 @@ export default function App() {
                 <li><button onClick={() => handleNavigate('/family')} className="hover:text-white transition-colors">আওয়ার ফ্যামিলি</button></li>
                 <li><button onClick={() => handleNavigate('/media')} className="hover:text-white transition-colors">মিডিয়া</button></li>
                 <li><button onClick={() => handleNavigate('/about')} className="hover:text-white transition-colors">আমাদের সম্পর্কে</button></li>
-                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-white transition-colors text-sami-blue">যোগাযোগ</button></li>
+                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-white transition-colors text-sami-red">যোগাযোগ</button></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-blue pl-2">সতর্কবার্তা</h3>
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">সতর্কবার্তা</h3>
               <p className="text-xs text-red-400 leading-relaxed italic">
                 "এই ওয়েবসাইটে কোন লেখা ছবি ভিডিও অনুমতি ছাড়া ব্যবহার করা বেআইনি।"
               </p>
               <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
                 <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Developed By</p>
                 <p className="text-sm font-bold text-white">Emran Hasan Sami</p>
-                <p className="text-[10px] text-sami-blue">Website Developer</p>
+                <p className="text-[10px] text-sami-red">Website Developer</p>
               </div>
             </div>
           </div>
