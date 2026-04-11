@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../lib/firebase';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMILogo } from './SAMILogo';
@@ -10,7 +10,7 @@ import { SAMILogo } from './SAMILogo';
 const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
 const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
 
-type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads' | 'applications' | 'messages';
+type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads' | 'applications' | 'messages' | 'migration';
 
 enum OperationType {
   CREATE = 'create',
@@ -116,6 +116,9 @@ export const AdminPanel: React.FC = () => {
   const [messages, setMessages] = useState<any[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationStats, setMigrationStats] = useState({ total: 0, completed: 0, currentItem: '' });
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ collection: string; id: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -246,9 +249,26 @@ export const AdminPanel: React.FC = () => {
   }, []);
 
   const uploadFile = async (file: File, path: string) => {
-    const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
-    await uploadBytes(fileRef, file);
-    return await getDownloadURL(fileRef);
+    return new Promise<string>((resolve, reject) => {
+      const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(fileRef, file);
+
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        }, 
+        (error) => {
+          console.error("Upload Error: ", error);
+          reject(error);
+        }, 
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setUploadProgress(0);
+          resolve(downloadURL);
+        }
+      );
+    });
   };
 
   const handleNewsSubmit = async (e: React.FormEvent) => {
@@ -499,14 +519,70 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  const migrateImagesToStorage = async () => {
+    if (!confirm('আপনি কি নিশ্চিত যে আপনি সব ছবি ফায়ারবেস স্টোরেজে ট্রান্সফার করতে চান? এটি কিছু সময় নিতে পারে।')) return;
+    
+    setIsMigrating(true);
+    const totalItems = newsList.length + reporters.length + mediaList.length + adsList.length;
+    let completedCount = 0;
+    
+    setMigrationStats({ total: totalItems, completed: 0, currentItem: 'শুরু হচ্ছে...' });
+
+    const migrateCollection = async (list: any[], collectionName: string) => {
+      for (const item of list) {
+        setMigrationStats(prev => ({ ...prev, currentItem: `${collectionName}: ${item.title || item.name || item.id}` }));
+        
+        const imageUrl = item.imageUrl;
+        // Check if it's already in storage
+        if (imageUrl && !imageUrl.includes('firebasestorage.googleapis.com')) {
+          try {
+            // Fetch image
+            const response = await fetch(imageUrl);
+            if (!response.ok) throw new Error('Fetch failed');
+            const blob = await response.blob();
+            const file = new File([blob], `migrated_${Date.now()}.jpg`, { type: blob.type });
+            
+            // Upload to storage
+            const storagePath = collectionName === 'news' ? 'news' : collectionName === 'reporters' ? 'reporters' : collectionName === 'media' ? 'media' : 'ads';
+            const newUrl = await uploadFile(file, storagePath);
+            
+            // Update firestore
+            await updateDoc(doc(db, collectionName, item.id), {
+              imageUrl: newUrl,
+              migratedAt: serverTimestamp()
+            });
+          } catch (error) {
+            console.error(`Migration error for ${item.id}: `, error);
+          }
+        }
+        completedCount++;
+        setMigrationStats(prev => ({ ...prev, completed: completedCount }));
+      }
+    };
+
+    try {
+      await migrateCollection(newsList, 'news');
+      await migrateCollection(reporters, 'reporters');
+      await migrateCollection(mediaList, 'media');
+      await migrateCollection(adsList, 'ads');
+      showNotification('সব ছবি সফলভাবে ট্রান্সফার হয়েছে!');
+    } catch (error) {
+      console.error("Migration failed: ", error);
+      showNotification('ট্রান্সফার প্রসেসে সমস্যা হয়েছে। কিছু ছবিতে CORS সমস্যা থাকতে পারে।', 'error');
+    } finally {
+      setIsMigrating(false);
+      setMigrationStats({ total: 0, completed: 0, currentItem: '' });
+    }
+  };
+
   if (loading) return <div className="flex items-center justify-center h-screen">লোডিং...</div>;
 
   if (!isLocalAdmin && (!user || user.email !== 'info.samitv.bd@gmail.com')) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sami-dark to-sami-red p-4 relative overflow-hidden">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sami-dark to-sami-teal p-4 relative overflow-hidden">
         {/* Decorative Elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-sami-red/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-sami-red/5 rounded-full blur-3xl"></div>
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -654,6 +730,9 @@ export const AdminPanel: React.FC = () => {
           <button onClick={() => setActiveTab('messages')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'messages' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
             <MessageSquare size={18} /> মেসেজ
           </button>
+          <button onClick={() => setActiveTab('migration')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'migration' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
+            <Upload size={18} /> ডাটা ট্রান্সফার
+          </button>
         </div>
 
         {activeTab === 'dashboard' ? (
@@ -777,8 +856,19 @@ export const AdminPanel: React.FC = () => {
                     </div>
 
                     <textarea required rows={6} value={newsForm.content} onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="নিউজ কন্টেন্ট" />
+                    
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${uploadProgress}%` }}
+                          className="h-full bg-sami-red"
+                        />
+                      </div>
+                    )}
+
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? 'আপলোড হচ্ছে...' : 'পাবলিশ করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'পাবলিশ করুন'}
                     </button>
                   </form>
                 </>
@@ -821,8 +911,19 @@ export const AdminPanel: React.FC = () => {
 
                     <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ফোন (ঐচ্ছিক)" />
                     <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ইমেইল (ঐচ্ছিক)" />
+                    
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${uploadProgress}%` }}
+                          className="h-full bg-sami-red"
+                        />
+                      </div>
+                    )}
+
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> যোগ করুন
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'যোগ করুন'}
                     </button>
                   </form>
                 </>
@@ -864,8 +965,19 @@ export const AdminPanel: React.FC = () => {
                     {mediaForm.type === 'video' && (
                       <input type="url" required value={mediaForm.videoUrl} onChange={(e) => setMediaForm({...mediaForm, videoUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ভিডিও ইউআরএল (Youtube/Direct)" />
                     )}
+
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${uploadProgress}%` }}
+                          className="h-full bg-sami-red"
+                        />
+                      </div>
+                    )}
+
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> আপলোড করুন
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'আপলোড করুন'}
                     </button>
                   </form>
                 </>
@@ -908,8 +1020,18 @@ export const AdminPanel: React.FC = () => {
                       )}
                     </div>
 
+                    {uploadProgress > 0 && (
+                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${uploadProgress}%` }}
+                          className="h-full bg-sami-red"
+                        />
+                      </div>
+                    )}
+
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? 'আপলোড হচ্ছে...' : 'বিজ্ঞাপন পাবলিশ করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'বিজ্ঞাপন পাবলিশ করুন'}
                     </button>
                   </form>
                 </>
@@ -1106,6 +1228,53 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   </div>
                 ))}
+
+                {activeTab === 'migration' && (
+                  <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-2xl mx-auto text-center">
+                    <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Upload size={40} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">ডাটা ট্রান্সফার ইউটিলিটি</h2>
+                    <p className="text-gray-600 mb-8 leading-relaxed">
+                      আপনার আগের আপলোড করা নিউজ, রিপোর্টার এবং মিডিয়া ফাইলগুলোর ছবি সরাসরি ফায়ারবেস স্টোরেজে ট্রান্সফার করতে এই টুলটি ব্যবহার করুন। এটি করলে আপনার ওয়েবসাইট আরও দ্রুত লোড হবে।
+                    </p>
+
+                    {isMigrating ? (
+                      <div className="space-y-6">
+                        <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden">
+                          <motion.div 
+                            className="bg-sami-red h-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(migrationStats.completed / migrationStats.total) * 100}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-sm font-bold text-gray-500">
+                          <span>প্রসেসিং: {migrationStats.completed} / {migrationStats.total}</span>
+                          <span>{Math.round((migrationStats.completed / migrationStats.total) * 100)}%</span>
+                        </div>
+                        <p className="text-xs text-gray-400 italic truncate">
+                          {migrationStats.currentItem}
+                        </p>
+                      </div>
+                    ) : (
+                      <button 
+                        onClick={migrateImagesToStorage}
+                        className="bg-sami-red text-white px-10 py-4 rounded-2xl font-bold hover:bg-sami-dark transition-all shadow-lg shadow-sami-red/20"
+                      >
+                        ট্রান্সফার শুরু করুন
+                      </button>
+                    )}
+
+                    <div className="mt-12 p-4 bg-yellow-50 rounded-xl border border-yellow-100 text-left">
+                      <p className="text-xs text-yellow-700 font-bold flex items-center gap-2">
+                        <ShieldCheck size={14} /> নোট:
+                      </p>
+                      <p className="text-[10px] text-yellow-600 mt-1">
+                        কিছু ছবির ক্ষেত্রে (যেমন ব্লগার বা অন্য ওয়েবসাইট) সিকিউরিটি পলিসির কারণে ট্রান্সফার নাও হতে পারে। সেক্ষেত্রে সেই নিউজগুলো ম্যানুয়ালি এডিট করে ছবি আপলোড করে নিন।
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -29,19 +29,16 @@ export const BreakingNews: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-sami-dark text-white h-12 flex items-center overflow-hidden border-y border-white/5">
+    <div className="bg-sami-dark text-white h-10 flex items-center overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-full max-w-7xl">
-        <div className="bg-sami-red px-6 h-full flex items-center font-black text-sm shrink-0 shadow-[10px_0_20px_rgba(0,0,0,0.3)] z-10 relative skew-x-[-12deg] -ml-4">
-          <span className="skew-x-[12deg] flex items-center gap-2">
-            <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-            শিরোনাম:
-          </span>
+        <div className="bg-sami-red px-4 h-full flex items-center font-bold text-sm shrink-0 shadow-[4px_0_10px_rgba(0,0,0,0.2)] z-10">
+          শিরোনাম:
         </div>
-        <div className="flex-1 px-8 overflow-hidden relative">
-          <div className="whitespace-nowrap animate-marquee flex items-center gap-16">
+        <div className="flex-1 px-4 overflow-hidden relative">
+          <div className="whitespace-nowrap animate-marquee flex items-center gap-12">
             {tickerText ? (
-              <span className="flex items-center gap-6 text-sm font-bold tracking-wide">
-                <span className="w-1.5 h-1.5 bg-sami-red rounded-full shrink-0"></span>
+              <span className="flex items-center gap-4 text-sm font-medium">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></span>
                 {tickerText}
               </span>
             ) : newsList.length > 0 ? (
@@ -49,16 +46,16 @@ export const BreakingNews: React.FC = () => {
                 <span 
                   key={news.id} 
                   onClick={() => navigate(`/news/${news.id}`)}
-                  className="flex items-center gap-6 text-sm font-bold tracking-wide cursor-pointer hover:text-sami-accent transition-colors group"
+                  className="flex items-center gap-3 text-sm font-medium cursor-pointer hover:text-yellow-300 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 bg-sami-red rounded-full shrink-0 group-hover:scale-150 transition-transform"></span>
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></span>
                   {news.title}
                 </span>
               ))
             ) : (
-              <span className="flex items-center gap-6 text-sm font-bold tracking-wide">
-                <span className="w-1.5 h-1.5 bg-sami-red rounded-full shrink-0"></span>
-                সামি টিভিতে আপনাকে স্বাগতম... হৃদয়ের নতুন প্রজন্ম
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></span>
+                সামি টিভিতে আপনাকে স্বাগতম...
               </span>
             )}
           </div>

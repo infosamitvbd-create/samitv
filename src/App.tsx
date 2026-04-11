@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
+import { SAMILogo } from './components/SAMILogo';
 import { BreakingNews } from './components/BreakingNews';
 import { HeroSection } from './components/HeroSection';
 import { Sidebar } from './components/Sidebar';
@@ -115,10 +116,10 @@ export default function App() {
           </div>
         </div>
 
-        <div className="bg-sami-dark text-white py-12">
+        <div className="bg-white text-gray-900 py-12 border-t border-gray-200">
           <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
             <div className="col-span-1 md:col-span-1">
-              <div className="bg-white p-2 rounded inline-block mb-4">
+              <div className="bg-gray-100 p-2 rounded inline-block mb-4">
                 <img 
                   src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
                   alt="Sami TV" 
@@ -126,23 +127,23 @@ export default function App() {
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-600 leading-relaxed">
                 দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার নীতি মেনে সংবাদ সংগ্রহ ও প্রচারে বিশ্বাসী আমরা। এতে কোনো দল, গোষ্ঠী বা মতবাদের প্রতি পক্ষপাত করা হয় না। থাকে, বাংলায় কথা বলে । খবরের ভেতরের খবর ও বিশ্লেষণে সর্বোচ্চ উৎকর্ষতা বজায় রাখার চেষ্টা করে সামী টিভি ।
               </p>
               <div className="mt-6 flex gap-3">
-                <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-red transition-all">
+                <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-sami-red hover:text-white transition-all">
                   <Facebook size={16} />
                 </a>
-                <a href="https://www.youtube.com/@stv2026Banglades" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-sami-red transition-all">
+                <a href="https://www.youtube.com/@stv2026Banglades" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-sami-red hover:text-white transition-all">
                   <Youtube size={16} />
                 </a>
               </div>
               <div className="mt-6 flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm text-gray-300">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
                   <Phone size={16} className="text-sami-red" />
                   <span>01912618994 / 01939080605</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-300">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
                   <ShieldAlert size={16} className="text-red-500" />
                   <span>HOTLINE: (Coming Soon)</span>
                 </div>
@@ -150,44 +151,44 @@ export default function App() {
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">দ্রুত লিঙ্ক</h3>
-              <ul className="text-sm text-gray-400 space-y-3">
-                <li><button onClick={() => handleNavigate('/live')} className="hover:text-white transition-colors">লাইভ টিভি</button></li>
-                <li><button onClick={() => handleNavigate('/downlink')} className="hover:text-white transition-colors">ডাউনলিংক প্যারামিটার</button></li>
-                <li><button onClick={() => handleNavigate('/terms')} className="hover:text-white transition-colors">শর্ত ও নিয়মাবলী</button></li>
-                <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-white transition-colors">গোপনীয়তা নীতি</button></li>
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">দ্রুত লিঙ্ক</h3>
+              <ul className="text-sm text-gray-600 space-y-3">
+                <li><button onClick={() => handleNavigate('/live')} className="hover:text-sami-red transition-colors">লাইভ টিভি</button></li>
+                <li><button onClick={() => handleNavigate('/downlink')} className="hover:text-sami-red transition-colors">ডাউনলিংক প্যারামিটার</button></li>
+                <li><button onClick={() => handleNavigate('/terms')} className="hover:text-sami-red transition-colors">শর্ত ও নিয়মাবলী</button></li>
+                <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-sami-red transition-colors">গোপনীয়তা নীতি</button></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">বিভাগসমূহ</h3>
-              <ul className="text-sm font-bold text-gray-400 grid grid-cols-2 gap-3">
-                <li><button onClick={() => handleNavigate('/category/জাতীয়')} className="hover:text-white transition-colors">জাতীয়</button></li>
-                <li><button onClick={() => handleNavigate('/category/রাজনীতি')} className="hover:text-white transition-colors">রাজনীতি</button></li>
-                <li><button onClick={() => handleNavigate('/category/সারাদেশ')} className="hover:text-white transition-colors">সারাদেশ</button></li>
-                <li><button onClick={() => handleNavigate('/category/খেলাধুলা')} className="hover:text-white transition-colors">খেলাধুলা</button></li>
-                <li><button onClick={() => handleNavigate('/family')} className="hover:text-white transition-colors">আওয়ার ফ্যামিলি</button></li>
-                <li><button onClick={() => handleNavigate('/media')} className="hover:text-white transition-colors">মিডিয়া</button></li>
-                <li><button onClick={() => handleNavigate('/about')} className="hover:text-white transition-colors">আমাদের সম্পর্কে</button></li>
-                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-white transition-colors text-sami-red">যোগাযোগ</button></li>
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">বিভাগসমূহ</h3>
+              <ul className="text-sm font-bold text-gray-600 grid grid-cols-2 gap-3">
+                <li><button onClick={() => handleNavigate('/category/জাতীয়')} className="hover:text-sami-red transition-colors">জাতীয়</button></li>
+                <li><button onClick={() => handleNavigate('/category/রাজনীতি')} className="hover:text-sami-red transition-colors">রাজনীতি</button></li>
+                <li><button onClick={() => handleNavigate('/category/সারাদেশ')} className="hover:text-sami-red transition-colors">সারাদেশ</button></li>
+                <li><button onClick={() => handleNavigate('/category/খেলাধুলা')} className="hover:text-sami-red transition-colors">খেলাধুলা</button></li>
+                <li><button onClick={() => handleNavigate('/family')} className="hover:text-sami-red transition-colors">আওয়ার ফ্যামিলি</button></li>
+                <li><button onClick={() => handleNavigate('/media')} className="hover:text-sami-red transition-colors">মিডিয়া</button></li>
+                <li><button onClick={() => handleNavigate('/about')} className="hover:text-sami-red transition-colors">আমাদের সম্পর্কে</button></li>
+                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-sami-red transition-colors text-sami-red">যোগাযোগ</button></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2">সতর্কবার্তা</h3>
-              <p className="text-xs text-red-400 leading-relaxed italic">
+              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">সতর্কবার্তা</h3>
+              <p className="text-xs text-red-600 leading-relaxed italic">
                 "এই ওয়েবসাইটে কোন লেখা ছবি ভিডিও অনুমতি ছাড়া ব্যবহার করা বেআইনি।"
               </p>
-              <div className="mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Developed By</p>
-                <p className="text-sm font-bold text-white">Emran Hasan Sami</p>
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Developed By</p>
+                <p className="text-sm font-bold text-gray-900">Emran Hasan Sami</p>
                 <p className="text-[10px] text-sami-red">Website Developer</p>
               </div>
             </div>
           </div>
 
-          <div className="container mx-auto px-4 mt-12 pt-8 border-t border-white/10 text-center">
-            <p className="text-sm text-gray-400 mb-2 font-bold">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
+          <div className="container mx-auto px-4 mt-12 pt-8 border-t border-gray-100 text-center">
+            <p className="text-sm text-gray-700 mb-2 font-bold">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
             <p className="text-xs text-gray-500">
               Website Developer by Emran Hasan Sami | &copy; {new Date().getFullYear()} SAMI TV. All rights reserved.
             </p>

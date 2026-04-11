@@ -2,18 +2,18 @@
 
 @theme {
   --color-sami-red: #e31e24;
-  --color-sami-teal: #e31e24;
-  --color-sami-blue: #e31e24;
-  --color-sami-dark: #8b0000;
-  --color-sami-light: #fff5f5;
-  --color-sami-accent: #ffcc00;
+  --color-sami-teal: #0a0a0a;
+  --color-sami-blue: #0f172a;
+  --color-sami-dark: #020617;
+  --color-sami-light: #ffffff;
+  --color-sami-accent: #facc15;
   --color-red-600: #e31e24;
-  --color-teal-600: #e31e24;
+  --color-teal-600: #0a0a0a;
 }
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-white text-gray-900 font-sans;
   }
 }
 
