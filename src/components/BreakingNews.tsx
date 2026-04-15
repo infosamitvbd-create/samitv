@@ -29,7 +29,7 @@ export const BreakingNews: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-sami-dark text-white h-10 flex items-center overflow-hidden">
+    <div className="bg-[#004a7c] text-white h-10 flex items-center overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-full max-w-7xl">
         <div className="bg-sami-red px-4 h-full flex items-center font-bold text-sm shrink-0 shadow-[4px_0_10px_rgba(0,0,0,0.2)] z-10">
           শিরোনাম:

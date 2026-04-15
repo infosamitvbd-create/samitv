@@ -9,19 +9,16 @@ interface NavItem {
 }
 
 const mainNavItems: NavItem[] = [
-  { label: 'লাইভ টিভি', href: '/live', isSpecial: true },
+  { label: 'প্রচ্ছদ', href: '/' },
   { label: 'জাতীয়', href: '/category/জাতীয়' },
   { label: 'রাজনীতি', href: '/category/রাজনীতি' },
+  { label: 'অর্থনীতি', href: '/category/অর্থনীতি' },
+  { label: 'সারা দেশ', href: '/category/সারা দেশ' },
   { label: 'আন্তর্জাতিক', href: '/category/আন্তর্জাতিক' },
-  { label: 'বিশ্ব', href: '/category/বিশ্ব' },
-  { label: 'বাণিজ্য', href: '/category/বাণিজ্য' },
-  { label: 'সারাদেশ', href: '/category/সারাদেশ' },
-  { label: 'সরিষাবাড়ী', href: '/category/সরিষাবাড়ী' },
-  { label: 'খেলাধুলা', href: '/category/খেলাধুলা' },
-  { label: 'বিনোদন', href: '/category/বিনোদন' },
-  { label: 'তথ্যপ্রযুক্তি', href: '/category/তথ্যপ্রযুক্তি' },
   { label: 'জামালপুর', href: '/category/জামালপুর' },
-  { label: 'আওয়ার ফ্যামিলি', href: '/family' },
+  { label: 'খেলা-ধুলা', href: '/category/খেলাধুলা' },
+  { label: 'তথ্য-প্রযুক্তি', href: '/category/তথ্যপ্রযুক্তি' },
+  { label: 'বিনোদন', href: '/category/বিনোদন' },
 ];
 
 const otherNavItems: NavItem[] = [
@@ -29,6 +26,8 @@ const otherNavItems: NavItem[] = [
   { label: 'আমাদের সম্পর্কে', href: '/about' },
   { label: 'যোগাযোগ', href: '/contact' },
   { label: 'ডাউনলিংক প্যারামিটার', href: '/downlink' },
+  { label: 'আওয়ার ফ্যামিলি', href: '/family' },
+  { label: 'লাইভ টিভি', href: '/live' },
 ];
 
 export const Navbar: React.FC<{ 
@@ -59,28 +58,26 @@ export const Navbar: React.FC<{
   const isItemActive = (href: string) => {
     if (href.startsWith('/category/')) {
       const cat = href.replace('/category/', '');
-      return currentPage === '/category' && currentCategory === cat;
+      return currentPage.includes('/category/') && currentCategory === cat;
     }
     return currentPage === href;
   };
 
   return (
-    <nav className="bg-sami-teal text-white sticky top-0 z-50 shadow-lg">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 max-w-7xl">
+    <nav className="bg-sami-purple text-white sticky top-0 z-50 shadow-lg">
+      <div className="container mx-auto px-4 flex items-center justify-between h-11 max-w-7xl">
         {/* Desktop Menu */}
-        <ul className="hidden lg:flex items-center gap-1 font-bold text-[14px] h-full">
+        <ul className="hidden lg:flex items-center font-bold text-[13px] h-full">
           {mainNavItems.map((item) => {
             const isActive = isItemActive(item.href);
             return (
-              <li key={item.label} className="h-full flex items-center">
+              <li key={item.label} className="h-full flex items-center border-r border-white/10 last:border-0">
                 <button 
                   onClick={() => handleNavClick(item.href)}
-                  className={`px-3 h-full flex items-center gap-1 transition-all duration-200 ${
+                  className={`px-3 h-full flex items-center transition-all duration-200 ${
                     isActive 
-                      ? 'bg-white text-sami-teal font-bold' 
-                      : item.isSpecial 
-                        ? 'bg-sami-red hover:bg-red-700 animate-pulse' 
-                        : 'hover:bg-white/10'
+                      ? 'bg-sami-red text-white' 
+                      : 'hover:bg-white/10'
                   }`}
                 >
                   {item.label}
@@ -90,27 +87,27 @@ export const Navbar: React.FC<{
           })}
           
           {/* Others Dropdown Desktop */}
-          <li className="h-full flex items-center relative" ref={dropdownRef}>
+          <li className="h-full flex items-center relative border-l border-white/10" ref={dropdownRef}>
             <button 
               onClick={() => setIsOthersOpen(!isOthersOpen)}
-              className={`px-4 h-full flex items-center gap-2 transition-all duration-200 hover:bg-white/10 ${isOthersOpen ? 'bg-white/10' : ''}`}
+              className={`px-4 h-full flex items-center gap-1 transition-all duration-200 hover:bg-white/10 ${isOthersOpen ? 'bg-white/10' : ''}`}
             >
-              অন্যান্য <ChevronDown size={16} className={`transition-transform ${isOthersOpen ? 'rotate-180' : ''}`} />
+              অন্যান্য <ChevronDown size={14} className={`transition-transform ${isOthersOpen ? 'rotate-180' : ''}`} />
             </button>
             
             <AnimatePresence>
               {isOthersOpen && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 w-48 bg-white text-gray-800 shadow-2xl rounded-b-sm py-2 border-t-2 border-sami-red"
+                  exit={{ opacity: 0, y: 5 }}
+                  className="absolute top-full left-0 w-48 bg-white text-gray-800 shadow-2xl py-2 border-t-2 border-sami-red"
                 >
                   {otherNavItems.map((item) => (
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item.href)}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-between ${isItemActive(item.href) ? 'text-sami-red bg-sami-light/30' : ''}`}
+                      className={`w-full text-left px-4 py-2 text-sm font-bold hover:bg-gray-50 transition-colors ${isItemActive(item.href) ? 'text-sami-red' : ''}`}
                     >
                       {item.label}
                     </button>
@@ -125,15 +122,15 @@ export const Navbar: React.FC<{
         <div className="lg:hidden flex items-center">
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 hover:bg-sami-dark rounded transition-colors"
+            className="p-2 hover:bg-white/5 rounded-xl transition-colors"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-sami-dark rounded transition-colors">
+        <div className="flex items-center gap-2">
+          <button className="p-2.5 hover:bg-white/5 rounded-full transition-all text-white/70 hover:text-white">
             <Search size={20} />
           </button>
         </div>
@@ -143,24 +140,24 @@ export const Navbar: React.FC<{
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-sami-dark border-t border-white/10 overflow-hidden"
+            initial={{ opacity: 0, x: -100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            className="lg:hidden fixed inset-0 top-14 bg-sami-dark z-50 overflow-y-auto"
           >
-            <ul className="flex flex-col p-4 gap-2">
+            <ul className="flex flex-col p-6 gap-2">
               {[...mainNavItems, ...otherNavItems].map((item) => {
                 const isActive = isItemActive(item.href);
                 return (
                   <li key={item.label}>
                     <button 
                       onClick={() => handleNavClick(item.href)}
-                      className={`w-full text-left py-3 px-4 rounded transition-all font-bold ${
+                      className={`w-full text-left py-4 px-6 rounded-2xl transition-all font-black uppercase tracking-tighter text-sm ${
                         isActive 
-                          ? 'bg-white text-sami-teal font-bold' 
+                          ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20' 
                           : item.isSpecial 
-                            ? 'bg-sami-red text-white' 
-                            : 'text-white hover:bg-sami-teal'
+                            ? 'bg-sami-red/10 text-sami-red border border-sami-red/20' 
+                            : 'text-white/70 hover:bg-white/5 hover:text-white'
                       }`}
                     >
                       {item.label}

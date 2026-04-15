@@ -15,11 +15,12 @@ import { AdminPanel } from './components/AdminPanel';
 import { Home } from './components/Home';
 import { LiveTV } from './components/LiveTV';
 import { ContactUs } from './components/ContactUs';
+import { Footer } from './components/Footer';
 import { DownlinkParameters } from './components/DownlinkParameters';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { motion, AnimatePresence } from 'motion/react';
-import { Download, Phone, Info, ShieldAlert, ArrowLeft, Lock, Facebook, Youtube } from 'lucide-react';
+import { Info, ArrowLeft, Lock } from 'lucide-react';
 
 export default function App() {
   const navigate = useNavigate();
@@ -91,109 +92,7 @@ export default function App() {
 
       <footer className="mt-auto print:hidden">
         <BreakingNews />
-        
-        {/* App Download Section (Footer) */}
-        <div className="bg-sami-light py-6 border-t border-sami-red/20">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 max-w-7xl">
-            <div className="flex items-center gap-4">
-              <div className="bg-sami-red p-3 rounded-xl text-white shadow-lg shadow-sami-red/20">
-                <Download size={28} />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg text-sami-dark">সামি টিভি অ্যাপ ডাউনলোড করুন</h3>
-                <p className="text-xs text-gray-600">লাইভ টিভি এবং লেটেস্ট নিউজ পেতে আজই ডাউনলোড করুন</p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <button className="bg-black text-white px-6 py-2.5 rounded-lg flex items-center gap-3 hover:bg-gray-800 transition-all hover:scale-105 shadow-md">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store" className="h-6" />
-                <div className="text-left">
-                  <p className="text-[8px] uppercase font-bold opacity-70">Get it on</p>
-                  <p className="text-sm font-bold">Google Play</p>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white text-gray-900 py-12 border-t border-gray-200">
-          <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
-            <div className="col-span-1 md:col-span-1">
-              <div className="bg-gray-100 p-2 rounded inline-block mb-4">
-                <img 
-                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
-                  alt="Sami TV" 
-                  className="h-16"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার নীতি মেনে সংবাদ সংগ্রহ ও প্রচারে বিশ্বাসী আমরা। এতে কোনো দল, গোষ্ঠী বা মতবাদের প্রতি পক্ষপাত করা হয় না। থাকে, বাংলায় কথা বলে । খবরের ভেতরের খবর ও বিশ্লেষণে সর্বোচ্চ উৎকর্ষতা বজায় রাখার চেষ্টা করে সামী টিভি ।
-              </p>
-              <div className="mt-6 flex gap-3">
-                <a href="https://www.facebook.com/samitvbd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-sami-red hover:text-white transition-all">
-                  <Facebook size={16} />
-                </a>
-                <a href="https://www.youtube.com/@stv2026Banglades" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-sami-red hover:text-white transition-all">
-                  <Youtube size={16} />
-                </a>
-              </div>
-              <div className="mt-6 flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Phone size={16} className="text-sami-red" />
-                  <span>01912618994 / 01939080605</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <ShieldAlert size={16} className="text-red-500" />
-                  <span>HOTLINE: (Coming Soon)</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">দ্রুত লিঙ্ক</h3>
-              <ul className="text-sm text-gray-600 space-y-3">
-                <li><button onClick={() => handleNavigate('/live')} className="hover:text-sami-red transition-colors">লাইভ টিভি</button></li>
-                <li><button onClick={() => handleNavigate('/downlink')} className="hover:text-sami-red transition-colors">ডাউনলিংক প্যারামিটার</button></li>
-                <li><button onClick={() => handleNavigate('/terms')} className="hover:text-sami-red transition-colors">শর্ত ও নিয়মাবলী</button></li>
-                <li><button onClick={() => handleNavigate('/privacy')} className="hover:text-sami-red transition-colors">গোপনীয়তা নীতি</button></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">বিভাগসমূহ</h3>
-              <ul className="text-sm font-bold text-gray-600 grid grid-cols-2 gap-3">
-                <li><button onClick={() => handleNavigate('/category/জাতীয়')} className="hover:text-sami-red transition-colors">জাতীয়</button></li>
-                <li><button onClick={() => handleNavigate('/category/রাজনীতি')} className="hover:text-sami-red transition-colors">রাজনীতি</button></li>
-                <li><button onClick={() => handleNavigate('/category/সারাদেশ')} className="hover:text-sami-red transition-colors">সারাদেশ</button></li>
-                <li><button onClick={() => handleNavigate('/category/খেলাধুলা')} className="hover:text-sami-red transition-colors">খেলাধুলা</button></li>
-                <li><button onClick={() => handleNavigate('/family')} className="hover:text-sami-red transition-colors">আওয়ার ফ্যামিলি</button></li>
-                <li><button onClick={() => handleNavigate('/media')} className="hover:text-sami-red transition-colors">মিডিয়া</button></li>
-                <li><button onClick={() => handleNavigate('/about')} className="hover:text-sami-red transition-colors">আমাদের সম্পর্কে</button></li>
-                <li><button onClick={() => handleNavigate('/contact')} className="hover:text-sami-red transition-colors text-sami-red">যোগাযোগ</button></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="font-bold text-lg mb-6 border-l-4 border-sami-red pl-2 text-sami-dark">সতর্কবার্তা</h3>
-              <p className="text-xs text-red-600 leading-relaxed italic">
-                "এই ওয়েবসাইটে কোন লেখা ছবি ভিডিও অনুমতি ছাড়া ব্যবহার করা বেআইনি।"
-              </p>
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Developed By</p>
-                <p className="text-sm font-bold text-gray-900">Emran Hasan Sami</p>
-                <p className="text-[10px] text-sami-red">Website Developer</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="container mx-auto px-4 mt-12 pt-8 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-700 mb-2 font-bold">সামী মাল্টিমিডিয়া লিমিটেডের একটি প্রতিষ্ঠান</p>
-            <p className="text-xs text-gray-500">
-              Website Developer by Emran Hasan Sami | &copy; {new Date().getFullYear()} SAMI TV. All rights reserved.
-            </p>
-          </div>
-        </div>
+        <Footer onNavigate={handleNavigate} />
       </footer>
 
       {/* Admin Floating Button */}

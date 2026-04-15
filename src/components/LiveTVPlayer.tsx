@@ -47,7 +47,7 @@ export const LiveTVPlayer: React.FC = () => {
         {Player && (
           <Player
             url={liveUrl}
-            playing={true}
+            playing={false}
             controls={true}
             width="100%"
             height="100%"

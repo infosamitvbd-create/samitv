@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Music, Map as MapIcon, Play, Pause, Radio } from 'lucide-react';
+import { Music, Map as MapIcon, Play, Pause, Radio, Clock, Layout } from 'lucide-react';
 import { LiveTVPlayer } from './LiveTVPlayer';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, limit } from 'firebase/firestore';
@@ -32,6 +32,28 @@ export const Sidebar: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Archive Section */}
+      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+        <div className="bg-[#004a7c] text-white px-4 py-2 font-bold text-sm">Archive</div>
+        <div className="p-4 flex gap-2">
+          <input 
+            type="date" 
+            className="flex-1 border border-gray-300 rounded-sm px-2 py-1 text-xs focus:outline-none focus:border-sami-red"
+          />
+          <button className="bg-[#1d70b8] text-white px-4 py-1 text-xs font-bold rounded-sm hover:bg-blue-700 transition-colors">Search</button>
+        </div>
+      </div>
+
+      {/* Facebook Section */}
+      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+        <div className="bg-[#004a7c] text-white px-4 py-2 font-bold text-sm">ফেসবুকে আমরা..</div>
+        <div className="p-2">
+          <div className="bg-gray-100 aspect-square flex items-center justify-center text-gray-400 text-xs text-center p-4 border border-dashed border-gray-300">
+            Facebook Page Widget Placeholder<br/>(NP Creations)
+          </div>
+        </div>
+      </div>
+
       {/* National Anthem Player */}
       <div 
         onClick={() => {
@@ -88,37 +110,64 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-sm news-card-shadow overflow-hidden">
-        <div className="flex border-b border-gray-200">
+      {/* Tabbed News Sidebar */}
+      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+        <div className="flex bg-gray-100">
           <button 
             onClick={() => setActiveTab('latest')}
-            className={`flex-1 py-3 font-bold text-sm transition-colors ${activeTab === 'latest' ? 'bg-sami-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`flex-1 py-3 text-sm font-bold transition-all ${activeTab === 'latest' ? 'bg-white text-gray-900 border-t-2 border-sami-red' : 'text-gray-500 hover:text-gray-700'}`}
           >
-            সর্বশেষ
+            সর্বশেষ সংবাদ
           </button>
           <button 
             onClick={() => setActiveTab('popular')}
-            className={`flex-1 py-3 font-bold text-sm transition-colors ${activeTab === 'popular' ? 'bg-sami-red text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`flex-1 py-3 text-sm font-bold transition-all ${activeTab === 'popular' ? 'bg-white text-gray-900 border-t-2 border-sami-red' : 'text-gray-500 hover:text-gray-700'}`}
           >
-            সর্বোচ্চ পঠিত
+            জনপ্রিয় সংবাদ
           </button>
         </div>
-        <div className="p-4 flex flex-col gap-4">
-          {latestNews.map((news, index) => (
-            <div key={news.id} className="flex gap-3 group cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-sami-dark text-white flex items-center justify-center font-bold text-sm shrink-0">
-                {index + 1}
+        <div className="p-4 space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+          {latestNews.map((news) => (
+            <div key={news.id} className="flex gap-3 group cursor-pointer pb-3 border-b border-gray-50 last:border-0">
+              <div className="w-16 h-12 shrink-0 rounded-sm overflow-hidden bg-gray-100">
+                <img src={news.img} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
               </div>
-              <div className="flex-1 flex gap-2">
-                <div className="w-16 h-12 shrink-0 overflow-hidden rounded-sm">
-                  <img src={news.img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                </div>
-                <p className="text-xs font-bold leading-tight group-hover:text-sami-red transition-colors line-clamp-2">
+              <div className="flex-1 min-w-0">
+                <h4 className="text-[13px] font-bold text-gray-800 line-clamp-2 leading-tight group-hover:text-sami-red transition-colors">
                   {news.title}
-                </p>
+                </h4>
               </div>
             </div>
           ))}
+        </div>
+        <div className="p-3 bg-gray-50 border-t border-gray-100 text-right">
+          <button className="text-xs font-bold text-sami-red hover:underline">More News.. »</button>
+        </div>
+      </div>
+
+      {/* Sara Desh Section in Sidebar */}
+      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden">
+        <div className="border-b-2 border-gray-200 relative">
+          <div className="flex items-center gap-2 p-3">
+            <Layout size={16} className="text-gray-900" />
+            <h2 className="text-sm font-bold text-gray-900">সারা দেশ</h2>
+          </div>
+          <div className="absolute bottom-[-2px] left-0 w-12 h-[2px] bg-sami-red"></div>
+        </div>
+        <div className="p-4 space-y-4">
+          {latestNews.slice(0, 3).map((news) => (
+            <div key={news.id} className="flex gap-3 group cursor-pointer">
+              <div className="w-16 h-12 shrink-0 rounded-sm overflow-hidden bg-gray-100">
+                <img src={news.img} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-[13px] font-bold text-gray-800 line-clamp-2 leading-tight group-hover:text-sami-red transition-colors">
+                  {news.title}
+                </h4>
+              </div>
+            </div>
+          ))}
+          <button className="w-full py-2 text-xs font-bold text-sami-red hover:underline text-right">More News.. »</button>
         </div>
       </div>
 

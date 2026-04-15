@@ -22,127 +22,67 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick }) => {
   }, []);
 
   const featured = newsList[0];
-  const sideNews = newsList.slice(1, 3);
-  const healthNews = newsList.slice(3, 5);
+  const secondary = newsList.slice(1, 5);
 
   if (newsList.length === 0) {
-    // Fallback mock data
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-8">
-          <div className="bg-white rounded-sm overflow-hidden news-card-shadow group cursor-pointer">
-            <div className="relative aspect-video overflow-hidden">
-              <img 
-                src="https://picsum.photos/seed/news1/800/450" 
-                alt="Featured News" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="p-5">
-              <h1 className="text-3xl font-bold text-gray-900 mb-3 leading-tight hover:text-sami-red transition-colors">
-                মুন্সীগঞ্জে সুষ্ঠু নির্বাচন আয়োজনে সভা
-              </h1>
-              <p className="text-gray-600 leading-relaxed line-clamp-3">
-                মুন্সীগঞ্জে সুষ্ঠু ও নিরপেক্ষভাবে আসন্ন জাতীয় সংসদ নির্বাচন আয়োজনে ভিজিল্যান্স ও অবজারভেশন টিমের সভা অনুষ্ঠিত হয়েছে...
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-white p-4 rounded-sm news-card-shadow flex flex-col gap-4">
-            <div className="flex gap-4 group cursor-pointer">
-              <div className="w-1/3 aspect-square shrink-0 overflow-hidden rounded-sm">
-                <img src="https://picsum.photos/seed/news2/200/200" alt="News" className="w-full h-full object-cover group-hover:scale-110 transition-transform" referrerPolicy="no-referrer" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors">
-                  গণভোটে 'হ্যাঁ'-এর পক্ষে প্রচার চালাতে ২৭০ আসনে 'অ্যাম্বাসেডর' নিয়োগ দেবে এনসিপি
-                </h3>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-2 gap-4 h-[600px] lg:h-[500px]">
+        <div className="lg:col-span-2 lg:row-span-2 bg-gray-200 animate-pulse rounded-xl"></div>
+        <div className="lg:col-span-2 bg-gray-200 animate-pulse rounded-xl"></div>
+        <div className="bg-gray-200 animate-pulse rounded-xl"></div>
+        <div className="bg-gray-200 animate-pulse rounded-xl"></div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
       {/* Main Featured News */}
       <div className="lg:col-span-8">
         <div 
           onClick={() => onNewsClick(featured)}
-          className="bg-white rounded-sm overflow-hidden news-card-shadow group cursor-pointer h-full"
+          className="bg-white rounded-sm overflow-hidden border border-gray-200 group cursor-pointer h-full"
         >
-          <div className="relative aspect-video overflow-hidden">
+          <div className="relative aspect-[16/10] overflow-hidden">
             <img 
               src={featured.imageUrl} 
               alt={featured.title} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               referrerPolicy="no-referrer"
             />
-            <div className="absolute top-4 left-4">
-              <span className="bg-sami-red text-white px-3 py-1 rounded-full text-xs font-bold uppercase shadow-lg">
-                {featured.category}
-              </span>
-            </div>
           </div>
-          <div className="p-5">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3 leading-tight hover:text-sami-red transition-colors">
+          <div className="p-4">
+            <h1 className="text-2xl font-bold text-gray-900 leading-tight group-hover:text-sami-red transition-colors">
               {featured.title}
             </h1>
-            <p className="text-gray-600 leading-relaxed line-clamp-3">
-              {featured.content}
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Side News */}
-      <div className="lg:col-span-4 flex flex-col gap-6">
-        <div className="bg-white p-4 rounded-sm news-card-shadow flex flex-col gap-4">
-          {sideNews.map((news) => (
-            <React.Fragment key={news.id}>
-              <div 
-                onClick={() => onNewsClick(news)}
-                className="flex gap-4 group cursor-pointer"
-              >
-                <div className="w-1/3 aspect-square shrink-0 overflow-hidden rounded-sm">
-                  <img src={news.imageUrl} alt={news.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" referrerPolicy="no-referrer" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
-                    {news.title}
-                  </h3>
-                </div>
-              </div>
-              <hr className="border-gray-100 last:hidden" />
-            </React.Fragment>
-          ))}
-        </div>
-
-        {healthNews.length > 0 && (
-          <div className="bg-white rounded-sm news-card-shadow overflow-hidden">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
-              <h2 className="font-bold text-lg">অন্যান্য সংবাদ</h2>
-            </div>
-            <div className="p-4 flex flex-col gap-4">
-              {healthNews.map((news) => (
-                <div 
-                  key={news.id} 
-                  onClick={() => onNewsClick(news)}
-                  className="flex gap-3 group cursor-pointer"
-                >
-                  <div className="w-20 h-14 shrink-0 overflow-hidden rounded-sm">
-                    <img src={news.imageUrl} alt={news.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  </div>
-                  <p className="text-xs font-bold leading-tight group-hover:text-sami-red line-clamp-2">{news.title}</p>
-                </div>
-              ))}
-            </div>
+      {/* Tabbed News List */}
+      <div className="lg:col-span-4 flex flex-col h-full">
+        <div className="bg-white border border-gray-200 rounded-sm overflow-hidden flex flex-col h-full">
+          <div className="flex border-b border-gray-200">
+            <button className="flex-1 py-2 text-xs font-bold bg-gray-100 border-r border-gray-200">সর্বশেষ সংবাদ</button>
+            <button className="flex-1 py-2 text-xs font-bold bg-white">জনপ্রিয় সংবাদ</button>
           </div>
-        )}
+          <div className="flex-1 overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-300">
+            {newsList.map((news) => (
+              <div 
+                key={news.id}
+                onClick={() => onNewsClick(news)}
+                className="p-3 flex gap-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer group"
+              >
+                <div className="w-16 h-16 shrink-0 bg-gray-100 rounded-sm overflow-hidden">
+                  <img src={news.imageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+                <p className="text-xs font-bold leading-snug group-hover:text-sami-red transition-colors line-clamp-3">
+                  {news.title}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

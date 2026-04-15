@@ -4,7 +4,7 @@ import { Sidebar } from './Sidebar';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, X, Image as ImageIcon } from 'lucide-react';
+import { Clock, X, Image as ImageIcon, Layout } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -118,9 +118,85 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col gap-8">
+      <div className="flex-1 flex flex-col gap-10">
         <HeroSection onNewsClick={onNewsClick} />
         
+        {/* Category Sections */}
+        {['রাজনীতি', 'অর্থনীতি', 'জাতীয়', 'আন্তর্জাতিক'].map((cat) => {
+          const catNews = newsList.filter(n => n.category === cat).slice(0, 4);
+          if (catNews.length === 0) return null;
+          
+          return (
+            <div key={cat} className="flex flex-col gap-4">
+              <div className="border-b-2 border-gray-200 relative mb-4">
+                <div className="flex items-center gap-2 pb-2">
+                  <Layout size={18} className="text-gray-900" />
+                  <h2 className="text-lg font-bold text-gray-900">{cat}</h2>
+                </div>
+                <div className="absolute bottom-[-2px] left-0 w-16 h-[2px] bg-sami-red"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {catNews.map((news) => (
+                  <div 
+                    key={news.id}
+                    onClick={() => onNewsClick(news)}
+                    className="bg-white group cursor-pointer"
+                  >
+                    <div className="aspect-video overflow-hidden mb-3">
+                      <img 
+                        src={news.imageUrl} 
+                        alt={news.title} 
+                        className="w-full h-full object-cover transition-transform duration-500"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                    <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
+                      {news.title}
+                    </h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Sports & Entertainment Sections (Side by Side) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {['খেলাধুলা', 'বিনোদন'].map((cat) => {
+            const catNews = newsList.find(n => n.category === cat);
+            return (
+              <div key={cat} className="flex flex-col gap-4">
+                <div className="border-b-2 border-gray-200 relative mb-4">
+                  <div className="flex items-center gap-2 pb-2">
+                    <Layout size={18} className="text-gray-900" />
+                    <h2 className="text-lg font-bold text-gray-900">{cat === 'খেলাধুলা' ? 'খেলা-ধুলা' : 'বিনোদন'}</h2>
+                  </div>
+                  <div className="absolute bottom-[-2px] left-0 w-16 h-[2px] bg-sami-red"></div>
+                </div>
+                {catNews && (
+                  <div 
+                    onClick={() => onNewsClick(catNews)}
+                    className="bg-white group cursor-pointer"
+                  >
+                    <div className="aspect-video overflow-hidden mb-3">
+                      <img 
+                        src={catNews.imageUrl} 
+                        alt={catNews.title} 
+                        className="w-full h-full object-cover transition-transform duration-500"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                    <h3 className="font-bold text-lg leading-snug group-hover:text-sami-red transition-colors">
+                      {catNews.title}
+                    </h3>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
         {/* Home Content Ad */}
         {contentAds.length > 0 && (
           <div className="w-full">
@@ -128,94 +204,87 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               href={contentAds[0].link || '#'} 
               target={contentAds[0].link ? "_blank" : "_self"} 
               rel="noopener noreferrer"
-              className="block rounded-sm overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+              className="block rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all group"
             >
               <img 
                 src={contentAds[0].imageUrl} 
                 alt={contentAds[0].title} 
-                className="w-full h-auto" 
+                className="w-full h-auto group-hover:scale-[1.02] transition-transform duration-700" 
                 referrerPolicy="no-referrer" 
               />
             </a>
           </div>
         )}
 
+        {/* Top News Grid (2 Columns) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {newsList.length > 1 ? (
-            newsList.slice(1).map((news) => (
-              <div
-                key={news.id}
-                onClick={() => onNewsClick(news)}
-                className="bg-white p-4 rounded-sm news-card-shadow flex gap-4 group cursor-pointer"
-              >
-                <div className="w-1/3 aspect-video shrink-0 overflow-hidden rounded-sm">
-                  <img 
-                    src={news.imageUrl} 
-                    alt={news.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] text-sami-red font-bold uppercase">{news.category}</span>
-                  </div>
-                  <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
-                    {news.title}
-                  </h3>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-2">
-                    <Clock size={10} />
-                    <span>{news.createdAt?.toDate().toLocaleDateString('bn-BD')}</span>
-                  </div>
-                </div>
+          {newsList.slice(0, 2).map((news) => (
+            <div
+              key={news.id}
+              onClick={() => onNewsClick(news)}
+              className="bg-white group cursor-pointer"
+            >
+              <div className="aspect-video overflow-hidden mb-3">
+                <img 
+                  src={news.imageUrl} 
+                  alt={news.title} 
+                  className="w-full h-full object-cover transition-transform duration-500"
+                  referrerPolicy="no-referrer"
+                />
               </div>
-            ))
-          ) : (
-            // Fallback mock data if no news in Firestore yet
-            [1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="bg-white p-4 rounded-sm news-card-shadow flex gap-4 group cursor-pointer"
-              >
-                <div className="w-1/3 aspect-video shrink-0 overflow-hidden rounded-sm">
-                  <img 
-                    src={`https://picsum.photos/seed/grid${i}/300/200`} 
-                    alt="News" 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors">
-                    রাজধানীর বিভিন্ন এলাকায় গ্যাস সরবরাহ বন্ধ থাকবে আজ
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-2">২ ঘণ্টা আগে</p>
-                </div>
+              <h3 className="font-bold text-lg leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
+                {news.title}
+              </h3>
+            </div>
+          ))}
+        </div>
+
+        {/* Middle News Grid (4 Columns) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {newsList.slice(2, 6).map((news) => (
+            <div
+              key={news.id}
+              onClick={() => onNewsClick(news)}
+              className="bg-white group cursor-pointer"
+            >
+              <div className="aspect-video overflow-hidden mb-3">
+                <img 
+                  src={news.imageUrl} 
+                  alt={news.title} 
+                  className="w-full h-full object-cover transition-transform duration-500"
+                  referrerPolicy="no-referrer"
+                />
               </div>
-            ))
-          )}
+              <h3 className="font-bold text-sm leading-snug group-hover:text-sami-red transition-colors line-clamp-2">
+                {news.title}
+              </h3>
+            </div>
+          ))}
         </div>
 
         {/* Our Family Section on Home */}
         {reporters.length > 0 && (
-          <div className="bg-white p-6 rounded-sm news-card-shadow">
-            <div className="flex items-center justify-between mb-6 border-l-4 border-sami-red pl-3">
-              <h2 className="text-xl font-bold text-sami-dark">আমাদের পরিবার</h2>
+          <div className="bg-white p-8 rounded-2xl news-card-shadow border border-gray-50">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-sami-red rounded-full"></div>
+                <h2 className="text-2xl font-black text-sami-dark tracking-tight">আমাদের পরিবার</h2>
+              </div>
               <button 
                 onClick={() => onNavigate('/family')}
-                className="text-sami-red text-sm font-bold hover:underline"
+                className="bg-gray-50 text-sami-red px-4 py-2 rounded-full text-xs font-bold hover:bg-sami-red hover:text-white transition-all shadow-sm"
               >
                 সব দেখুন
               </button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
               {reporters.map((rep) => (
                 <div key={rep.id} className="flex flex-col items-center text-center group cursor-pointer" onClick={() => onNavigate('/family')}>
-                  <div className="w-16 h-16 rounded-full overflow-hidden mb-2 ring-2 ring-gray-100 group-hover:ring-sami-red transition-all">
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden mb-3 ring-4 ring-gray-50 group-hover:ring-sami-red/20 transition-all shadow-md group-hover:scale-105 duration-300">
                     <img src={rep.imageUrl} alt={rep.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
-                  <h3 className="text-[10px] font-bold text-gray-900 line-clamp-1">{rep.name}</h3>
-                  <p className="text-[8px] text-gray-500 line-clamp-1">{rep.designation}</p>
+                  <h3 className="text-xs font-bold text-gray-900 line-clamp-1 mb-0.5">{rep.name}</h3>
+                  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{rep.designation}</p>
                 </div>
               ))}
             </div>
@@ -224,12 +293,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
 
         {/* Media Gallery Section on Home */}
         {mediaItems.length > 0 && (
-          <div className="bg-white p-6 rounded-sm news-card-shadow">
-            <div className="flex items-center justify-between mb-6 border-l-4 border-red-600 pl-3">
-              <h2 className="text-xl font-bold text-sami-dark">মিডিয়া গ্যালারি</h2>
+          <div className="bg-white p-8 rounded-2xl news-card-shadow border border-gray-50">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-8 bg-red-600 rounded-full"></div>
+                <h2 className="text-2xl font-black text-sami-dark tracking-tight">মিডিয়া গ্যালারি</h2>
+              </div>
               <button 
                 onClick={() => onNavigate('/media')}
-                className="text-red-600 text-sm font-bold hover:underline"
+                className="bg-gray-50 text-red-600 px-4 py-2 rounded-full text-xs font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm"
               >
                 সব দেখুন
               </button>
@@ -238,14 +310,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               {mediaItems.map((item) => (
                 <div 
                   key={item.id} 
-                  className="relative aspect-video rounded-sm overflow-hidden group cursor-pointer"
+                  className="relative aspect-video rounded-xl overflow-hidden group cursor-pointer shadow-md"
                   onClick={() => onNavigate('/media')}
                 >
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                    <div className="w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white mb-2">
                       <ImageIcon size={16} />
                     </div>
+                    <p className="text-white text-[10px] font-bold truncate">{item.title}</p>
                   </div>
                 </div>
               ))}

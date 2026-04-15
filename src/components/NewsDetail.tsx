@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Clock, User, Share2, Tag, Printer, MapPin, Facebook, Twitter, MessageCircle, Copy, Check, ChevronRight, Download, Bookmark, Eye, ThumbsUp, ArrowUp } from 'lucide-react';
+import { ArrowLeft, Clock, User, Share2, Tag, Printer, MapPin, Facebook, Twitter, MessageCircle, Copy, Check, ChevronRight, Download, Bookmark, Eye, ThumbsUp, ArrowUp, Home as HomeIcon, Layout } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, where, doc, getDoc } from 'firebase/firestore';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -24,7 +24,9 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
   const [isDownloading, setIsDownloading] = useState(false);
   const [loading, setLoading] = useState(!initialNews);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeSidebarTab, setActiveSidebarTab] = useState<'latest' | 'popular'>('latest');
   const newsRef = useRef<HTMLDivElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -112,12 +114,12 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
   };
 
   const handleDownload = async () => {
-    if (!newsRef.current) return;
+    if (!printRef.current) return;
     setIsDownloading(true);
     try {
-      const canvas = await html2canvas(newsRef.current, {
+      const canvas = await html2canvas(printRef.current, {
         useCORS: true,
-        scale: 2,
+        scale: 3,
         backgroundColor: '#ffffff',
         logging: false,
       });
@@ -164,162 +166,91 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-8 right-8 w-12 h-12 bg-sami-blue text-white rounded-full shadow-2xl z-50 flex items-center justify-center hover:bg-sami-dark transition-colors"
+            className="fixed bottom-8 right-8 w-12 h-12 bg-white text-gray-900 border border-gray-200 rounded-full shadow-2xl z-50 flex items-center justify-center hover:bg-gray-50 transition-colors"
           >
             <ArrowUp size={24} />
           </motion.button>
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-6 print:block">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 py-6 print:hidden">
         {/* Main Content */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
-          className="lg:col-span-8 bg-white rounded-sm news-card-shadow overflow-hidden print:shadow-none print:p-0"
+          className="lg:col-span-8 bg-white print:shadow-none print:p-0"
         >
-          {/* Header Actions */}
-          <div className="p-4 sm:p-6 border-b border-gray-50 flex justify-between items-center print:hidden">
+          {/* Breadcrumb Bar */}
+          <div className="flex items-center gap-0 mb-6 bg-gray-100 p-0 rounded-sm overflow-hidden print:hidden">
             <button 
-              onClick={() => navigate(-1)}
-              className="text-gray-500 hover:text-sami-blue text-sm font-bold flex items-center gap-2 transition-colors group"
+              onClick={() => navigate('/')}
+              className="bg-[#d9232d] text-white px-4 py-2 flex items-center gap-2 text-sm font-bold hover:bg-red-700 transition-colors"
             >
-              <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-sami-light transition-colors">
-                <ArrowLeft size={18} />
-              </div>
-              ফিরে যান
+              <HomeIcon size={16} />
+              Home
             </button>
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 hover:bg-sami-light hover:text-sami-blue rounded-full text-xs font-bold transition-all disabled:opacity-50"
-              >
-                <Download size={16} className={isDownloading ? 'animate-bounce' : ''} />
-                ডাউনলোড
-              </button>
-              <button 
-                onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 hover:bg-sami-light hover:text-sami-blue rounded-full text-xs font-bold transition-all"
-              >
-                <Printer size={16} />
-                প্রিন্ট
-              </button>
+            <div className="bg-[#777] text-white px-4 py-2 flex items-center gap-2 text-sm font-bold">
+              <Layout size={16} />
+              {news.category}
             </div>
           </div>
 
           <div ref={newsRef} className="bg-white">
-            {/* Print/Download Logo */}
-            <div className="hidden print:block mb-8 text-center border-b-4 border-sami-blue pb-6">
-              <h1 className="text-4xl font-black text-sami-blue tracking-tighter uppercase italic">সামি টিভি (SAMI TV)</h1>
-              <p className="text-sm text-gray-500 font-bold mt-1">দিগপাইত, জামালপুর | www.samitv.com</p>
-            </div>
-            
-            {isDownloading && (
-              <div className="mb-8 text-center border-b-4 border-sami-blue pb-6">
-                <h1 className="text-4xl font-black text-sami-blue tracking-tighter uppercase italic">সামি টিভি (SAMI TV)</h1>
-                <p className="text-sm text-gray-500 font-bold mt-1">দিগপাইত, জামালপুর | www.samitv.com</p>
-              </div>
-            )}
-
-            <div className="p-6 sm:p-10">
-              {/* Meta Info */}
-              <div className="flex flex-wrap items-center gap-4 mb-8">
-                <span className="bg-red-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-600/20">
-                  {news.category}
-                </span>
-                <div className="flex items-center gap-4 text-xs text-gray-400 font-bold">
-                  <div className="flex items-center gap-1.5">
-                    <Clock size={14} className="text-sami-blue" />
-                    <span>{news.createdAt?.toDate ? news.createdAt.toDate().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : 'এখনই'}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Eye size={14} className="text-sami-blue" />
-                    <span>{calculateReadingTime(news.content)} মিনিট পাঠ</span>
-                  </div>
-                  {news.location && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin size={14} className="text-sami-blue" />
-                      <span>{news.location}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-[1.15] mb-10 tracking-tight">
+            <div className="p-0">
+              {/* Title */}
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#004a7c] leading-tight mb-6 tracking-tight">
                 {news.title}
               </h1>
 
-              {/* Author Section */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between py-8 border-y border-gray-50 gap-6 mb-10">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-sami-blue to-sami-dark rounded-full flex items-center justify-center text-white shadow-xl">
-                      <User size={28} />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
-                      <Check size={12} className="text-white" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-900 leading-none mb-1">{news.journalistName || 'সামি টিভি ডেস্ক'}</p>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">
-                      {news.journalistName ? 'নিজস্ব প্রতিবেদক' : 'স্টাফ রিপোর্টার'} • সামি টিভি
-                    </p>
-                  </div>
+              {/* Meta Info Section */}
+              <div className="flex items-start gap-4 py-4 border-y border-gray-100 mb-6">
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
+                  <img 
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
+                    alt="Reporter"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                
-                <div className="flex items-center gap-2 print:hidden">
-                  <a 
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:translate-y-[-4px] transition-all shadow-lg shadow-blue-600/20"
-                  >
-                    <Facebook size={20} />
-                  </a>
-                  <a 
-                    href={`https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#1DA1F2] text-white hover:translate-y-[-4px] transition-all shadow-lg shadow-blue-400/20"
-                  >
-                    <Twitter size={20} />
-                  </a>
-                  <a 
-                    href={`https://wa.me/?text=${shareTitle}%20${shareUrl}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#25D366] text-white hover:translate-y-[-4px] transition-all shadow-lg shadow-green-600/20"
-                  >
-                    <MessageCircle size={20} />
-                  </a>
-                  <button 
-                    onClick={handleCopyLink}
-                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-all shadow-lg ${copied ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 shadow-gray-200/20'}`}
-                  >
-                    {copied ? <Check size={20} /> : <Copy size={20} />}
-                  </button>
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-bold text-gray-700">{news.journalistName || 'Reporter Name'}</p>
+                  <div className="flex flex-wrap items-center gap-4 text-[11px] text-gray-500 font-medium">
+                    <div className="flex items-center gap-1">
+                      <Clock size={12} className="text-gray-400" />
+                      <span>আপডেট টাইম : {news.createdAt?.toDate ? news.createdAt.toDate().toLocaleDateString('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : 'সোমবার, ১৬ মার্চ, ২০২৬'}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Eye size={12} className="text-gray-400" />
+                      <span>৭৫ বার পঠিত</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Main Image */}
-              <div className="relative mb-12 group">
-                <div className="aspect-video w-full rounded-sm overflow-hidden shadow-2xl">
+              <div className="relative mb-8">
+                <div className="w-full rounded-sm overflow-hidden shadow-sm">
                   <img 
                     src={news.imageUrl} 
                     alt={news.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                    className="w-full h-auto object-cover"
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                  <p className="text-white text-xs font-medium italic opacity-90">ছবি: সামি টিভি আর্কাইভ</p>
-                </div>
+              </div>
+
+              {/* Print Button */}
+              <div className="mb-6 print:hidden">
+                <button 
+                  onClick={handlePrint}
+                  className="bg-[#3c9c84] text-white px-4 py-1.5 rounded-sm flex items-center gap-2 text-sm font-bold hover:bg-[#2d7a68] transition-colors shadow-sm"
+                >
+                  <Printer size={16} />
+                  প্রিন্ট নিউজ
+                </button>
               </div>
 
               {/* Content Body */}
-              <div className="prose prose-lg max-w-none text-gray-800 leading-[1.8] whitespace-pre-wrap font-sans text-xl mb-12">
+              <div className="prose prose-lg max-w-none text-gray-800 leading-[1.8] whitespace-pre-wrap font-sans text-lg mb-12">
                 {news.content}
               </div>
 
@@ -389,59 +320,40 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
 
         {/* Sidebar */}
         <aside className="lg:col-span-4 space-y-8 print:hidden">
-          {/* Newsletter CTA */}
-          <div className="bg-sami-dark text-white p-8 rounded-sm news-card-shadow relative overflow-hidden">
-            <div className="absolute -right-8 -bottom-8 opacity-10">
-              <Bookmark size={120} />
-            </div>
-            <h3 className="text-xl font-bold mb-4 relative z-10">সরাসরি আপডেট পান</h3>
-            <p className="text-gray-400 text-sm mb-6 relative z-10">আমাদের নিউজলেটারে সাবস্ক্রাইব করুন এবং প্রতিদিনের গুরুত্বপূর্ণ সংবাদগুলো আপনার ইনবক্সে পান।</p>
-            <div className="space-y-3 relative z-10">
-              <input 
-                type="email" 
-                placeholder="আপনার ইমেইল" 
-                className="w-full px-4 py-3 bg-white/10 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-sami-blue transition-colors"
-              />
-              <button className="w-full py-3 bg-sami-blue hover:bg-sami-dark border border-sami-blue text-white font-bold text-sm rounded-lg transition-all">
-                সাবস্ক্রাইব করুন
+          {/* Tabbed News Sidebar */}
+          <div className="bg-white rounded-sm border border-gray-200 overflow-hidden">
+            <div className="flex bg-gray-100">
+              <button 
+                onClick={() => setActiveSidebarTab('latest')}
+                className={`flex-1 py-3 text-sm font-bold transition-all ${activeSidebarTab === 'latest' ? 'bg-white text-gray-900 border-t-2 border-sami-red' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                সর্বশেষ সংবাদ
+              </button>
+              <button 
+                onClick={() => setActiveSidebarTab('popular')}
+                className={`flex-1 py-3 text-sm font-bold transition-all ${activeSidebarTab === 'popular' ? 'bg-white text-gray-900 border-t-2 border-sami-red' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                জনপ্রিয় সংবাদ
               </button>
             </div>
-          </div>
-
-          {/* Latest News Sidebar */}
-          <div className="bg-white rounded-sm news-card-shadow p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <div className="w-1.5 h-6 bg-sami-blue rounded-full"></div>
-              সর্বশেষ সংবাদ
-            </h3>
-            <div className="space-y-6">
+            <div className="p-4 space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
               {latestNews.map((item) => (
                 <div 
                   key={item.id} 
-                  className="flex gap-4 group cursor-pointer"
+                  className="flex gap-3 group cursor-pointer pb-4 border-b border-gray-50 last:border-0"
                   onClick={() => onNewsClick?.(item)}
                 >
-                  <div className="w-24 h-16 shrink-0 rounded-sm overflow-hidden shadow-sm">
+                  <div className="w-20 h-14 shrink-0 rounded-sm overflow-hidden bg-gray-100">
                     <img src={item.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-sami-blue transition-colors">
+                    <h4 className="text-[13px] font-bold text-gray-800 line-clamp-2 leading-tight group-hover:text-sami-red transition-colors">
                       {item.title}
                     </h4>
-                    <p className="text-[10px] text-gray-400 mt-1 flex items-center gap-1 font-bold">
-                      <Clock size={10} className="text-sami-blue" />
-                      {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('bn-BD') : 'এখনই'}
-                    </p>
                   </div>
                 </div>
               ))}
             </div>
-            <button 
-              onClick={() => navigate('/')}
-              className="w-full mt-8 py-3 bg-gray-50 text-sami-blue font-bold text-sm rounded-lg hover:bg-sami-blue hover:text-white transition-all flex items-center justify-center gap-2 border border-gray-100"
-            >
-              সব খবর দেখুন <ChevronRight size={16} />
-            </button>
           </div>
 
           {/* Advertisements Sidebar */}
@@ -475,6 +387,57 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
             </div>
           )}
         </aside>
+      </div>
+      {/* Professional Print/Download Template (Hidden in UI, visible in Print/Download) */}
+      <div className="fixed left-[-9999px] top-0 print:static print:left-0">
+        <div 
+          ref={printRef} 
+          className="w-[800px] bg-white p-8 border border-gray-300 font-sans text-gray-900"
+          style={{ minHeight: '1000px' }}
+        >
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
+              alt="Sami TV Logo" 
+              className="h-24 w-auto"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          {/* Date Bar */}
+          <div className="bg-[#1a4731] text-white py-2 px-4 text-center text-sm font-bold mb-6">
+            প্রিন্ট এর তারিখ: {new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })} || 
+            প্রকাশের তারিখ: {news.createdAt?.toDate ? news.createdAt.toDate().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' }) : '১৬ মার্চ, ২০২৬'}
+          </div>
+
+          {/* Title */}
+          <h1 className="text-4xl font-bold text-[#004a7c] leading-tight mb-8 border-b-2 border-gray-100 pb-4">
+            {news.title}
+          </h1>
+
+          {/* Content with Image Wrapping */}
+          <div className="clearfix">
+            <div className="float-left w-[45%] mr-6 mb-4">
+              <img 
+                src={news.imageUrl} 
+                alt={news.title} 
+                className="w-full h-auto rounded-sm shadow-sm border border-gray-200"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="text-lg leading-[1.8] text-justify whitespace-pre-wrap">
+              {news.content}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-12 pt-6 border-t border-gray-200 text-center">
+            <p className="text-sm font-bold text-gray-700">
+              Copyright © {new Date().getFullYear()} Sami TV. All rights reserved.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
