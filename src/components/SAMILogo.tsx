@@ -9,8 +9,6 @@ export const SAMILogo: React.FC<{ className?: string }> = ({ className }) => {
         className="h-20 w-auto object-contain drop-shadow-[0_4px_4px_rgba(0,0,0,0.03)]"
         referrerPolicy="no-referrer"
       />
-      <div className="text-sami-red font-black text-xl mt-2 tracking-tighter">সামি টেলিভিশন</div>
-      <div className="text-gray-500 text-xs font-bold tracking-widest">হৃদয়ের নতুন প্রজন্ম</div>
     </div>
   );
 };

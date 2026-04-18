@@ -64,10 +64,20 @@ export const Navbar: React.FC<{
   };
 
   return (
-    <nav className="bg-sami-purple text-white sticky top-0 z-50 shadow-lg">
-      <div className="container mx-auto px-4 flex items-center justify-between h-11 max-w-7xl">
+    <nav className="bg-[#1a1a1a] text-white sticky top-0 z-50 shadow-lg border-b border-black">
+      <div className="container mx-auto px-4 flex items-center justify-between h-10 max-w-7xl">
+        {/* Mobile Menu Toggle */}
+        <div className="lg:hidden flex items-center">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 hover:bg-white/5 rounded-xl transition-colors"
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+
         {/* Desktop Menu */}
-        <ul className="hidden lg:flex items-center font-bold text-[13px] h-full">
+        <ul className="hidden lg:flex items-center font-bold text-[12px] h-full uppercase tracking-tighter">
           {mainNavItems.map((item) => {
             const isActive = isItemActive(item.href);
             return (
@@ -118,16 +128,6 @@ export const Navbar: React.FC<{
           </li>
         </ul>
 
-        {/* Mobile Menu Toggle */}
-        <div className="lg:hidden flex items-center">
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 hover:bg-white/5 rounded-xl transition-colors"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
           <button className="p-2.5 hover:bg-white/5 rounded-full transition-all text-white/70 hover:text-white">
@@ -143,7 +143,7 @@ export const Navbar: React.FC<{
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}
-            className="lg:hidden fixed inset-0 top-14 bg-sami-dark z-50 overflow-y-auto"
+            className="lg:hidden fixed inset-0 top-10 bg-sami-dark z-50 overflow-y-auto"
           >
             <ul className="flex flex-col p-6 gap-2">
               {[...mainNavItems, ...otherNavItems].map((item) => {
@@ -155,9 +155,7 @@ export const Navbar: React.FC<{
                       className={`w-full text-left py-4 px-6 rounded-2xl transition-all font-black uppercase tracking-tighter text-sm ${
                         isActive 
                           ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20' 
-                          : item.isSpecial 
-                            ? 'bg-sami-red/10 text-sami-red border border-sami-red/20' 
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                          : 'text-white/70 hover:bg-white/5 hover:text-white'
                       }`}
                     >
                       {item.label}

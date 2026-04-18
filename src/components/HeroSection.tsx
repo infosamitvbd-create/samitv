@@ -43,7 +43,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick }) => {
           onClick={() => onNewsClick(featured)}
           className="bg-white rounded-sm overflow-hidden border border-gray-200 group cursor-pointer h-full"
         >
-          <div className="relative aspect-[16/10] overflow-hidden">
+          <div className="relative aspect-video sm:aspect-[16/10] overflow-hidden">
             <img 
               src={featured.imageUrl} 
               alt={featured.title} 
@@ -52,7 +52,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick }) => {
             />
           </div>
           <div className="p-4">
-            <h1 className="text-2xl font-bold text-gray-900 leading-tight group-hover:text-sami-red transition-colors">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight group-hover:text-sami-red transition-colors">
               {featured.title}
             </h1>
           </div>

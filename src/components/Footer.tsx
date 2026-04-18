@@ -8,7 +8,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
   return (
     <footer className="bg-sami-dark text-white pt-16 pb-8 mt-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12 text-center md:text-left">
           {/* Brand Section */}
           <div className="space-y-6">
             <div className="bg-white p-4 rounded-xl inline-block">
@@ -86,19 +86,28 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <Phone size={18} className="text-sami-red shrink-0" />
-                <span>+৮৮০ ১৭০০-০০০০০০</span>
+                <span className="font-eng">01912618994</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <Mail size={18} className="text-sami-red shrink-0" />
-                <span>info.samitv.bd@gmail.com</span>
+                <span className="font-eng">info.samitv.bd@gmail.com</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium">
+        <div className="pt-8 border-t border-white/5 flex flex-row justify-between items-center gap-4 text-xs text-gray-500 font-medium font-eng">
           <p>© {currentYear} সামি টেলিভিশন। সর্বস্বত্ব সংরক্ষিত।</p>
-          <p>Developed by <span className="text-gray-400">Sami Multimedia Ltd.</span></p>
+          <div className="flex items-center gap-4">
+            <p>Developed by <span className="text-gray-400">Emran Hasan Sami</span></p>
+            <button 
+              onClick={() => onNavigate('/admin')}
+              className="text-gray-600 hover:text-gray-400 transition-colors flex items-center gap-1"
+              title="Admin Access"
+            >
+               অ্যাডমিন : <MapPin size={10} className="hidden" /> 🔒
+            </button>
+          </div>
         </div>
       </div>
     </footer>

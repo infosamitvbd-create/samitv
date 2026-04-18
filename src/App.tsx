@@ -94,16 +94,6 @@ export default function App() {
         <BreakingNews />
         <Footer onNavigate={handleNavigate} />
       </footer>
-
-      {/* Admin Floating Button */}
-      <button 
-        onClick={() => handleNavigate('/admin')}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-black transition-all z-40 group print:hidden"
-        title="Admin Panel"
-      >
-        <Lock size={20} />
-        <span className="absolute right-full mr-3 bg-black text-white px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">অ্যাডমিন প্যানেল</span>
-      </button>
     </div>
   );
 }

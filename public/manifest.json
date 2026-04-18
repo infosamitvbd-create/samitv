@@ -1,0 +1,21 @@
+{
+  "name": "Jamalpur Television",
+  "short_name": "Jamalpur TV",
+  "description": "জামালপুরের সব খবর সবার আগে",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#e31e24",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/jamalpur/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/jamalpur/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

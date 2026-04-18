@@ -29,9 +29,9 @@ export const BreakingNews: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-[#004a7c] text-white h-10 flex items-center overflow-hidden">
+    <div className="bg-[#1a1a1a] text-white h-10 flex items-center overflow-hidden border-b border-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-full max-w-7xl">
-        <div className="bg-sami-red px-4 h-full flex items-center font-bold text-sm shrink-0 shadow-[4px_0_10px_rgba(0,0,0,0.2)] z-10">
+        <div className="bg-sami-red px-4 h-full flex items-center font-bold text-[12px] shrink-0 shadow-[4px_0_10px_rgba(0,0,0,0.2)] z-10 uppercase tracking-wider">
           শিরোনাম:
         </div>
         <div className="flex-1 px-4 overflow-hidden relative">

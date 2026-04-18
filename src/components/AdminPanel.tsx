@@ -186,21 +186,34 @@ export const AdminPanel: React.FC = () => {
       showNotification("বিজ্ঞাপন লোড করতে সমস্যা হয়েছে।", "error");
     });
 
-    // Applications Subscription
-    const qApps = query(collection(db, 'applications'), orderBy('createdAt', 'desc'));
-    const unsubscribeApps = onSnapshot(qApps, (snapshot) => {
-      setApplications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (error) => {
-      console.error("Applications Subscription Error: ", error);
-    });
+    // Protected Subscriptions (Only if authenticated as Admin)
+    const isAdminUser = user?.email === "info.samitv.bd@gmail.com";
+    
+    let unsubscribeApps: (() => void) | undefined;
+    let unsubscribeMessages: (() => void) | undefined;
 
-    // Messages Subscription
-    const qMessages = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
-    const unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
-      setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (error) => {
-      console.error("Messages Subscription Error: ", error);
-    });
+    if (isAdminUser || isLocalAdmin) {
+      // Applications Subscription
+      const qApps = query(collection(db, 'applications'), orderBy('createdAt', 'desc'));
+      unsubscribeApps = onSnapshot(qApps, (snapshot) => {
+        setApplications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }, (error) => {
+        // If it's a permission error, we don't spam the console if we're not technically Firebase Admin
+        if (!error.message.includes('insufficient permissions')) {
+          console.error("Applications Subscription Error: ", error);
+        }
+      });
+
+      // Messages Subscription
+      const qMessages = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+      unsubscribeMessages = onSnapshot(qMessages, (snapshot) => {
+        setMessages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      }, (error) => {
+        if (!error.message.includes('insufficient permissions')) {
+          console.error("Messages Subscription Error: ", error);
+        }
+      });
+    }
 
     return () => {
       unsubscribeAuth();
@@ -209,10 +222,10 @@ export const AdminPanel: React.FC = () => {
       unsubscribeMedia();
       unsubscribeTicker();
       unsubscribeAds();
-      unsubscribeApps();
-      unsubscribeMessages();
+      if (unsubscribeApps) unsubscribeApps();
+      if (unsubscribeMessages) unsubscribeMessages();
     };
-  }, []);
+  }, [user, isLocalAdmin]);
 
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
@@ -587,7 +600,7 @@ export const AdminPanel: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 sm:p-12 rounded-3xl shadow-2xl max-w-md w-full text-center relative z-10 border border-white/20"
+          className="bg-white p-12 rounded-3xl shadow-2xl max-w-md w-full text-center relative z-10 border border-white/20"
         >
           <div className="mb-8">
             <SAMILogo className="scale-125 mb-4" />
@@ -675,9 +688,12 @@ export const AdminPanel: React.FC = () => {
             )}
           </div>
           
-          <div className="mt-12 pt-8 border-t border-gray-100">
+          <div className="mt-12 pt-8 border-t border-gray-100 space-y-2 font-eng">
             <p className="text-[10px] text-gray-400 uppercase tracking-widest">
               &copy; {new Date().getFullYear()} SAMI MULTIMEDIA LTD.
+            </p>
+            <p className="text-[11px] text-sami-red font-black uppercase tracking-tighter">
+              Developer BY EMRAN HASAN SAMI
             </p>
           </div>
         </motion.div>
@@ -686,95 +702,120 @@ export const AdminPanel: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Admin Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between max-w-7xl">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col md:flex-row font-sans">
+      {/* Sidebar Navigation */}
+      <aside className="w-full md:w-64 bg-gray-900 text-white flex flex-col sticky top-0 md:h-screen z-50">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-sami-red rounded-lg flex items-center justify-center text-white font-bold">A</div>
-            <div>
-              <h1 className="font-bold text-gray-900">অ্যাডমিন প্যানেল</h1>
-              <p className="text-[10px] text-gray-500">{user?.email || 'Local Admin'}</p>
+            <div className="w-10 h-10 bg-sami-red rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-sami-red/20 ring-2 ring-white/10">S</div>
+            <div className="font-eng">
+              <h1 className="font-black text-sm uppercase tracking-tighter">SAMI CMS</h1>
+              <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Admin v2.0</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 text-red-600 font-bold text-sm hover:bg-red-50 px-4 py-2 rounded-lg transition-all">
-            <LogOut size={18} /> লগআউট
-          </button>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-          <button onClick={() => setActiveTab('dashboard')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Layout size={18} /> ড্যাশবোর্ড
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          {[
+            { id: 'dashboard', icon: Layout, label: 'ড্যাশবোর্ড' },
+            { id: 'news', icon: Send, label: 'নিউজ ম্যানেজমেন্ট' },
+            { id: 'reporters', icon: Users, label: 'আওয়ার ফ্যামিলি' },
+            { id: 'media', icon: Film, label: 'মিডিয়া গ্যালারি' },
+            { id: 'ticker', icon: MessageSquare, label: 'স্ক্রলিং নিউজ' },
+            { id: 'ads', icon: ImageIcon, label: 'বিজ্ঞাপন' },
+            { id: 'applications', icon: Users, label: 'আবেদনসমূহ' },
+            { id: 'messages', icon: MessageSquare, label: 'মেসেজ বক্স' },
+            { id: 'migration', icon: Upload, label: 'ডাটা ট্রান্সফার' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id as AdminTab)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+                activeTab === item.id 
+                  ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20 scale-[1.02]' 
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <item.icon size={18} className={activeTab === item.id ? 'text-white' : 'text-gray-500'} />
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-white/10 space-y-4">
+          <div className="bg-white/5 rounded-xl p-3 flex items-center gap-3">
+             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+                <User size={16} className="text-gray-400" />
+             </div>
+             <div className="flex-1 min-w-0 font-eng">
+                <p className="text-[11px] font-bold truncate uppercase">{user?.email?.split('@')[0] || 'Admin'}</p>
+                <p className="text-[9px] text-gray-500 font-black uppercase">Role: Super Admin</p>
+             </div>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 text-red-500 rounded-xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all border border-red-600/20"
+          >
+            <LogOut size={16} /> লগআউট করুন
           </button>
-          <button onClick={() => setActiveTab('news')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'news' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Send size={18} /> নিউজ
-          </button>
-          <button onClick={() => setActiveTab('reporters')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'reporters' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Users size={18} /> আওয়ার ফ্যামিলি
-          </button>
-          <button onClick={() => setActiveTab('media')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'media' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Film size={18} /> মিডিয়া
-          </button>
-          <button onClick={() => setActiveTab('ticker')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ticker' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <MessageSquare size={18} /> স্ক্রলিং নিউজ
-          </button>
-          <button onClick={() => setActiveTab('ads')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'ads' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <ImageIcon size={18} /> বিজ্ঞাপন
-          </button>
-          <button onClick={() => setActiveTab('applications')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'applications' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Users size={18} /> আবেদনসমূহ
-          </button>
-          <button onClick={() => setActiveTab('messages')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'messages' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <MessageSquare size={18} /> মেসেজ
-          </button>
-          <button onClick={() => setActiveTab('migration')} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap ${activeTab === 'migration' ? 'bg-sami-red text-white shadow-lg' : 'text-gray-500 hover:bg-gray-50'}`}>
-            <Upload size={18} /> ডাটা ট্রান্সফার
-          </button>
+          
+          <div className="text-center pt-2 font-eng">
+            <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter">Developed BY</p>
+            <p className="text-[10px] text-sami-red font-black uppercase tracking-tighter">EMRAN HASAN SAMI</p>
+          </div>
         </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+        <header className="bg-white border-b border-gray-100 h-16 flex items-center justify-between px-8 shrink-0">
+          <div className="flex items-center gap-4">
+             <h2 className="text-lg font-black text-gray-800 uppercase tracking-tight">
+               {activeTab === 'dashboard' && 'ড্যাশবোর্ড সীরাত'}
+               {activeTab === 'news' && 'নিউজ ম্যানেজমেন্ট'}
+               {activeTab === 'reporters' && 'রিপোর্টার প্যানেল'}
+               {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
+               {activeTab === 'ticker' && 'স্ক্রলিং নিউজ এডিটর'}
+               {activeTab === 'ads' && 'অ্যাড ম্যানেজমেন্ট'}
+               {activeTab === 'applications' && 'চাকরির আবেদন'}
+               {activeTab === 'messages' && 'দর্শকদের মেসেজ'}
+               {activeTab === 'migration' && 'সিস্টেম মাইগ্রেশন'}
+             </h2>
+          </div>
+          <div className="flex items-center gap-6">
+             <div className="hidden sm:flex flex-col items-end">
+                <p className="text-xs font-bold text-gray-900">{new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Jamalpur TV</p>
+             </div>
+             <div className="w-px h-8 bg-gray-100"></div>
+             <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+                <ShieldCheck size={20} className="text-green-600" />
+             </div>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
 
         {activeTab === 'dashboard' ? (
           <div className="space-y-8">
             {/* Stats Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                  <Layout size={24} />
+              {[
+                { label: 'মোট নিউজ', value: stats.news, icon: Layout, color: 'blue', bg: 'bg-blue-500' },
+                { label: 'রিপোর্টার', value: stats.reporters, icon: Users, color: 'green', bg: 'bg-emerald-500' },
+                { label: 'মিডিয়া ফাইল', value: stats.media, icon: Film, color: 'purple', bg: 'bg-violet-500' },
+                { label: 'বিজ্ঞাপন', value: stats.ads, icon: ImageIcon, color: 'red', bg: 'bg-sami-red' }
+              ].map((stat, i) => (
+                <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group">
+                  <div className={`w-14 h-14 ${stat.bg} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-${stat.color}-500/20 group-hover:scale-110 transition-transform`}>
+                    <stat.icon size={28} />
+                  </div>
+                  <div>
+            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1 font-eng">{stat.label}</p>
+            <p className="text-3xl font-black text-gray-900 tracking-tight font-eng">{stat.value}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500 font-bold">মোট নিউজ</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.news}</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
-                  <Users size={24} />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 font-bold">রিপোর্টার</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.reporters}</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
-                  <Film size={24} />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 font-bold">মিডিয়া ফাইল</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.media}</p>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
-                  <ImageIcon size={24} />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 font-bold">বিজ্ঞাপন</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.ads}</p>
-                </div>
-              </div>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1042,13 +1083,18 @@ export const AdminPanel: React.FC = () => {
           {/* Right Column: Lists */}
           <div className="lg:col-span-2">
             <div className="bg-white p-6 rounded-2xl shadow-lg min-h-[600px]">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Layout size={20} className="text-sami-red" /> 
-                {activeTab === 'news' && 'আপলোড করা নিউজসমূহ'}
-                {activeTab === 'reporters' && 'রিপোর্টার তালিকা'}
-                {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
-                {activeTab === 'ticker' && 'বর্তমান স্ক্রলিং নিউজ'}
-              </h2>
+                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                  <Layout size={20} className="text-sami-red" /> 
+                  <span className="uppercase tracking-tight text-gray-900">
+                    {activeTab === 'news' && 'আপলোড করা নিউজসমূহ'}
+                    {activeTab === 'reporters' && 'রিপোর্টার তালিকা'}
+                    {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
+                    {activeTab === 'ticker' && 'বর্তমান ব্রেকিং নিউজ'}
+                    {activeTab === 'ads' && 'বিজ্ঞাপন স্লট'}
+                    {activeTab === 'applications' && 'আবেদন ডিটেইলস'}
+                    {activeTab === 'messages' && 'সংবাদ রুম'}
+                  </span>
+                </h2>
 
               <div className="space-y-4">
                 {activeTab === 'news' && newsList.map((news) => (
@@ -1280,7 +1326,8 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
       )}
-    </main>
+        </div>
+      </div>
 
       {/* Custom Notification */}
       <AnimatePresence>
