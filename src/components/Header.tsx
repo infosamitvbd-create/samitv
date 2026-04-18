@@ -115,7 +115,7 @@ export const Header: React.FC<{
         {/* Header Ad */}
         <div className="flex-grow w-full lg:max-w-[728px] h-[90px] bg-gray-50 rounded-lg border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group relative cursor-pointer">
            <img 
-              src="https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-016.jpg" 
+              src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-016.jpg" 
               alt="Header Ad" 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"

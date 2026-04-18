@@ -88,15 +88,37 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Information Ad */}
-      <div className="p-2 border-2 border-yellow-400 bg-yellow-50 rounded-sm shadow-sm">
-        <div className="bg-white p-3 border border-yellow-200 rounded-sm">
-          <h6 className="text-[10px] font-bold text-red-600 mb-2 text-center uppercase tracking-widest">বিজ্ঞপ্তি</h6>
-          <div className="bg-red-600 text-white p-4 rounded-sm text-center font-bold text-sm shadow-inner mb-3">
-            আপনার প্রতিষ্ঠানের সঠিক ও নির্ভরযোগ্য প্রচারের জন্য আজই যোগাযোগ করুন
+      <div className="flex flex-col gap-4">
+        <div className="p-2 border-2 border-yellow-400 bg-yellow-50 rounded-sm shadow-sm">
+          <div className="bg-white p-3 border border-yellow-200 rounded-sm">
+            <h6 className="text-[10px] font-bold text-red-600 mb-2 text-center uppercase tracking-widest">বিজ্ঞপ্তি</h6>
+            <div className="bg-red-600 text-white p-4 rounded-sm text-center font-bold text-sm shadow-inner mb-3">
+              আপনার প্রতিষ্ঠানের সঠিক ও নির্ভরযোগ্য প্রচারের জন্য আজই যোগাযোগ করুন
+            </div>
+            <div className="bg-sami-dark text-white p-4 rounded-sm text-center border-l-4 border-yellow-400">
+               <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Advertisement Hotline</p>
+               <p className="text-xs font-black text-sami-red">COMING SOON</p>
+            </div>
           </div>
-          <div className="bg-sami-dark text-white p-4 rounded-sm text-center border-l-4 border-yellow-400">
-             <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Advertisement Hotline</p>
-             <p className="text-xs font-black text-sami-red">COMING SOON</p>
+        </div>
+
+        {/* User Specific Ads */}
+        <div className="flex flex-col gap-4">
+          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
+            <img 
+              src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/021.png" 
+              alt="Sidebar Ad 1" 
+              className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
+            <img 
+              src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-052.jpg" 
+              alt="Sidebar Ad 2" 
+              className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+              referrerPolicy="no-referrer"
+            />
           </div>
         </div>
       </div>

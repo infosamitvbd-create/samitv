@@ -147,7 +147,7 @@ export const AdminPanel: React.FC = () => {
       setNewsList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       console.error("News Subscription Error: ", error);
-      showNotification("নিউজ লোড করতে সমস্যা হয়েছে। ইনডেক্স চেক করুন।", "error");
+      showNotification("Error loading news. Please check your indexes.", "error");
     });
 
     // Reporters Subscription
@@ -156,7 +156,7 @@ export const AdminPanel: React.FC = () => {
       setReporters(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       console.error("Reporters Subscription Error: ", error);
-      showNotification("রিপোর্টার লোড করতে সমস্যা হয়েছে।", "error");
+      showNotification("Error loading reporters.", "error");
     });
 
     // Media Subscription
@@ -165,7 +165,7 @@ export const AdminPanel: React.FC = () => {
       setMediaList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       console.error("Media Subscription Error: ", error);
-      showNotification("মিডিয়া লোড করতে সমস্যা হয়েছে।", "error");
+      showNotification("Error loading media.", "error");
     });
 
     // Ticker Subscription
@@ -183,7 +183,7 @@ export const AdminPanel: React.FC = () => {
       setAdsList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (error) => {
       console.error("Ads Subscription Error: ", error);
-      showNotification("বিজ্ঞাপন লোড করতে সমস্যা হয়েছে।", "error");
+      showNotification("Error loading advertisements.", "error");
     });
 
     // Protected Subscriptions (Only if authenticated as Admin)
@@ -244,7 +244,7 @@ export const AdminPanel: React.FC = () => {
       // Persist session for current tab
       sessionStorage.setItem('sami_admin_auth', 'true');
     } else {
-      setLoginError('ভুল ইউজারনেম অথবা পাসওয়ার্ড!');
+      setLoginError('Invalid username or password!');
     }
   };
 
@@ -295,7 +295,7 @@ export const AdminPanel: React.FC = () => {
       }
 
       if (!finalImageUrl) {
-        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        showNotification('Please provide an image.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -306,7 +306,7 @@ export const AdminPanel: React.FC = () => {
           imageUrl: finalImageUrl,
           updatedAt: serverTimestamp()
         });
-        showNotification('নিউজ সফলভাবে আপডেট হয়েছে!');
+        showNotification('News updated successfully!');
       } else {
         await addDoc(collection(db, 'news'), {
           ...newsForm,
@@ -314,14 +314,14 @@ export const AdminPanel: React.FC = () => {
           authorUid: user.uid,
           createdAt: serverTimestamp()
         });
-        showNotification('নিউজ সফলভাবে আপলোড হয়েছে!');
+        showNotification('News uploaded successfully!');
       }
       setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
       setNewsImageFile(null);
       setEditingId(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'news');
-      showNotification('নিউজ আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error uploading/updating news.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -337,7 +337,7 @@ export const AdminPanel: React.FC = () => {
       }
 
       if (!finalImageUrl) {
-        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        showNotification('Please provide an image.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -348,21 +348,21 @@ export const AdminPanel: React.FC = () => {
           imageUrl: finalImageUrl,
           updatedAt: serverTimestamp()
         });
-        showNotification('রিপোর্টার সফলভাবে আপডেট হয়েছে!');
+        showNotification('Reporter updated successfully!');
       } else {
         await addDoc(collection(db, 'reporters'), {
           ...reporterForm,
           imageUrl: finalImageUrl,
           createdAt: serverTimestamp()
         });
-        showNotification('রিপোর্টার সফলভাবে যোগ করা হয়েছে!');
+        showNotification('Reporter added successfully!');
       }
       setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
       setReporterImageFile(null);
       setEditingId(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'reporters');
-      showNotification('রিপোর্টার যোগ/আপডেট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error adding/updating reporter.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -378,7 +378,7 @@ export const AdminPanel: React.FC = () => {
       }
 
       if (!finalImageUrl) {
-        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        showNotification('Please provide an image.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -389,21 +389,21 @@ export const AdminPanel: React.FC = () => {
           imageUrl: finalImageUrl,
           updatedAt: serverTimestamp()
         });
-        showNotification('মিডিয়া সফলভাবে আপডেট হয়েছে!');
+        showNotification('Media updated successfully!');
       } else {
         await addDoc(collection(db, 'media'), {
           ...mediaForm,
           imageUrl: finalImageUrl,
           createdAt: serverTimestamp()
         });
-        showNotification('মিডিয়া সফলভাবে আপলোড হয়েছে!');
+        showNotification('Media uploaded successfully!');
       }
       setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
       setMediaImageFile(null);
       setEditingId(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'media');
-      showNotification('মিডিয়া আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error uploading/updating media.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -416,10 +416,10 @@ export const AdminPanel: React.FC = () => {
         text: tickerText,
         updatedAt: serverTimestamp()
       });
-      showNotification('স্ক্রলিং নিউজ আপডেট হয়েছে!');
+      showNotification('Ticker news updated!');
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'settings/ticker');
-      showNotification('স্ক্রলিং নিউজ আপডেট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error updating ticker news.', 'error');
     } finally {
       setIsUpdatingTicker(false);
     }
@@ -435,7 +435,7 @@ export const AdminPanel: React.FC = () => {
       }
 
       if (!finalImageUrl) {
-        showNotification('অনুগ্রহ করে একটি ছবি দিন।', 'error');
+        showNotification('Please provide an image.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -446,21 +446,21 @@ export const AdminPanel: React.FC = () => {
           imageUrl: finalImageUrl,
           updatedAt: serverTimestamp()
         });
-        showNotification('বিজ্ঞাপন সফলভাবে আপডেট হয়েছে!');
+        showNotification('Advertisement updated!');
       } else {
         await addDoc(collection(db, 'ads'), {
           ...adForm,
           imageUrl: finalImageUrl,
           createdAt: serverTimestamp()
         });
-        showNotification('বিজ্ঞাপন সফলভাবে আপলোড হয়েছে!');
+        showNotification('Advertisement uploaded!');
       }
       setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
       setAdImageFile(null);
       setEditingId(null);
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'ads');
-      showNotification('বিজ্ঞাপন আপলোড/আপডেট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error uploading/updating ad.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -523,23 +523,23 @@ export const AdminPanel: React.FC = () => {
     if (!confirmDelete) return;
     try {
       await deleteDoc(doc(db, confirmDelete.collection, confirmDelete.id));
-      showNotification('সফলভাবে ডিলিট হয়েছে!');
+      showNotification('Deleted successfully!');
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `${confirmDelete.collection}/${confirmDelete.id}`);
-      showNotification('ডিলিট করতে সমস্যা হয়েছে।', 'error');
+      showNotification('Error deleting item.', 'error');
     } finally {
       setConfirmDelete(null);
     }
   };
 
   const migrateImagesToStorage = async () => {
-    if (!confirm('আপনি কি নিশ্চিত যে আপনি সব ছবি ফায়ারবেস স্টোরেজে ট্রান্সফার করতে চান? এটি কিছু সময় নিতে পারে।')) return;
+    if (!confirm('Are you sure you want to transfer all images to Firebase Storage? This process may take some time.')) return;
     
     setIsMigrating(true);
     const totalItems = newsList.length + reporters.length + mediaList.length + adsList.length;
     let completedCount = 0;
     
-    setMigrationStats({ total: totalItems, completed: 0, currentItem: 'শুরু হচ্ছে...' });
+    setMigrationStats({ total: totalItems, completed: 0, currentItem: 'Starting...' });
 
     const migrateCollection = async (list: any[], collectionName: string) => {
       for (const item of list) {
@@ -578,17 +578,17 @@ export const AdminPanel: React.FC = () => {
       await migrateCollection(reporters, 'reporters');
       await migrateCollection(mediaList, 'media');
       await migrateCollection(adsList, 'ads');
-      showNotification('সব ছবি সফলভাবে ট্রান্সফার হয়েছে!');
+      showNotification('All images transferred successfully!');
     } catch (error) {
       console.error("Migration failed: ", error);
-      showNotification('ট্রান্সফার প্রসেসে সমস্যা হয়েছে। কিছু ছবিতে CORS সমস্যা থাকতে পারে।', 'error');
+      showNotification('Migration process encountered an error. Some images might have CORS issues.', 'error');
     } finally {
       setIsMigrating(false);
       setMigrationStats({ total: 0, completed: 0, currentItem: '' });
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-screen">লোডিং...</div>;
+  if (loading) return <div className="flex items-center justify-center h-screen">Loading Admin Panel...</div>;
 
   if (!isLocalAdmin && (!user || user.email !== 'info.samitv.bd@gmail.com')) {
     return (
@@ -613,11 +613,11 @@ export const AdminPanel: React.FC = () => {
               Secure Admin Access
             </div>
             
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">অ্যাডমিন লগইন</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Admin Login</h1>
             
             <form onSubmit={handleCustomLogin} className="space-y-4 text-left">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase ml-1">ইউজারনেম</label>
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">Username</label>
                 <input 
                   type="text" 
                   required
@@ -628,7 +628,7 @@ export const AdminPanel: React.FC = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড</label>
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">Password</label>
                 <input 
                   type="password" 
                   required
@@ -648,20 +648,20 @@ export const AdminPanel: React.FC = () => {
                 className="w-full bg-sami-red text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-sami-dark transition-all shadow-lg shadow-sami-red/20 hover:shadow-xl active:scale-[0.98]"
               >
                 <LogIn size={20} />
-                লগইন করুন
+                Login Now
               </button>
             </form>
 
             <div className="relative py-4">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400 font-bold">অথবা</span></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400 font-bold">OR</span></div>
             </div>
             
             {user ? (
               <div className="space-y-6">
                 <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
                   <p className="text-red-600 font-bold text-sm leading-relaxed">
-                    দুঃখিত, আপনার এই প্যানেল অ্যাক্সেস করার অনুমতি নেই।
+                    Sorry, you do not have permission to access this panel.
                   </p>
                   <p className="text-[10px] text-gray-400 mt-2">Logged in as: {user.email}</p>
                 </div>
@@ -670,7 +670,7 @@ export const AdminPanel: React.FC = () => {
                   className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-black transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
                 >
                   <LogOut size={20} />
-                  লগ আউট করুন
+                  Logout Now
                 </button>
               </div>
             ) : (
@@ -682,7 +682,7 @@ export const AdminPanel: React.FC = () => {
                   <div className="bg-white p-1 rounded-full shadow-sm">
                     <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
                   </div>
-                  গুগল দিয়ে লগইন করুন
+                  Login with Google
                 </button>
               </div>
             )}
@@ -717,15 +717,15 @@ export const AdminPanel: React.FC = () => {
 
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {[
-            { id: 'dashboard', icon: Layout, label: 'ড্যাশবোর্ড' },
-            { id: 'news', icon: Send, label: 'নিউজ ম্যানেজমেন্ট' },
-            { id: 'reporters', icon: Users, label: 'আওয়ার ফ্যামিলি' },
-            { id: 'media', icon: Film, label: 'মিডিয়া গ্যালারি' },
-            { id: 'ticker', icon: MessageSquare, label: 'স্ক্রলিং নিউজ' },
-            { id: 'ads', icon: ImageIcon, label: 'বিজ্ঞাপন' },
-            { id: 'applications', icon: Users, label: 'আবেদনসমূহ' },
-            { id: 'messages', icon: MessageSquare, label: 'মেসেজ বক্স' },
-            { id: 'migration', icon: Upload, label: 'ডাটা ট্রান্সফার' },
+            { id: 'dashboard', icon: Layout, label: 'Dashboard' },
+            { id: 'news', icon: Send, label: 'News Management' },
+            { id: 'reporters', icon: Users, label: 'Our Family' },
+            { id: 'media', icon: Film, label: 'Media Gallery' },
+            { id: 'ticker', icon: MessageSquare, label: 'News Ticker' },
+            { id: 'ads', icon: ImageIcon, label: 'Ads Management' },
+            { id: 'applications', icon: Users, label: 'Job Applications' },
+            { id: 'messages', icon: MessageSquare, label: 'Message Box' },
+            { id: 'migration', icon: Upload, label: 'Data Transfer' },
           ].map((item) => (
             <button
               key={item.id}
@@ -756,7 +756,7 @@ export const AdminPanel: React.FC = () => {
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 text-red-500 rounded-xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all border border-red-600/20"
           >
-            <LogOut size={16} /> লগআউট করুন
+            <LogOut size={16} /> Logout
           </button>
           
           <div className="text-center pt-2 font-eng">
@@ -771,15 +771,15 @@ export const AdminPanel: React.FC = () => {
         <header className="bg-white border-b border-gray-100 h-16 flex items-center justify-between px-8 shrink-0">
           <div className="flex items-center gap-4">
              <h2 className="text-lg font-black text-gray-800 uppercase tracking-tight">
-               {activeTab === 'dashboard' && 'ড্যাশবোর্ড সীরাত'}
-               {activeTab === 'news' && 'নিউজ ম্যানেজমেন্ট'}
-               {activeTab === 'reporters' && 'রিপোর্টার প্যানেল'}
-               {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
-               {activeTab === 'ticker' && 'স্ক্রলিং নিউজ এডিটর'}
-               {activeTab === 'ads' && 'অ্যাড ম্যানেজমেন্ট'}
-               {activeTab === 'applications' && 'চাকরির আবেদন'}
-               {activeTab === 'messages' && 'দর্শকদের মেসেজ'}
-               {activeTab === 'migration' && 'সিস্টেম মাইগ্রেশন'}
+               {activeTab === 'dashboard' && 'Admin Dashboard'}
+               {activeTab === 'news' && 'News Management'}
+               {activeTab === 'reporters' && 'Reporter Panel'}
+               {activeTab === 'media' && 'Media Gallery'}
+               {activeTab === 'ticker' && 'Ticker News Editor'}
+               {activeTab === 'ads' && 'Ad Management'}
+               {activeTab === 'applications' && 'Job Applications'}
+               {activeTab === 'messages' && 'User Messages'}
+               {activeTab === 'migration' && 'System Migration'}
              </h2>
           </div>
           <div className="flex items-center gap-6">
@@ -801,10 +801,10 @@ export const AdminPanel: React.FC = () => {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: 'মোট নিউজ', value: stats.news, icon: Layout, color: 'blue', bg: 'bg-blue-500' },
-                { label: 'রিপোর্টার', value: stats.reporters, icon: Users, color: 'green', bg: 'bg-emerald-500' },
-                { label: 'মিডিয়া ফাইল', value: stats.media, icon: Film, color: 'purple', bg: 'bg-violet-500' },
-                { label: 'বিজ্ঞাপন', value: stats.ads, icon: ImageIcon, color: 'red', bg: 'bg-sami-red' }
+                { label: 'Total News', value: stats.news, icon: Layout, color: 'blue', bg: 'bg-blue-500' },
+                { label: 'Reporters', value: stats.reporters, icon: Users, color: 'green', bg: 'bg-emerald-500' },
+                { label: 'Media Files', value: stats.media, icon: Film, color: 'purple', bg: 'bg-violet-500' },
+                { label: 'Advertisements', value: stats.ads, icon: ImageIcon, color: 'red', bg: 'bg-sami-red' }
               ].map((stat, i) => (
                 <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group">
                   <div className={`w-14 h-14 ${stat.bg} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-${stat.color}-500/20 group-hover:scale-110 transition-transform`}>
@@ -821,7 +821,7 @@ export const AdminPanel: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Send size={20} className="text-sami-red" /> সাম্প্রতিক নিউজ
+                  <Send size={20} className="text-sami-red" /> Recent News
                 </h3>
                 <div className="space-y-4">
                   {newsList.slice(0, 5).map(news => (
@@ -834,12 +834,12 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব নিউজ দেখুন</button>
+                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">View All News</button>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Users size={20} className="text-sami-red" /> নতুন রিপোর্টার
+                  <Users size={20} className="text-sami-red" /> New Reporters
                 </h3>
                 <div className="space-y-4">
                   {reporters.slice(0, 5).map(rep => (
@@ -852,7 +852,7 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব রিপোর্টার দেখুন</button>
+                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">View All Reporters</button>
               </div>
             </div>
           </div>
@@ -866,7 +866,7 @@ export const AdminPanel: React.FC = () => {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
                       {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
-                      {editingId ? 'নিউজ আপডেট করুন' : 'নতুন নিউজ'}
+                      {editingId ? 'Update News' : 'New News'}
                     </h2>
                     {editingId && (
                       <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -875,10 +875,10 @@ export const AdminPanel: React.FC = () => {
                     )}
                   </div>
                   <form onSubmit={handleNewsSubmit} className="space-y-4">
-                    <input type="text" required value={newsForm.title} onChange={(e) => setNewsForm({...newsForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="নিউজ টাইটেল" />
+                    <input type="text" required value={newsForm.title} onChange={(e) => setNewsForm({...newsForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="News Title" />
                     <div className="grid grid-cols-2 gap-4">
-                      <input type="text" required value={newsForm.journalistName} onChange={(e) => setNewsForm({...newsForm, journalistName: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="সাংবাদিকের নাম" />
-                      <input type="text" required value={newsForm.location} onChange={(e) => setNewsForm({...newsForm, location: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="স্থান" />
+                      <input type="text" required value={newsForm.journalistName} onChange={(e) => setNewsForm({...newsForm, journalistName: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Journalist Name" />
+                      <input type="text" required value={newsForm.location} onChange={(e) => setNewsForm({...newsForm, location: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Location" />
                     </div>
                     <select value={newsForm.category} onChange={(e) => setNewsForm({...newsForm, category: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
                       {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -890,13 +890,13 @@ export const AdminPanel: React.FC = () => {
                         <button type="button" onClick={() => setNewsUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {newsUploadMode === 'url' ? (
-                        <input type="url" required value={newsForm.imageUrl} onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ইমেজ ইউআরএল" />
+                        <input type="url" required value={newsForm.imageUrl} onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Image URL" />
                       ) : (
                         <input type="file" required accept="image/*" onChange={(e) => setNewsImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
                       )}
                     </div>
 
-                    <textarea required rows={6} value={newsForm.content} onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="নিউজ কন্টেন্ট" />
+                    <textarea required rows={6} value={newsForm.content} onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="News Content" />
                     
                     {uploadProgress > 0 && (
                       <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
@@ -909,7 +909,7 @@ export const AdminPanel: React.FC = () => {
                     )}
 
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'পাবলিশ করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `Uploading ${Math.round(uploadProgress)}%` : 'Processing...') : (editingId ? 'Update News' : 'Publish News')}
                     </button>
                   </form>
                 </>
@@ -920,7 +920,7 @@ export const AdminPanel: React.FC = () => {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
                       {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
-                      {editingId ? 'রিপোর্টার আপডেট করুন' : 'নতুন রিপোর্টার'}
+                      {editingId ? 'Update Reporter' : 'New Reporter'}
                     </h2>
                     {editingId && (
                       <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -929,10 +929,10 @@ export const AdminPanel: React.FC = () => {
                     )}
                   </div>
                   <form onSubmit={handleReporterSubmit} className="space-y-4">
-                    <input type="text" required value={reporterForm.name} onChange={(e) => setReporterForm({...reporterForm, name: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="নাম" />
-                    <input type="text" required value={reporterForm.designation} onChange={(e) => setReporterForm({...reporterForm, designation: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="পদবী" />
+                    <input type="text" required value={reporterForm.name} onChange={(e) => setReporterForm({...reporterForm, name: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Name" />
+                    <input type="text" required value={reporterForm.designation} onChange={(e) => setReporterForm({...reporterForm, designation: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Designation" />
                     <div className="grid grid-cols-2 gap-4">
-                      <input type="text" required value={reporterForm.location} onChange={(e) => setReporterForm({...reporterForm, location: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="কর্মস্থল" />
+                      <input type="text" required value={reporterForm.location} onChange={(e) => setReporterForm({...reporterForm, location: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Workplace" />
                       <select value={reporterForm.division} onChange={(e) => setReporterForm({...reporterForm, division: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
                         {divisions.map(div => <option key={div} value={div}>{div}</option>)}
                       </select>
@@ -944,14 +944,14 @@ export const AdminPanel: React.FC = () => {
                         <button type="button" onClick={() => setReporterUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {reporterUploadMode === 'url' ? (
-                        <input type="url" required value={reporterForm.imageUrl} onChange={(e) => setReporterForm({...reporterForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবি ইউআরএল" />
+                        <input type="url" required value={reporterForm.imageUrl} onChange={(e) => setReporterForm({...reporterForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Image URL" />
                       ) : (
                         <input type="file" required accept="image/*" onChange={(e) => setReporterImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
                       )}
                     </div>
 
-                    <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ফোন (ঐচ্ছিক)" />
-                    <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ইমেইল (ঐচ্ছিক)" />
+                    <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Phone (Optional)" />
+                    <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Email (Optional)" />
                     
                     {uploadProgress > 0 && (
                       <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
@@ -964,7 +964,7 @@ export const AdminPanel: React.FC = () => {
                     )}
 
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'যোগ করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `Uploading ${Math.round(uploadProgress)}%` : 'Processing...') : (editingId ? 'Update Reporter' : 'Add Reporter')}
                     </button>
                   </form>
                 </>
@@ -975,7 +975,7 @@ export const AdminPanel: React.FC = () => {
                   <div className="flex items-center justify-between mb-1">
                     <h2 className="text-xl font-bold flex items-center gap-2">
                       {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
-                      {editingId ? 'মিডিয়া আপডেট করুন' : 'নতুন মিডিয়া'}
+                      {editingId ? 'Update Media' : 'New Media'}
                     </h2>
                     {editingId && (
                       <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -983,12 +983,12 @@ export const AdminPanel: React.FC = () => {
                       </button>
                     )}
                   </div>
-                  <p className="text-[10px] text-gray-500 mb-6">এখানে আপলোড করা ছবি ও ভিডিও সরাসরি "মিডিয়া" পেজে দেখা যাবে।</p>
+                  <p className="text-[10px] text-gray-500 mb-6">Uploaded images and videos will be visible directly on the "Media" page.</p>
                   <form onSubmit={handleMediaSubmit} className="space-y-4">
-                    <input type="text" required value={mediaForm.title} onChange={(e) => setMediaForm({...mediaForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="টাইটেল" />
+                    <input type="text" required value={mediaForm.title} onChange={(e) => setMediaForm({...mediaForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Title" />
                     <select value={mediaForm.type} onChange={(e) => setMediaForm({...mediaForm, type: e.target.value as any})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
-                      <option value="image">ছবি</option>
-                      <option value="video">ভিডিও</option>
+                      <option value="image">Image</option>
+                      <option value="video">Video</option>
                     </select>
                     
                     <div className="space-y-2">
@@ -997,14 +997,14 @@ export const AdminPanel: React.FC = () => {
                         <button type="button" onClick={() => setMediaUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {mediaUploadMode === 'url' ? (
-                        <input type="url" required value={mediaForm.imageUrl} onChange={(e) => setMediaForm({...mediaForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="থাম্বনেইল ইমেজ ইউআরএল" />
+                        <input type="url" required value={mediaForm.imageUrl} onChange={(e) => setMediaForm({...mediaForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Thumbnail Image URL" />
                       ) : (
                         <input type="file" required accept="image/*" onChange={(e) => setMediaImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
                       )}
                     </div>
 
                     {mediaForm.type === 'video' && (
-                      <input type="url" required value={mediaForm.videoUrl} onChange={(e) => setMediaForm({...mediaForm, videoUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ভিডিও ইউআরএল (Youtube/Direct)" />
+                      <input type="url" required value={mediaForm.videoUrl} onChange={(e) => setMediaForm({...mediaForm, videoUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Video URL (Youtube/Direct)" />
                     )}
 
                     {uploadProgress > 0 && (
@@ -1018,7 +1018,7 @@ export const AdminPanel: React.FC = () => {
                     )}
 
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'আপলোড করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `Uploading ${Math.round(uploadProgress)}%` : 'Processing...') : (editingId ? 'Update Media' : 'Upload Media')}
                     </button>
                   </form>
                 </>
@@ -1026,11 +1026,11 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'ticker' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MessageSquare size={20} className="text-sami-red" /> স্ক্রলিং নিউজ এডিট</h2>
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MessageSquare size={20} className="text-sami-red" /> Edit Ticker News</h2>
                   <div className="space-y-4">
-                    <textarea rows={4} value={tickerText} onChange={(e) => setTickerText(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="ব্রেকিং নিউজ টেক্সট লিখুন..." />
+                    <textarea rows={4} value={tickerText} onChange={(e) => setTickerText(e.target.value)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="Enter breaking news text..." />
                     <button onClick={handleTickerUpdate} disabled={isUpdatingTicker} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Save size={18} /> {isUpdatingTicker ? 'আপডেট হচ্ছে...' : 'আপডেট করুন'}
+                      <Save size={18} /> {isUpdatingTicker ? 'Updating...' : 'Update Ticker'}
                     </button>
                   </div>
                 </>
@@ -1038,15 +1038,15 @@ export const AdminPanel: React.FC = () => {
 
               {activeTab === 'ads' && (
                 <>
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-red" /> নতুন বিজ্ঞাপন</h2>
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Plus size={20} className="text-sami-red" /> New Advertisement</h2>
                   <form onSubmit={handleAdSubmit} className="space-y-4">
-                    <input type="text" required value={adForm.title} onChange={(e) => setAdForm({...adForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="বিজ্ঞাপন টাইটেল" />
-                    <input type="url" value={adForm.link} onChange={(e) => setAdForm({...adForm, link: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="লিঙ্ক (ঐচ্ছিক)" />
+                    <input type="text" required value={adForm.title} onChange={(e) => setAdForm({...adForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Ad Title" />
+                    <input type="url" value={adForm.link} onChange={(e) => setAdForm({...adForm, link: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Link (Optional)" />
                     
                     <select value={adForm.position} onChange={(e) => setAdForm({...adForm, position: e.target.value as any})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
-                      <option value="sidebar">সাইডবার</option>
-                      <option value="content">নিউজ কন্টেন্ট</option>
-                      <option value="popup">পপআপ</option>
+                      <option value="sidebar">Sidebar</option>
+                      <option value="content">News Content</option>
+                      <option value="popup">Popup</option>
                     </select>
 
                     <div className="space-y-2">
@@ -1055,7 +1055,7 @@ export const AdminPanel: React.FC = () => {
                         <button type="button" onClick={() => setAdUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>Upload</button>
                       </div>
                       {adUploadMode === 'url' ? (
-                        <input type="url" required value={adForm.imageUrl} onChange={(e) => setAdForm({...adForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ব্যানার ইমেজ ইউআরএল" />
+                        <input type="url" required value={adForm.imageUrl} onChange={(e) => setAdForm({...adForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Banner Image URL" />
                       ) : (
                         <input type="file" required accept="image/*" onChange={(e) => setAdImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
                       )}
@@ -1072,7 +1072,7 @@ export const AdminPanel: React.FC = () => {
                     )}
 
                     <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `আপলোড হচ্ছে ${Math.round(uploadProgress)}%` : 'প্রসেসিং হচ্ছে...') : 'বিজ্ঞাপন পাবলিশ করুন'}
+                      <Send size={18} /> {isSubmitting ? (uploadProgress > 0 ? `Uploading ${Math.round(uploadProgress)}%` : 'Processing...') : (editingId ? 'Update Ad' : 'Publish Advertisement')}
                     </button>
                   </form>
                 </>
@@ -1086,13 +1086,13 @@ export const AdminPanel: React.FC = () => {
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <Layout size={20} className="text-sami-red" /> 
                   <span className="uppercase tracking-tight text-gray-900">
-                    {activeTab === 'news' && 'আপলোড করা নিউজসমূহ'}
-                    {activeTab === 'reporters' && 'রিপোর্টার তালিকা'}
-                    {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
-                    {activeTab === 'ticker' && 'বর্তমান ব্রেকিং নিউজ'}
-                    {activeTab === 'ads' && 'বিজ্ঞাপন স্লট'}
-                    {activeTab === 'applications' && 'আবেদন ডিটেইলস'}
-                    {activeTab === 'messages' && 'সংবাদ রুম'}
+                    {activeTab === 'news' && 'Uploaded News List'}
+                    {activeTab === 'reporters' && 'Reporter List'}
+                    {activeTab === 'media' && 'Media Gallery'}
+                    {activeTab === 'ticker' && 'Current Breaking News'}
+                    {activeTab === 'ads' && 'Ad Slots'}
+                    {activeTab === 'applications' && 'Job Applications'}
+                    {activeTab === 'messages' && 'User Messages'}
                   </span>
                 </h2>
 
@@ -1111,14 +1111,14 @@ export const AdminPanel: React.FC = () => {
                         className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Edit size={14} />
-                        <span>এডিট</span>
+                        <span>Edit</span>
                       </button>
                       <button 
                         onClick={() => setConfirmDelete({ collection: 'news', id: news.id })} 
                         className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Trash2 size={14} />
-                        <span>ডিলিট</span>
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -1138,14 +1138,14 @@ export const AdminPanel: React.FC = () => {
                         className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Edit size={14} />
-                        <span>এডিট</span>
+                        <span>Edit</span>
                       </button>
                       <button 
                         onClick={() => setConfirmDelete({ collection: 'reporters', id: reporter.id })} 
                         className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Trash2 size={14} />
-                        <span>ডিলিট</span>
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -1159,7 +1159,7 @@ export const AdminPanel: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-gray-900 line-clamp-1">{media.title}</h3>
-                      <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{media.type === 'image' ? 'ছবি' : 'ভিডিও'}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{media.type === 'image' ? 'Image' : 'Video'}</p>
                     </div>
                     <div className="flex flex-col gap-2 shrink-0">
                       <button 
@@ -1167,14 +1167,14 @@ export const AdminPanel: React.FC = () => {
                         className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Edit size={14} />
-                        <span>এডিট</span>
+                        <span>Edit</span>
                       </button>
                       <button 
                         onClick={() => setConfirmDelete({ collection: 'media', id: media.id })} 
                         className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
                       >
                         <Trash2 size={14} />
-                        <span>ডিলিট</span>
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
@@ -1182,7 +1182,7 @@ export const AdminPanel: React.FC = () => {
 
                 {activeTab === 'ticker' && (
                   <div className="p-6 bg-sami-light rounded-2xl border border-sami-blue/20">
-                    <p className="text-sami-dark font-medium italic">"{tickerText || 'কোনো টেক্সট নেই'}"</p>
+                    <p className="text-sami-dark font-medium italic">"{tickerText || 'No ticker text'}"</p>
                   </div>
                 )}
 
@@ -1206,7 +1206,7 @@ export const AdminPanel: React.FC = () => {
                       className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
                     >
                       <Trash2 size={16} />
-                      <span>ডিলিট</span>
+                      <span>Delete</span>
                     </button>
                   </div>
                 ))}
@@ -1227,8 +1227,8 @@ export const AdminPanel: React.FC = () => {
                           <p className="flex items-center gap-2"><Clock size={14} className="text-sami-blue" /> {app.createdAt?.toDate()?.toLocaleString('bn-BD')}</p>
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-gray-100 text-sm text-gray-700 italic">
-                          <p className="font-bold text-gray-900 not-italic mb-1">পূর্ব অভিজ্ঞতা:</p>
-                          {app.experience || 'কোনো অভিজ্ঞতা উল্লেখ করা হয়নি।'}
+                          <p className="font-bold text-gray-900 not-italic mb-1">Previous Experience:</p>
+                          {app.experience || 'No experience mentioned.'}
                         </div>
                       </div>
                       <div className="flex md:flex-col gap-2">
@@ -1236,7 +1236,7 @@ export const AdminPanel: React.FC = () => {
                           onClick={() => setConfirmDelete({ collection: 'applications', id: app.id })}
                           className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold text-xs hover:bg-red-100 transition-all"
                         >
-                          <Trash2 size={16} /> ডিলিট
+                          <Trash2 size={16} /> Delete
                         </button>
                       </div>
                     </div>
@@ -1269,7 +1269,7 @@ export const AdminPanel: React.FC = () => {
                         onClick={() => setConfirmDelete({ collection: 'messages', id: msg.id })}
                         className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
                       >
-                        <Trash2 size={16} /> ডিলিট করুন
+                        <Trash2 size={16} /> Delete
                       </button>
                     </div>
                   </div>
@@ -1280,9 +1280,9 @@ export const AdminPanel: React.FC = () => {
                     <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Upload size={40} />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">ডাটা ট্রান্সফার ইউটিলিটি</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Data Transfer Utility</h2>
                     <p className="text-gray-600 mb-8 leading-relaxed">
-                      আপনার আগের আপলোড করা নিউজ, রিপোর্টার এবং মিডিয়া ফাইলগুলোর ছবি সরাসরি ফায়ারবেস স্টোরেজে ট্রান্সফার করতে এই টুলটি ব্যবহার করুন। এটি করলে আপনার ওয়েবসাইট আরও দ্রুত লোড হবে।
+                      Use this tool to transfer previously uploaded images for news, reporters, and media directly to Firebase Storage. This will help your website load faster.
                     </p>
 
                     {isMigrating ? (
@@ -1295,7 +1295,7 @@ export const AdminPanel: React.FC = () => {
                           />
                         </div>
                         <div className="flex justify-between text-sm font-bold text-gray-500">
-                          <span>প্রসেসিং: {migrationStats.completed} / {migrationStats.total}</span>
+                          <span>Processing: {migrationStats.completed} / {migrationStats.total}</span>
                           <span>{Math.round((migrationStats.completed / migrationStats.total) * 100)}%</span>
                         </div>
                         <p className="text-xs text-gray-400 italic truncate">
@@ -1307,16 +1307,16 @@ export const AdminPanel: React.FC = () => {
                         onClick={migrateImagesToStorage}
                         className="bg-sami-red text-white px-10 py-4 rounded-2xl font-bold hover:bg-sami-dark transition-all shadow-lg shadow-sami-red/20"
                       >
-                        ট্রান্সফার শুরু করুন
+                        Start Transfer
                       </button>
                     )}
 
                     <div className="mt-12 p-4 bg-yellow-50 rounded-xl border border-yellow-100 text-left">
                       <p className="text-xs text-yellow-700 font-bold flex items-center gap-2">
-                        <ShieldCheck size={14} /> নোট:
+                        <ShieldCheck size={14} /> Note:
                       </p>
                       <p className="text-[10px] text-yellow-600 mt-1">
-                        কিছু ছবির ক্ষেত্রে (যেমন ব্লগার বা অন্য ওয়েবসাইট) সিকিউরিটি পলিসির কারণে ট্রান্সফার নাও হতে পারে। সেক্ষেত্রে সেই নিউজগুলো ম্যানুয়ালি এডিট করে ছবি আপলোড করে নিন।
+                        Some images (e.g., from Blogger or other sites) might not transfer due to security policies. In those cases, please edit those news items manually and upload the images.
                       </p>
                     </div>
                   </div>
@@ -1356,20 +1356,20 @@ export const AdminPanel: React.FC = () => {
               <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trash2 size={32} />
               </div>
-              <h3 className="text-xl font-bold mb-2">আপনি কি নিশ্চিত?</h3>
-              <p className="text-gray-500 mb-8">এটি ডিলিট করলে আর ফিরে পাওয়া যাবে না।</p>
+              <h3 className="text-xl font-bold mb-2">Are you sure?</h3>
+              <p className="text-gray-500 mb-8">This item will be deleted permanently and cannot be recovered.</p>
               <div className="flex gap-4">
                 <button 
                   onClick={() => setConfirmDelete(null)}
                   className="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
                 >
-                  না
+                  No, Cancel
                 </button>
                 <button 
                   onClick={handleDelete}
                   className="flex-1 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
                 >
-                  হ্যাঁ, ডিলিট করুন
+                  Yes, Delete
                 </button>
               </div>
             </motion.div>
