@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../lib/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck, Calendar } from 'lucide-react';
@@ -285,6 +285,17 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      showNotification('Signed in with Google!', 'success');
+    } catch (error) {
+      console.error("Login Error: ", error);
+      showNotification('Google Login Failed', 'error');
+    }
+  };
+
   const handleLogout = () => {
     signOut(auth);
     setIsLocalAdmin(false);
@@ -323,7 +334,10 @@ export const AdminPanel: React.FC = () => {
 
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      showNotification('Please Sign in with Google to perform this action.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     try {
       let finalImageUrl = newsForm.imageUrl;
@@ -356,9 +370,9 @@ export const AdminPanel: React.FC = () => {
       setNewsForm({ title: '', content: '', imageUrl: '', category: 'National', journalistName: '', location: '' });
       setNewsImageFile(null);
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'news');
-      showNotification('Error uploading/updating news.', 'error');
+      showNotification(`Error: ${error.message || 'Operation failed'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -366,6 +380,10 @@ export const AdminPanel: React.FC = () => {
 
   const handleReporterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showNotification('Please Sign in with Google to perform this action.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     try {
       let finalImageUrl = reporterForm.imageUrl;
@@ -397,9 +415,9 @@ export const AdminPanel: React.FC = () => {
       setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'Dhaka', phone: '', email: '' });
       setReporterImageFile(null);
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'reporters');
-      showNotification('Error adding/updating reporter.', 'error');
+      showNotification(`Error: ${error.message || 'Operation failed'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -407,6 +425,10 @@ export const AdminPanel: React.FC = () => {
 
   const handleMediaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showNotification('Please Sign in with Google to perform this action.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     try {
       let finalImageUrl = mediaForm.imageUrl;
@@ -438,9 +460,9 @@ export const AdminPanel: React.FC = () => {
       setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
       setMediaImageFile(null);
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'media');
-      showNotification('Error uploading/updating media.', 'error');
+      showNotification(`Error: ${error.message || 'Operation failed'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -464,6 +486,10 @@ export const AdminPanel: React.FC = () => {
 
   const handleAdSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showNotification('Please Sign in with Google to perform this action.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     try {
       let finalImageUrl = adForm.imageUrl;
@@ -495,9 +521,9 @@ export const AdminPanel: React.FC = () => {
       setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
       setAdImageFile(null);
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'ads');
-      showNotification('Error uploading/updating ad.', 'error');
+      showNotification(`Error: ${error.message || 'Operation failed'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -505,6 +531,10 @@ export const AdminPanel: React.FC = () => {
 
   const handleScheduleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      showNotification('Please Sign in with Google to perform this action.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     try {
       if (editingId) {
@@ -522,9 +552,9 @@ export const AdminPanel: React.FC = () => {
       }
       setScheduleForm({ time: '', title: '', active: false, order: scheduleList.length });
       setEditingId(null);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'schedules');
-      showNotification('Error updating schedule.', 'error');
+      showNotification(`Error: ${error.message || 'Operation failed'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -605,6 +635,10 @@ export const AdminPanel: React.FC = () => {
   };
 
   const migrateImagesToStorage = async () => {
+    if (!user) {
+      showNotification('Please Sign in with Google to use the Migration tool.', 'error');
+      return;
+    }
     if (!confirm('Are you sure you want to transfer all images to Firebase Storage? This process may take some time.')) return;
     
     setIsMigrating(true);
@@ -721,6 +755,24 @@ export const AdminPanel: React.FC = () => {
               >
                 <LogIn size={20} />
                 Login Now
+              </button>
+
+              <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-100"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-4 text-gray-400 font-bold tracking-widest">Or Cloud Save Access</span>
+                </div>
+              </div>
+
+              <button 
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-[0.98]"
+              >
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                Sign in with Google
               </button>
             </form>
           </div>
