@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, User, Phone, Mail, Filter, ChevronRight, Users, Search, Globe, X, Send, CheckCircle, Upload } from 'lucide-react';
+import { MapPin, User, Phone, Mail, Filter, ChevronRight, Users, Search, Globe, X, Send, CheckCircle, Upload, Clock } from 'lucide-react';
 import { db, storage } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -233,158 +233,186 @@ export const OurFamily: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Professional Header Section */}
-      <div className="relative bg-[#004a7c] py-24 px-8 text-center overflow-hidden">
+      {/* Professional Header Section - Premium Design */}
+      <div className="relative h-[60vh] flex items-center justify-center text-center overflow-hidden bg-gray-900 border-b border-white/5">
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          <div className="absolute top-0 left-0 w-96 h-96 bg-sami-red/20 rounded-full -translate-x-1/2 -translate-y-1/2 blur-[120px]"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-sami-blue/30 rounded-full translate-x-1/2 translate-y-1/2 blur-[120px]"></div>
-        </div>
-        <div className="relative z-10">
+          <img 
+            src="https://picsum.photos/seed/journalism/1920/1080?blur=4" 
+            className="w-full h-full object-cover opacity-40 scale-105"
+            referrerPolicy="no-referrer"
+            alt="Journalism Background"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/40 to-gray-900"></div>
+          
+          {/* Animated decorative elements */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-full text-white text-xs font-bold uppercase tracking-[0.2em] mb-8 border border-white/20 shadow-xl"
-          >
-            <Users size={16} className="text-sami-red" /> আমাদের পরিবার
-          </motion.div>
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter">
-            সামী টিভি <span className="text-sami-red">পরিবার</span>
-          </h1>
-          <div className="w-32 h-2 bg-sami-red mx-auto rounded-full mb-8 shadow-lg shadow-sami-red/50"></div>
-          <p className="text-blue-50 max-w-3xl mx-auto text-xl font-medium leading-relaxed">
-            সারাদেশে ছড়িয়ে থাকা আমাদের সাহসী ও দক্ষ সংবাদকর্মীদের তালিকা। বস্তুনিষ্ঠ সংবাদ সংগ্রহে যারা দিনরাত নিরলস কাজ করে যাচ্ছেন।
-          </p>
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-sami-red/20 rounded-full mix-blend-screen blur-[120px]"
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-sami-teal/20 rounded-full mix-blend-screen blur-[150px]"
+          />
         </div>
+
+        <div className="relative z-10 max-w-4xl px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 bg-sami-red text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8 shadow-2xl shadow-sami-red/40"
+          >
+            <Users size={14} /> Our Community
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-6xl md:text-8xl font-black text-white mb-8 tracking-tight leading-[0.9]"
+          >
+            সামী টিভি <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sami-red to-sami-accent">পরিবার</span>
+          </motion.h1>
+
+          <motion.div 
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.3, duration: 1 }}
+            className="w-32 h-2 bg-white mx-auto rounded-full mb-8"
+          />
+
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed"
+          >
+            বস্তুনিষ্ঠ সাংবাদিকতার মূল কারিগর—আমাদের সাহসিক সংবাদকর্মীদের মিলনস্থল।
+          </motion.p>
+        </div>
+
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50/50 to-transparent"></div>
       </div>
 
-      <div className="p-8 lg:p-16 bg-gray-50/50">
-        {/* Filter & Search Controls */}
-        <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 mb-16 flex flex-col lg:flex-row gap-8 items-center">
-          <div className="flex-1 w-full">
-            <div className="flex items-center gap-3 mb-5 text-gray-900 font-black text-sm uppercase tracking-widest">
-              <div className="w-8 h-8 rounded-lg bg-sami-red/10 flex items-center justify-center text-sami-red">
-                <Filter size={18} />
-              </div>
-              <span>বিভাগ অনুযায়ী ফিল্টার</span>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {divisions.map((division) => (
-                <button
-                  key={division}
-                  onClick={() => setSelectedDivision(division)}
-                  className={`px-6 py-3 rounded-2xl font-bold transition-all text-sm border-2 ${
-                    selectedDivision === division
-                      ? 'bg-sami-red text-white border-sami-red shadow-xl shadow-sami-red/20 scale-105'
-                      : 'bg-white text-gray-500 hover:bg-gray-50 border-gray-100 hover:border-gray-200'
-                  }`}
-                >
-                  {division}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="w-full lg:w-96">
-            <div className="flex items-center gap-3 mb-5 text-gray-900 font-black text-sm uppercase tracking-widest">
-              <div className="w-8 h-8 rounded-lg bg-sami-blue/10 flex items-center justify-center text-sami-blue">
-                <Search size={18} />
-              </div>
-              <span>সদস্য খুঁজুন</span>
-            </div>
-            <div className="relative group">
-              <input 
-                type="text" 
-                placeholder="নাম বা এলাকা দিয়ে খুঁজুন..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sami-blue/10 focus:border-sami-blue transition-all text-sm font-medium"
-              />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sami-blue transition-colors" size={20} />
-            </div>
-          </div>
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-20 relative z-20 pb-32">
+        {/* Statistics Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {[
+            { label: 'মোট সদস্য', value: filteredReporters.length, icon: Users, color: 'text-sami-red' },
+            { label: 'বিভাগ', value: divisions.length - 1, icon: Globe, color: 'text-sami-teal' },
+            { label: 'উপজেলা', value: '৫০+', icon: MapPin, color: 'text-sami-blue' },
+            { label: 'প্রচার সময়', value: '২৪/৭', icon: Clock, color: 'text-orange-500' }
+          ].map((stat, i) => (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + (i * 0.1) }}
+              key={i}
+              className="bg-white p-6 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center justify-center text-center group hover:bg-sami-dark transition-all duration-500"
+            >
+              <stat.icon className={`${stat.color} mb-3 group-hover:scale-110 transition-transform`} size={24} />
+              <p className="text-2xl font-black text-gray-900 group-hover:text-white transition-colors">{stat.value}</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 group-hover:text-gray-500">{stat.label}</p>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center gap-4">
-            <div className="w-2 h-10 bg-sami-red rounded-full"></div>
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">সংবাদকর্মী তালিকা</h2>
-          </div>
-          <div className="bg-white border border-gray-200 px-6 py-2.5 rounded-2xl text-sm font-black text-gray-500 shadow-sm">
-            মোট সদস্য: <span className="text-sami-red">{filteredReporters.length}</span> জন
+        {/* Search & Filter - Redesigned for Premium Look */}
+        <div className="bg-white/80 backdrop-blur-2xl p-10 rounded-[3rem] shadow-2xl shadow-gray-200/40 border border-white mb-20">
+          <div className="flex flex-col lg:flex-row gap-12 items-end">
+            <div className="flex-1 w-full space-y-6">
+              <div className="flex items-center gap-3 text-gray-900 font-black text-[10px] uppercase tracking-[0.3em]">
+                <div className="w-1 h-4 bg-sami-red rounded-full"></div>
+                <span>সংবাদকর্মী অন্বেষণ করুন</span>
+              </div>
+              <div className="relative group">
+                <input 
+                  type="text" 
+                  placeholder="নাম, পদবী বা এলাকা দিয়ে খুঁজুন..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-16 pr-8 py-6 bg-gray-50/50 border-2 border-gray-100/50 rounded-3xl outline-none focus:bg-white focus:border-sami-red focus:ring-4 focus:ring-sami-red/5 transition-all text-lg font-bold placeholder:text-gray-300"
+                />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-sami-red transition-colors" size={24} />
+              </div>
+            </div>
+            
+            <div className="w-full lg:w-1/3 space-y-4">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] block px-2">বিভাগ সিলেক্ট করুন</label>
+              <div className="relative">
+                <select 
+                  value={selectedDivision}
+                  onChange={(e) => setSelectedDivision(e.target.value)}
+                  className="w-full appearance-none bg-gray-900 text-white pl-8 pr-12 py-6 rounded-3xl font-black text-sm cursor-pointer hover:bg-sami-dark transition-colors outline-none shadow-xl shadow-gray-900/20"
+                >
+                  {divisions.map(div => <option key={div} value={div}>{div}</option>)}
+                </select>
+                <ChevronRight size={20} className="absolute right-6 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none text-white/40" />
+              </div>
+            </div>
           </div>
         </div>
         
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-40 gap-6">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-sami-red/10 border-t-sami-red rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Users size={24} className="text-sami-red animate-pulse" />
-              </div>
-            </div>
-            <p className="text-gray-400 font-bold tracking-widest uppercase text-xs">তথ্য লোড হচ্ছে...</p>
+          <div className="flex flex-col items-center justify-center py-40 gap-8">
+            <div className="w-20 h-20 border-[6px] border-sami-red/10 border-t-sami-red rounded-full animate-spin"></div>
+            <p className="text-[10px] text-gray-400 font-black tracking-[0.4em] uppercase">গ্যালারি লোড হচ্ছে</p>
           </div>
         ) : filteredReporters.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
             <AnimatePresence mode="popLayout">
-              {filteredReporters.map((rep) => (
+              {filteredReporters.map((rep, idx) => (
                 <motion.div
                   layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.05 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   key={rep.id}
-                  className="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 border border-gray-100 flex flex-col"
+                  className="group relative"
                 >
-                  <div className="relative h-32 bg-gradient-to-br from-gray-50 to-gray-100">
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-sami-dark/10 to-sami-red/10 rounded-t-[2.5rem]"></div>
-                    <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full border-[6px] border-white shadow-2xl overflow-hidden z-10 group-hover:scale-110 transition-transform duration-700 bg-white">
-                      <img 
-                        src={rep.imageUrl || "https://picsum.photos/seed/user/200/200"} 
-                        alt={rep.name} 
-                        className="w-full h-full object-cover" 
-                        referrerPolicy="no-referrer" 
-                      />
+                  <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl transition-all duration-700 group-hover:-translate-y-4 group-hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)]">
+                    <img 
+                      src={rep.imageUrl || "https://picsum.photos/seed/user/800/1200"} 
+                      alt={rep.name} 
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000 ease-out" 
+                      referrerPolicy="no-referrer" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
+                    
+                    <div className="absolute bottom-6 left-6 right-6">
+                      <div className="inline-block px-3 py-1 bg-sami-red text-white text-[9px] font-black uppercase tracking-widest rounded mb-3">
+                        {rep.designation}
+                      </div>
+                      <h3 className="text-xl font-black text-white leading-tight">{rep.name}</h3>
                     </div>
                   </div>
                   
-                  <div className="pt-20 pb-10 px-8 flex flex-col items-center text-center flex-1">
-                    <h3 className="font-black text-gray-900 text-xl mb-2 group-hover:text-sami-red transition-colors duration-300">{rep.name}</h3>
-                    <div className="px-4 py-1.5 bg-gray-50 text-gray-500 text-[10px] font-black uppercase tracking-[0.15em] rounded-full mb-8 border border-gray-100 group-hover:bg-sami-red group-hover:text-white group-hover:border-sami-red transition-all duration-300">
-                      {rep.designation}
+                  <div className="px-2 space-y-3">
+                    <div className="flex items-center gap-3 text-gray-500 group-hover:text-gray-900 transition-colors">
+                      <MapPin size={14} className="text-sami-red shrink-0" />
+                      <span className="text-xs font-bold leading-none">{rep.location}</span>
                     </div>
                     
-                    <div className="w-full space-y-4 pt-8 border-t border-gray-50">
-                      <div className="flex items-center gap-4 text-gray-600 group/item">
-                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-sami-red/10 group-hover/item:text-sami-red transition-all">
-                          <MapPin size={16} />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">অবস্থান</p>
-                          <p className="text-sm font-bold text-gray-700">{rep.location}</p>
-                        </div>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">অনলাইন</span>
                       </div>
-                      
-                      <div className="flex items-center gap-4 text-gray-600 group/item">
-                        <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-sami-blue/10 group-hover/item:text-sami-blue transition-all">
-                          <Globe size={16} />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">বিভাগ</p>
-                          <p className="text-sm font-bold text-gray-700">{rep.division}</p>
-                        </div>
-                      </div>
-
                       {rep.phone && (
-                        <a href={`tel:${rep.phone}`} className="flex items-center gap-4 text-gray-600 group/item hover:text-green-600 transition-colors">
-                          <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover/item:bg-green-50 group-hover/item:text-green-600 transition-all">
-                            <Phone size={16} />
-                          </div>
-                          <div className="text-left">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">ফোন</p>
-                            <p className="text-sm font-bold">{rep.phone}</p>
-                          </div>
+                        <a 
+                          href={`tel:${rep.phone}`} 
+                          className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-sami-red hover:text-white transition-all shadow-sm"
+                        >
+                          <Phone size={14} />
                         </a>
                       )}
                     </div>
@@ -394,37 +422,47 @@ export const OurFamily: React.FC = () => {
             </AnimatePresence>
           </div>
         ) : (
-          <div className="text-center py-32 text-gray-400 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center gap-4">
-            <Users size={48} className="text-gray-200" />
-            <div>
-              <p className="text-lg font-bold text-gray-500">কোনো সদস্য পাওয়া যায়নি</p>
-              <p className="text-sm">অনুগ্রহ করে অন্য কোনো বিভাগ বা নাম দিয়ে চেষ্টা করুন।</p>
+          <div className="text-center py-40">
+            <div className="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-dashed border-gray-200">
+               <Users size={40} className="text-gray-200" />
             </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-2">দুঃখিত, কোনো সদস্য পাওয়া যায়নি</h3>
+            <p className="text-gray-400 font-medium mb-10">আপনার অনুসন্ধান ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।</p>
             <button 
               onClick={() => { setSelectedDivision('সব'); setSearchTerm(''); }}
-              className="mt-2 text-sami-blue font-bold hover:underline"
+              className="px-8 py-4 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-sami-dark transition-all shadow-xl"
             >
-              সব সদস্য দেখুন
+              সকল সদস্য দেখুন
             </button>
           </div>
         )}
 
-        {/* Recruitment Call to Action */}
-        <div className="mt-20 p-10 bg-gray-900 rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-sami-blue/10 rounded-full translate-x-1/2 -translate-y-1/2"></div>
-          <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-2">আপনি কি আমাদের সাথে কাজ করতে চান?</h3>
-            <p className="text-gray-400 max-w-xl">
-              সামী টিভি পরিবারে যোগ দিন এবং আপনার এলাকার সংবাদ তুলে ধরুন। আমরা সবসময় দক্ষ ও সাহসী সংবাদকর্মী খুঁজছি।
+        {/* Recruitment Footer - High Impact */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-32 relative rounded-[3rem] overflow-hidden bg-gray-900 text-white"
+        >
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sami-red/10 rounded-full blur-[100px] -mr-64 -mt-64"></div>
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-sami-teal/10 rounded-full blur-[100px] -ml-64 -mb-64"></div>
+          
+          <div className="relative z-10 p-12 md:p-20 flex flex-col items-center text-center">
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center mb-8">
+              <Users size={32} className="text-sami-red" />
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">আপনি কি আমাদের সংবাদকর্মী <br /> হতে চান?</h2>
+            <p className="text-gray-400 max-w-2xl text-lg font-medium leading-relaxed mb-12">
+              সাত-বিদেশের সত্য সংবাদ সঠিক সময়ে পৌঁছে দিতে সামী টিভি নিরলস কাজ করে যাচ্ছে। আমাদের এই যাত্রার অংশীদার হতে আজই আবেদন করুন।
             </p>
+            <button 
+              onClick={() => setShowModal(true)}
+              className="group bg-sami-red hover:bg-white hover:text-gray-900 text-white px-12 py-5 rounded-3xl font-black text-sm uppercase tracking-widest transition-all duration-500 shadow-2xl shadow-sami-red/30 flex items-center gap-4"
+            >
+              আবেদন ফরম পূরণ করুন <ChevronRight className="group-hover:translate-x-2 transition-transform" />
+            </button>
           </div>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="relative z-10 bg-sami-blue hover:bg-sami-dark text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-sami-blue/20 flex items-center gap-2 group"
-          >
-            আবেদন করুন <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

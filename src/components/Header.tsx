@@ -52,7 +52,7 @@ export const Header: React.FC<{
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               {[
-                { icon: Facebook, color: 'bg-[#1877F2]', href: 'https://www.facebook.com/samitvbd/' },
+                { icon: Facebook, color: 'bg-[#1877F2]', href: 'https://www.facebook.com/samitvbd' },
                 { icon: Youtube, color: 'bg-[#FF0000]', href: 'https://www.youtube.com/@stv2026Banglades' },
                 { icon: Twitter, color: 'bg-[#1DA1F2]', href: '#' },
                 { icon: Linkedin, color: 'bg-[#0A66C2]', href: '#' }

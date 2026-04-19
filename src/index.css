@@ -1,10 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
-@import url('https://fonts.maateen.me/tonny-banglamj/font.css');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "TonnyBanglaMJ", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "TonnyBanglaMJ", "Outfit", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
   --font-eng: "Inter", "Outfit", sans-serif;
   --font-serif: "Cormorant+Garamond", "Times New Roman", serif;
   
@@ -106,7 +105,6 @@
 
 .drop-cap::first-letter {
   @apply float-left text-7xl font-black mr-3 mt-2 text-red-600 leading-none;
-  font-family: 'TonnyBanglaMJ', sans-serif;
 }
 
 .news-body-content p {

@@ -19,7 +19,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
             </p>
             <div className="flex items-center gap-3">
               {[
-                { icon: Facebook, color: 'hover:text-[#1877F2]', href: 'https://www.facebook.com/samitvbd/' },
+                { icon: Facebook, color: 'hover:text-[#1877F2]', href: 'https://www.facebook.com/samitvbd' },
                 { icon: Youtube, color: 'hover:text-[#FF0000]', href: 'https://www.youtube.com/@stv2026Banglades' },
                 { icon: Twitter, color: 'hover:text-[#1DA1F2]', href: '#' },
                 { icon: Instagram, color: 'hover:text-[#E4405F]', href: '#' }

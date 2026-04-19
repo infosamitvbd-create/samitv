@@ -54,19 +54,28 @@ export const Sidebar: React.FC = () => {
       {/* Facebook Section */}
       <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
         <div className="bg-[#004a7c] text-white px-4 py-2 font-bold text-sm uppercase tracking-tighter">ফেসবুকে আমরা..</div>
+        <div className="p-0 border-b border-gray-100">
+          <iframe 
+            src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fsamitvbd&tabs&width=320&height=130&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId" 
+            width="100%" 
+            height="130" 
+            style={{ border: 'none', overflow: 'hidden' }} 
+            scrolling="no" 
+            frameBorder="0" 
+            allowFullScreen={true} 
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            title="Sami TV Facebook Page"
+          ></iframe>
+        </div>
         <div className="p-3">
-          <div className="border border-gray-200 p-2 rounded-sm bg-gray-50 flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-white flex items-center justify-center border border-gray-100 overflow-hidden rounded-md shadow-sm">
-              <img src="/logo.png" alt="" className="w-full h-auto" onError={(e) => (e.currentTarget.src = 'https://picsum.photos/seed/fb/50/50')} />
-            </div>
-            <div className="flex-1">
-              <h5 className="text-[14px] font-bold text-blue-600 leading-none">Sami TV</h5>
-              <p className="text-[10px] text-gray-500 mt-1">125K followers</p>
-            </div>
-          </div>
-          <button className="w-full py-2 border border-blue-100 bg-blue-50 text-blue-600 text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors rounded-sm font-eng">
-            <Facebook size={12} fill="currentColor" /> Like Page
-          </button>
+          <a 
+            href="https://www.facebook.com/samitvbd" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full py-2 bg-[#1877F2] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#166fe5] transition-all rounded-sm font-eng shadow-sm"
+          >
+            <Facebook size={12} fill="currentColor" /> Visit samitvbd
+          </a>
         </div>
       </div>
 

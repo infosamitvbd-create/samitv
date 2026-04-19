@@ -1,16 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db, storage } from '../lib/firebase';
-import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck } from 'lucide-react';
+import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMILogo } from './SAMILogo';
 
-const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
-const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
+const categories = ['National', 'Politics', 'International', 'World', 'Business', 'Around the Country', 'Sarishabari', 'Sports', 'Entertainment', 'IT', 'Jamalpur'];
+const divisions = ['Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh'];
 
-type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads' | 'applications' | 'messages' | 'migration';
+const categoryMap: Record<string, string> = {
+  'জাতীয়': 'National',
+  'জাতীয়': 'National',
+  'রাজনীতি': 'Politics',
+  'আন্তর্জাতিক': 'International',
+  'বিশ্ব': 'World',
+  'বাণিজ্য': 'Business',
+  'সারাদেশ': 'Around the Country',
+  'সারা দেশ': 'Around the Country',
+  'সরিষাবাড়ী': 'Sarishabari',
+  'খেলাধুলা': 'Sports',
+  'বিনোদন': 'Entertainment',
+  'তথ্যপ্রযুক্তি': 'IT',
+  'জামালপুর': 'Jamalpur'
+};
+
+const divisionMap: Record<string, string> = {
+  'ঢাকা': 'Dhaka',
+  'চট্টগ্রাম': 'Chattogram',
+  'রাজশাহী': 'Rajshahi',
+  'খুলনা': 'Khulna',
+  'বরিশাল': 'Barishal',
+  'সিলেট': 'Sylhet',
+  'রংপুর': 'Rangpur',
+  'ময়মনসিংহ': 'Mymensingh'
+};
+
+type AdminTab = 'dashboard' | 'news' | 'reporters' | 'media' | 'ticker' | 'ads' | 'schedule' | 'applications' | 'messages' | 'migration';
 
 enum OperationType {
   CREATE = 'create',
@@ -63,7 +90,7 @@ export const AdminPanel: React.FC = () => {
     title: '',
     content: '',
     imageUrl: '',
-    category: 'জাতীয়',
+    category: 'National',
     journalistName: '',
     location: ''
   });
@@ -77,7 +104,7 @@ export const AdminPanel: React.FC = () => {
     designation: '',
     imageUrl: '',
     location: '',
-    division: 'ঢাকা',
+    division: 'Dhaka',
     phone: '',
     email: ''
   });
@@ -110,6 +137,15 @@ export const AdminPanel: React.FC = () => {
   });
   const [adImageFile, setAdImageFile] = useState<File | null>(null);
   const [adUploadMode, setAdUploadMode] = useState<'url' | 'file'>('url');
+
+  // Schedule State
+  const [scheduleList, setScheduleList] = useState<any[]>([]);
+  const [scheduleForm, setScheduleForm] = useState({
+    time: '',
+    title: '',
+    active: false,
+    order: 0
+  });
 
   // Applications & Messages State
   const [applications, setApplications] = useState<any[]>([]);
@@ -186,6 +222,15 @@ export const AdminPanel: React.FC = () => {
       showNotification("Error loading advertisements.", "error");
     });
 
+    // Schedule Subscription
+    const qSchedule = query(collection(db, 'schedules'), orderBy('order', 'asc'));
+    const unsubscribeSchedule = onSnapshot(qSchedule, (snapshot) => {
+      setScheduleList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("Schedule Subscription Error: ", error);
+      showNotification("Error loading schedule.", "error");
+    });
+
     // Protected Subscriptions (Only if authenticated as Admin)
     const isAdminUser = user?.email === "info.samitv.bd@gmail.com";
     
@@ -222,19 +267,11 @@ export const AdminPanel: React.FC = () => {
       unsubscribeMedia();
       unsubscribeTicker();
       unsubscribeAds();
+      unsubscribeSchedule();
       if (unsubscribeApps) unsubscribeApps();
       if (unsubscribeMessages) unsubscribeMessages();
     };
   }, [user, isLocalAdmin]);
-
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Login Error: ", error);
-    }
-  };
 
   const handleCustomLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -316,7 +353,7 @@ export const AdminPanel: React.FC = () => {
         });
         showNotification('News uploaded successfully!');
       }
-      setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
+      setNewsForm({ title: '', content: '', imageUrl: '', category: 'National', journalistName: '', location: '' });
       setNewsImageFile(null);
       setEditingId(null);
     } catch (error) {
@@ -357,7 +394,7 @@ export const AdminPanel: React.FC = () => {
         });
         showNotification('Reporter added successfully!');
       }
-      setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
+      setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'Dhaka', phone: '', email: '' });
       setReporterImageFile(null);
       setEditingId(null);
     } catch (error) {
@@ -466,6 +503,33 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
+  const handleScheduleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, 'schedules', editingId), {
+          ...scheduleForm,
+          updatedAt: serverTimestamp()
+        });
+        showNotification('Schedule item updated!');
+      } else {
+        await addDoc(collection(db, 'schedules'), {
+          ...scheduleForm,
+          createdAt: serverTimestamp()
+        });
+        showNotification('Schedule item added!');
+      }
+      setScheduleForm({ time: '', title: '', active: false, order: scheduleList.length });
+      setEditingId(null);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.CREATE, 'schedules');
+      showNotification('Error updating schedule.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const startEditing = (item: any, type: AdminTab) => {
     setEditingId(item.id);
     setActiveTab(type);
@@ -474,7 +538,7 @@ export const AdminPanel: React.FC = () => {
         title: item.title,
         content: item.content,
         imageUrl: item.imageUrl,
-        category: item.category,
+        category: categoryMap[item.category] || item.category,
         journalistName: item.journalistName || '',
         location: item.location || ''
       });
@@ -485,7 +549,7 @@ export const AdminPanel: React.FC = () => {
         designation: item.designation,
         imageUrl: item.imageUrl,
         location: item.location,
-        division: item.division,
+        division: divisionMap[item.division] || item.division,
         phone: item.phone || '',
         email: item.email || ''
       });
@@ -507,16 +571,24 @@ export const AdminPanel: React.FC = () => {
         active: item.active
       });
       setAdUploadMode('url');
+    } else if (type === 'schedule') {
+      setScheduleForm({
+        time: item.time,
+        title: item.title,
+        active: item.active,
+        order: item.order || 0
+      });
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const cancelEditing = () => {
     setEditingId(null);
-    setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
-    setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
+    setNewsForm({ title: '', content: '', imageUrl: '', category: 'National', journalistName: '', location: '' });
+    setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'Dhaka', phone: '', email: '' });
     setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
     setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
+    setScheduleForm({ time: '', title: '', active: false, order: 0 });
   };
 
   const handleDelete = async () => {
@@ -651,41 +723,6 @@ export const AdminPanel: React.FC = () => {
                 Login Now
               </button>
             </form>
-
-            <div className="relative py-4">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
-              <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400 font-bold">OR</span></div>
-            </div>
-            
-            {user ? (
-              <div className="space-y-6">
-                <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
-                  <p className="text-red-600 font-bold text-sm leading-relaxed">
-                    Sorry, you do not have permission to access this panel.
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-2">Logged in as: {user.email}</p>
-                </div>
-                <button 
-                  onClick={handleLogout}
-                  className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-black transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
-                >
-                  <LogOut size={20} />
-                  Logout Now
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <button 
-                  onClick={handleLogin}
-                  className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-[0.98]"
-                >
-                  <div className="bg-white p-1 rounded-full shadow-sm">
-                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
-                  </div>
-                  Login with Google
-                </button>
-              </div>
-            )}
           </div>
           
           <div className="mt-12 pt-8 border-t border-gray-100 space-y-2 font-eng">
@@ -722,6 +759,7 @@ export const AdminPanel: React.FC = () => {
             { id: 'reporters', icon: Users, label: 'Our Family' },
             { id: 'media', icon: Film, label: 'Media Gallery' },
             { id: 'ticker', icon: MessageSquare, label: 'News Ticker' },
+            { id: 'schedule', icon: Calendar, label: 'TV Schedule' },
             { id: 'ads', icon: ImageIcon, label: 'Ads Management' },
             { id: 'applications', icon: Users, label: 'Job Applications' },
             { id: 'messages', icon: MessageSquare, label: 'Message Box' },
@@ -776,6 +814,7 @@ export const AdminPanel: React.FC = () => {
                {activeTab === 'reporters' && 'Reporter Panel'}
                {activeTab === 'media' && 'Media Gallery'}
                {activeTab === 'ticker' && 'Ticker News Editor'}
+               {activeTab === 'schedule' && 'TV Program Schedule'}
                {activeTab === 'ads' && 'Ad Management'}
                {activeTab === 'applications' && 'Job Applications'}
                {activeTab === 'messages' && 'User Messages'}
@@ -784,7 +823,7 @@ export const AdminPanel: React.FC = () => {
           </div>
           <div className="flex items-center gap-6">
              <div className="hidden sm:flex flex-col items-end">
-                <p className="text-xs font-bold text-gray-900">{new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p className="text-xs font-bold text-gray-900">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Jamalpur TV</p>
              </div>
              <div className="w-px h-8 bg-gray-100"></div>
@@ -829,7 +868,7 @@ export const AdminPanel: React.FC = () => {
                       <img src={news.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-gray-900 truncate text-sm">{news.title}</p>
-                        <p className="text-[10px] text-gray-500">{new Date(news.createdAt?.toDate()).toLocaleDateString('bn-BD')}</p>
+                        <p className="text-[10px] text-gray-500">{new Date(news.createdAt?.toDate()).toLocaleDateString('en-US')}</p>
                       </div>
                     </div>
                   ))}
@@ -1077,6 +1116,36 @@ export const AdminPanel: React.FC = () => {
                   </form>
                 </>
               )}
+
+              {activeTab === 'schedule' && (
+                <>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
+                      {editingId ? 'Update Program' : 'New Program'}
+                    </h2>
+                    {editingId && (
+                      <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <XCircle size={20} />
+                      </button>
+                    )}
+                  </div>
+                  <form onSubmit={handleScheduleSubmit} className="space-y-4">
+                    <input type="text" required value={scheduleForm.time} onChange={(e) => setScheduleForm({...scheduleForm, time: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none font-eng" placeholder="Time (e.g. 09:00 AM)" />
+                    <input type="text" required value={scheduleForm.title} onChange={(e) => setScheduleForm({...scheduleForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Program Title" />
+                    <input type="number" required value={scheduleForm.order} onChange={(e) => setScheduleForm({...scheduleForm, order: parseInt(e.target.value)})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="Sort Order" />
+                    
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input type="checkbox" checked={scheduleForm.active} onChange={(e) => setScheduleForm({...scheduleForm, active: e.target.checked})} className="w-5 h-5 accent-sami-red" />
+                      <span className="font-bold text-gray-700">Currently Live? (এখন চলছে)</span>
+                    </label>
+
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
+                      <Save size={18} /> {isSubmitting ? 'Processing...' : (editingId ? 'Update Program' : 'Add to Schedule')}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </div>
 
@@ -1090,6 +1159,7 @@ export const AdminPanel: React.FC = () => {
                     {activeTab === 'reporters' && 'Reporter List'}
                     {activeTab === 'media' && 'Media Gallery'}
                     {activeTab === 'ticker' && 'Current Breaking News'}
+                    {activeTab === 'schedule' && 'Live Program Schedule'}
                     {activeTab === 'ads' && 'Ad Slots'}
                     {activeTab === 'applications' && 'Job Applications'}
                     {activeTab === 'messages' && 'User Messages'}
@@ -1101,7 +1171,7 @@ export const AdminPanel: React.FC = () => {
                   <div key={news.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
                     <img src={news.imageUrl} alt="" className="w-24 h-20 shrink-0 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[10px] bg-sami-red/10 text-sami-red px-2 py-0.5 rounded-full font-bold uppercase">{news.category}</span>
+                      <span className="text-[10px] bg-sami-red/10 text-sami-red px-2 py-0.5 rounded-full font-bold uppercase">{categoryMap[news.category] || news.category}</span>
                       <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{news.title}</h3>
                       <p className="text-xs text-gray-500 line-clamp-2">{news.content}</p>
                     </div>
@@ -1130,7 +1200,7 @@ export const AdminPanel: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-gray-900">{reporter.name}</h3>
                       <p className="text-sm text-sami-blue font-medium">{reporter.designation}</p>
-                      <p className="text-xs text-gray-500">{reporter.location} | {reporter.division}</p>
+                      <p className="text-xs text-gray-500">{reporter.location} | {divisionMap[reporter.division] || reporter.division}</p>
                     </div>
                     <div className="flex flex-col gap-2 shrink-0">
                       <button 
@@ -1186,30 +1256,59 @@ export const AdminPanel: React.FC = () => {
                   </div>
                 )}
 
-                {activeTab === 'ads' && adsList.map((ad) => (
-                  <div key={ad.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
-                    <img src={ad.imageUrl} alt="" className="w-24 h-20 shrink-0 rounded-lg object-cover" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] bg-sami-blue/10 text-sami-blue px-2 py-0.5 rounded-full font-bold uppercase">{ad.position}</span>
-                        {ad.active ? (
-                          <span className="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">Active</span>
-                        ) : (
-                          <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-bold">Inactive</span>
-                        )}
+                    {activeTab === 'ads' && adsList.map((ad) => (
+                      <div key={ad.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
+                        <img src={ad.imageUrl} alt="" className="w-24 h-20 shrink-0 rounded-lg object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] bg-sami-blue/10 text-sami-blue px-2 py-0.5 rounded-full font-bold uppercase">{ad.position}</span>
+                            {ad.active ? (
+                              <span className="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">Active</span>
+                            ) : (
+                              <span className="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-bold">Inactive</span>
+                            )}
+                          </div>
+                          <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{ad.title}</h3>
+                          <p className="text-xs text-gray-500 truncate">{ad.link || 'No link'}</p>
+                        </div>
+                        <button 
+                          onClick={() => setConfirmDelete({ collection: 'ads', id: ad.id })} 
+                          className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
+                        >
+                          <Trash2 size={16} />
+                          <span>Delete</span>
+                        </button>
                       </div>
-                      <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{ad.title}</h3>
-                      <p className="text-xs text-gray-500 truncate">{ad.link || 'No link'}</p>
-                    </div>
-                    <button 
-                      onClick={() => setConfirmDelete({ collection: 'ads', id: ad.id })} 
-                      className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs shrink-0"
-                    >
-                      <Trash2 size={16} />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                ))}
+                    ))}
+
+                    {activeTab === 'schedule' && scheduleList.map((prog) => (
+                      <div key={prog.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group items-center">
+                        <div className="w-16 text-xs font-black text-gray-400 font-eng">
+                          {prog.time}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-bold text-gray-900">{prog.title}</h3>
+                            {prog.active && <span className="text-[9px] bg-red-100 text-sami-red px-2 py-0.5 rounded-full font-black uppercase tracking-widest line-none h-fit">LIVE NOW</span>}
+                          </div>
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">Sort Order: {prog.order}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => startEditing(prog, 'schedule')} 
+                            className="p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-all"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button 
+                            onClick={() => setConfirmDelete({ collection: 'schedules', id: prog.id })} 
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
 
                 {activeTab === 'applications' && applications.map((app) => (
                   <div key={app.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
@@ -1223,8 +1322,8 @@ export const AdminPanel: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-600 mb-4">
                           <p className="flex items-center gap-2"><Phone size={14} className="text-sami-blue" /> {app.phone}</p>
                           <p className="flex items-center gap-2"><Mail size={14} className="text-sami-blue" /> {app.email || 'N/A'}</p>
-                          <p className="flex items-center gap-2"><MapPin size={14} className="text-sami-blue" /> {app.location} ({app.division})</p>
-                          <p className="flex items-center gap-2"><Clock size={14} className="text-sami-blue" /> {app.createdAt?.toDate()?.toLocaleString('bn-BD')}</p>
+                          <p className="flex items-center gap-2"><MapPin size={14} className="text-sami-blue" /> {app.location} ({divisionMap[app.division] || app.division})</p>
+                          <p className="flex items-center gap-2"><Clock size={14} className="text-sami-blue" /> {app.createdAt?.toDate()?.toLocaleString('en-US')}</p>
                         </div>
                         <div className="bg-white p-4 rounded-xl border border-gray-100 text-sm text-gray-700 italic">
                           <p className="font-bold text-gray-900 not-italic mb-1">Previous Experience:</p>
@@ -1252,7 +1351,7 @@ export const AdminPanel: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-gray-900">{msg.name}</h3>
-                          <p className="text-xs text-gray-500">{msg.createdAt?.toDate()?.toLocaleString('bn-BD')}</p>
+                          <p className="text-xs text-gray-500">{msg.createdAt?.toDate()?.toLocaleString('en-US')}</p>
                         </div>
                       </div>
                       <span className="text-[10px] bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">{msg.subject}</span>

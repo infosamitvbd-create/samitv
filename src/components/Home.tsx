@@ -18,6 +18,20 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
   const [popupAd, setPopupAd] = useState<any>(null);
   const [contentAds, setContentAds] = useState<any[]>([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+
+  const bannerAds = [
+    "https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/021.png",
+    "https://basis.org.bd/public//img/cover_photo/thumb/c3714243e84b8b13a6f24a1ce694352a21082023080245.jpg"
+  ];
+
+  useEffect(() => {
+    const bannerInterval = setInterval(() => {
+      setActiveBannerIndex((prev) => (prev + 1) % bannerAds.length);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(bannerInterval);
+  }, []);
 
   useEffect(() => {
     const q = query(collection(db, 'news'), orderBy('createdAt', 'desc'), limit(50));
@@ -156,6 +170,27 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Banner Ad above National - Alternating every 30s */}
+        <div className="w-full relative min-h-[60px] md:min-h-[100px] overflow-hidden bg-gray-50 rounded-sm">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeBannerIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              className="w-full h-full cursor-pointer"
+            >
+              <img 
+                src={bannerAds[activeBannerIndex]} 
+                alt="Advertisement" 
+                className="w-full h-auto rounded-sm shadow-sm transition-all hover:brightness-110"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Category: 'জাতীয়' Style 1 */}

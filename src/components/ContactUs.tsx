@@ -212,7 +212,7 @@ export const ContactUs: React.FC = () => {
               সামাজিক যোগাযোগ
             </h3>
             <div className="space-y-4">
-              <a href="https://facebook.com/samitvbd" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-all group">
+              <a href="https://www.facebook.com/samitvbd" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-all group">
                 <Facebook size={24} className="group-hover:scale-110 transition-transform" />
                 <span className="font-bold">ফেসবুক পেজ</span>
               </a>

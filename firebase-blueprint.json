@@ -133,6 +133,19 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "phone", "subject", "message", "createdAt"]
+    },
+    "Schedule": {
+      "title": "Program Schedule",
+      "description": "An entry for the TV program schedule.",
+      "type": "object",
+      "properties": {
+        "time": { "type": "string", "description": "Time of the program (e.g., 09:00 AM)." },
+        "title": { "type": "string", "description": "Title of the program." },
+        "active": { "type": "boolean", "description": "Whether the program is currently live." },
+        "order": { "type": "integer", "description": "The order of the program in the schedule." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["time", "title", "active", "order", "createdAt"]
     }
   },
   "firestore": {
@@ -167,6 +180,10 @@
     "/messages/{messageId}": {
       "schema": "Message",
       "description": "Collection of contact messages."
+    },
+    "/schedules/{scheduleId}": {
+      "schema": "Schedule",
+      "description": "Program schedule for Live TV."
     }
   }
 }

@@ -213,7 +213,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
 
             {/* Heading Section */}
             <div className="space-y-6 mb-10">
-               <h1 className="text-[32px] sm:text-[44px] font-black leading-[1.1] text-gray-900 tracking-tightest" style={{ fontFamily: 'TonnyBanglaMJ, Inter, sans-serif' }}>
+               <h1 className="text-[32px] sm:text-[44px] font-black leading-[1.1] text-gray-900 tracking-tightest">
                  {news.title}
                </h1>
                
@@ -228,7 +228,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
                      </div>
                      <div>
                         <p className="text-sm font-black text-gray-900">{news.journalistName || 'স্টাফ রিপোর্টার'}</p>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jamalpur TV Official</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">SAMI TV Official</p>
                      </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-6">
@@ -262,7 +262,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
                   </div>
                </div>
                <figcaption className="mt-4 px-4 py-3 border-l-4 border-red-600 bg-gray-50 text-xs font-bold text-gray-500 italic leading-relaxed shadow-sm">
-                  ছবি: প্রতিনিধি / জামালপুর টেলিভিশন
+                  ছবি: প্রতিনিধি / সামী টিভি
                </figcaption>
             </figure>
 
@@ -455,7 +455,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
           {/* Main Logo Container */}
           <div className="flex justify-center mb-8">
             <div className="flex flex-col items-center">
-               <h1 className="text-[52px] font-black text-[#b71c1c] leading-none tracking-tighter" style={{ fontFamily: 'Kalpurush, Roboto, sans-serif' }}>জামালপুর টেলিভিশন</h1>
+               <h1 className="text-[52px] font-black text-[#b71c1c] leading-none tracking-tighter" style={{ fontFamily: 'Kalpurush, Roboto, sans-serif' }}>সামী টিভি</h1>
             </div>
           </div>
 
@@ -496,9 +496,9 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
           {/* Print Footer */}
           <div className="mt-auto pt-16 border-t-[1.5px] border-gray-100">
             <div className="flex flex-col items-center gap-2">
-               <h3 className="text-[20px] font-black text-red-700">জামালপুর টেলিভিশন</h3>
-               <p className="text-[12px] text-gray-500 font-bold">© ২০২৬ জামালপুর টেলিভিশন | জামালপুরের সব খবর সবার আগে</p>
-               <p className="text-[11px] text-blue-600 font-medium underline">ওয়েবসাইট: jamalpur-television.web.app</p>
+               <h3 className="text-[20px] font-black text-red-700">সামী টিভি</h3>
+               <p className="text-[12px] text-gray-500 font-bold">© ২০২৬ সামী টিভি | জামালপুরের সব খবর সবার আগে</p>
+               <p className="text-[11px] text-blue-600 font-medium underline">ওয়েবসাইট: samitv.com</p>
             </div>
           </div>
         </div>
