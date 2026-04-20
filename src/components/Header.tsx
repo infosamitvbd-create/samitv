@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Youtube, Twitter, Instagram, Linkedin, MapPin, Calendar, Search } from 'lucide-react';
+import { Facebook, Youtube, Twitter, Instagram, Linkedin, MapPin, Calendar, Search, PlayCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMILogo } from './SAMILogo';
 
@@ -50,6 +50,18 @@ export const Header: React.FC<{
           </div>
 
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => onNavigate('/live')}
+              className="flex items-center gap-2 bg-sami-red text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 group"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              LIVE TV
+              <PlayCircle size={14} className="group-hover:scale-110 transition-transform" />
+            </button>
+            <div className="h-4 w-[1px] bg-gray-300 mx-1 hidden md:block"></div>
             <div className="flex items-center gap-2">
               {[
                 { icon: Facebook, color: 'bg-[#1877F2]', href: 'https://www.facebook.com/samitvbd' },
@@ -106,10 +118,29 @@ export const Header: React.FC<{
       </AnimatePresence>
       
       {/* Main Header Row: Logo & Ad */}
-      <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row items-center justify-between gap-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row items-center justify-between gap-8 max-w-7xl">
         {/* Logo Section */}
-        <div className="flex-shrink-0 cursor-pointer transform hover:scale-105 transition-transform duration-300" onClick={() => onNavigate('/')}>
-          <SAMILogo className="scale-100 origin-center lg:origin-left" />
+        <div className="flex items-center gap-8">
+          <div className="flex-shrink-0 cursor-pointer transform hover:scale-105 transition-transform duration-300" onClick={() => onNavigate('/')}>
+            <SAMILogo className="scale-100 origin-center lg:origin-left" />
+          </div>
+          <div className="hidden sm:flex flex-col border-l-2 border-sami-red/20 pl-6 py-1">
+            <h1 className="text-2xl font-black text-gray-900 leading-none tracking-tighter uppercase font-eng">
+              SAMI MULTIMEDIA <span className="text-sami-red">LTD.</span>
+            </h1>
+            <p className="text-[10px] font-black text-gray-400 mt-1 uppercase tracking-[0.3em] font-eng">
+              SAMI NETWORK BANGLADESH
+            </p>
+            <div className="flex items-center gap-3 mt-3">
+              <div className="flex items-center gap-1.5 bg-gray-900 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-widest font-eng">
+                <span className="w-1.5 h-1.5 bg-sami-red rounded-full animate-pulse"></span>
+                Digital Edition
+              </div>
+              <span className="text-[11px] text-gray-500 font-bold italic tracking-wide">
+                সততার পথে অবিরাম...
+              </span>
+            </div>
+          </div>
         </div>
         
         {/* Header Ad */}

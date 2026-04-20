@@ -21,7 +21,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
 
   const bannerAds = [
-    "https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/021.png",
+    "https://plain-apac-prod-public.komododecks.com/202604/20/FxZqG7iijsxZeM6vLjIR/image.jpg",
     "https://basis.org.bd/public//img/cover_photo/thumb/c3714243e84b8b13a6f24a1ce694352a21082023080245.jpg"
   ];
 
@@ -440,6 +440,27 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
                   <img src={news.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" referrerPolicy="no-referrer" />
                 </div>
                 <h3 className="text-[10px] font-bold leading-tight line-clamp-2 group-hover:text-sami-red transition-colors">{news.title}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Category: 'সরিষাবাড়ী' */}
+        <div className="flex flex-col gap-3">
+          <div className="bg-gray-100 border-t-2 border-black border-b border-gray-200 px-3 py-1.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sami-red font-bold">■</span>
+              <h2 className="text-[13px] font-bold text-gray-900">সরিষাবাড়ী</h2>
+            </div>
+            <button onClick={() => onNavigate('/category/সরিষাবাড়ী')} className="text-[10px] font-bold text-sami-red hover:underline uppercase">More News.. »</button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {newsList.filter(n => n.category === 'সরিষাবাড়ী').slice(0, 3).map((news) => (
+              <div key={news.id} onClick={() => onNewsClick(news)} className="bg-white border border-gray-100 p-2 hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="aspect-video overflow-hidden mb-2 border border-gray-50">
+                  <img src={news.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" referrerPolicy="no-referrer" />
+                </div>
+                <h3 className="text-[12px] font-bold leading-tight group-hover:text-sami-red transition-colors line-clamp-2 text-center">{news.title}</h3>
               </div>
             ))}
           </div>
