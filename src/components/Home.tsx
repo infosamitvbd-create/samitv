@@ -350,15 +350,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               </div>
             )}
             <div className="space-y-1.5">
-              {newsList.filter(n => n.category === 'খেলাধুলা').slice(1, 5).map((news) => (
-                <div key={news.id} onClick={() => onNewsClick(news)} className="group cursor-pointer flex gap-1.5 items-start border-b border-dashed border-gray-200 pb-1.5 last:border-0">
+              {newsList.filter(n => n.category === 'খেলাধুলা').slice(1, 4).map((news) => (
+                <div key={news.id} onClick={() => onNewsClick(news)} className="group cursor-pointer flex gap-1.5 items-start border-b border-dashed border-gray-200 pb-1.5 last:border-0 hover:bg-gray-50/50 transition-colors">
                   <span className="text-gray-400 text-[10px] mt-1 shrink-0">»</span>
                   <h4 className="text-[12px] font-bold text-gray-700 leading-tight group-hover:text-sami-red line-clamp-2">{news.title}</h4>
                 </div>
               ))}
-            </div>
-            <div className="text-right">
-               <button onClick={() => onNavigate('/category/খেলাধুলা')} className="text-[10px] font-bold text-sami-red hover:underline">More News.. »</button>
             </div>
           </div>
 
@@ -380,15 +377,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               </div>
             )}
             <div className="space-y-1.5">
-              {newsList.filter(n => n.category === 'বিনোদন').slice(1, 5).map((news) => (
-                <div key={news.id} onClick={() => onNewsClick(news)} className="group cursor-pointer flex gap-1.5 items-start border-b border-dashed border-gray-200 pb-1.5 last:border-0">
+              {newsList.filter(n => n.category === 'বিনোদন').slice(1, 4).map((news) => (
+                <div key={news.id} onClick={() => onNewsClick(news)} className="group cursor-pointer flex gap-1.5 items-start border-b border-dashed border-gray-200 pb-1.5 last:border-0 hover:bg-gray-50/50 transition-colors">
                   <span className="text-gray-400 text-[10px] mt-1 shrink-0">»</span>
                   <h4 className="text-[12px] font-bold text-gray-700 leading-tight group-hover:text-sami-red line-clamp-2">{news.title}</h4>
                 </div>
               ))}
-            </div>
-            <div className="text-right">
-               <button onClick={() => onNavigate('/category/বিনোদন')} className="text-[10px] font-bold text-sami-red hover:underline">More News.. »</button>
             </div>
           </div>
         </div>
@@ -468,7 +462,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
       </div>
 
       <aside className="w-full lg:w-[320px] shrink-0">
-        <Sidebar />
+        <Sidebar onNavigate={onNavigate} />
       </aside>
     </motion.div>
   );

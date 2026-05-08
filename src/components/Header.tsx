@@ -83,7 +83,7 @@ export const Header: React.FC<{
             <div className="h-4 w-[1px] bg-gray-300 mx-1"></div>
             <button 
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-1 text-gray-700 hover:text-red-600 transition-colors"
+              className="p-1 text-gray-700 hover:text-sami-red transition-colors"
             >
               <Search size={22} className="stroke-[2.5px]" />
             </button>
@@ -106,9 +106,9 @@ export const Header: React.FC<{
                   type="text" 
                   autoFocus
                   placeholder="সংবাদ খুঁজুন..."
-                  className="w-full bg-white border-2 border-red-100 rounded-xl py-4 pl-6 pr-16 text-lg focus:outline-none focus:border-red-600 transition-all shadow-xl shadow-red-600/5"
+                  className="w-full bg-white border-2 border-sami-accent rounded-xl py-4 pl-6 pr-16 text-lg focus:outline-none focus:border-sami-red transition-all shadow-xl shadow-sami-red/5"
                 />
-                <button className="absolute right-2 top-2 bottom-2 px-6 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20">
+                <button className="absolute right-2 top-2 bottom-2 px-6 bg-sami-red text-white rounded-lg hover:bg-sami-purple transition-colors shadow-lg shadow-sami-red/20">
                   <Search size={24} />
                 </button>
               </div>
@@ -125,7 +125,7 @@ export const Header: React.FC<{
             <SAMILogo className="scale-100 origin-center lg:origin-left" />
           </div>
           <div className="hidden sm:flex flex-col border-l-2 border-sami-red/20 pl-6 py-1">
-            <h1 className="text-2xl font-black text-gray-900 leading-none tracking-tighter uppercase font-eng">
+            <h1 className="text-2xl font-black text-sami-dark leading-none tracking-tighter uppercase font-eng">
               SAMI MULTIMEDIA <span className="text-sami-red">LTD.</span>
             </h1>
             <p className="text-[10px] font-black text-gray-400 mt-1 uppercase tracking-[0.3em] font-eng">
@@ -146,7 +146,7 @@ export const Header: React.FC<{
         {/* Header Ad */}
         <div className="flex-grow w-full lg:max-w-[728px] h-[90px] bg-gray-50 rounded-lg border border-gray-100 shadow-sm overflow-hidden flex items-center justify-center group relative cursor-pointer">
            <img 
-              src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-016.jpg" 
+              src="https://islamictv.news/backend_assets/images/ads/6991b4129a545.jpg" 
               alt="Header Ad" 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"

@@ -34,26 +34,29 @@ export const LiveTV: React.FC = () => {
         <div className={`${isTheaterMode ? 'w-full' : 'lg:col-span-3 space-y-6'}`}>
           <div className={`${isTheaterMode ? 'rounded-none border-0 shadow-none' : 'bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100'} transition-all duration-500`}>
             {!isTheaterMode && (
-              <div className="bg-gradient-to-r from-sami-dark to-sami-teal text-white px-6 py-5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
+              <div className="bg-[#0a0a0a] text-white px-6 py-5 flex items-center justify-between border-b border-white/5">
+                <div className="flex items-center gap-5">
                   <div className="relative">
-                    <div className="bg-red-600 p-2 rounded-lg animate-pulse shadow-lg shadow-red-600/20">
-                      <Radio size={20} />
+                    <div className="bg-red-600 p-2.5 rounded-xl animate-pulse shadow-[0_0_20px_rgba(204,0,0,0.4)]">
+                      <Radio size={22} />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+                    <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-[#1a1a1a] shadow-lg"></div>
                   </div>
                   <div>
-                    <h1 className="text-xl font-black uppercase tracking-tight leading-none">সামি টিভি লাইভ</h1>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
-                      <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">সরাসরি সম্প্রচার</span>
+                    <h1 className="text-2xl font-black uppercase tracking-tighter leading-none flex items-center gap-3">
+                      SAMI TV <span className="text-sami-red">LIVE</span>
+                      <span className="hidden sm:inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-black text-white/40 tracking-widest">STREAM V2.4</span>
+                    </h1>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></span>
+                      <span className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">ULTRA HD BROADCAST 📡 LIVE</span>
                     </div>
                   </div>
                 </div>
-                <div className="hidden sm:flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-xs font-bold bg-white/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-sm">
-                    <Users size={14} className="text-sami-red" />
-                    <span>২৪/৭ সম্প্রচার</span>
+                <div className="hidden md:flex items-center gap-4">
+                  <div className="flex items-center gap-3 text-[10px] font-black bg-white/5 px-5 py-2.5 rounded-xl border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors cursor-default">
+                    <Users size={16} className="text-sami-red" />
+                    <span className="uppercase tracking-widest">২৪/৭ গ্লোবাল ফিড</span>
                   </div>
                 </div>
               </div>
@@ -68,30 +71,30 @@ export const LiveTV: React.FC = () => {
             </div>
 
             <div className={`${isTheaterMode ? 'bg-[#111] py-12 px-4 sm:px-8 lg:px-16 text-white border-t border-white/5' : 'p-6 sm:p-10'} transition-all`}>
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-10">
-                <div className="space-y-4 flex-1">
-                  <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded-full uppercase tracking-tighter">Live Now</span>
-                    <div className={`h-1 w-1 ${isTheaterMode ? 'bg-white/20' : 'bg-gray-300'} rounded-full`}></div>
-                    <span className={`text-xs ${isTheaterMode ? 'text-gray-400' : 'text-gray-500'} font-bold flex items-center gap-1.5`}>
-                      <Calendar size={14} className="text-sami-red" /> {new Date().toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              <div className="flex flex-col xl:flex-row xl:items-start justify-between gap-10 mb-12">
+                <div className="space-y-6 flex-1">
+                  <div className="flex items-center gap-4">
+                    <span className="px-4 py-1.5 bg-red-600 text-white text-[10px] font-black rounded-lg uppercase tracking-tight shadow-lg shadow-red-600/20">LIVE NOW</span>
+                    <div className={`h-1.5 w-1.5 ${isTheaterMode ? 'bg-white/20' : 'bg-gray-300'} rounded-full`}></div>
+                    <span className={`text-sm ${isTheaterMode ? 'text-gray-400' : 'text-gray-500'} font-black flex items-center gap-2.5`}>
+                      <Calendar size={18} className="text-sami-red" /> {new Date().toLocaleDateString('bn-BD', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </div>
-                  <h2 className={`text-2xl sm:text-4xl font-black ${isTheaterMode ? 'text-white' : 'text-gray-900'} leading-[1.1] tracking-tight`}>
-                    সরাসরি সম্প্রচার: সামি টেলিভিশন (সামী মাল্টিমিডিয়া লিমিটেড)
+                  <h2 className={`text-3xl sm:text-5xl font-black ${isTheaterMode ? 'text-white' : 'text-[#0a0a0a]'} leading-[1] tracking-tighter max-w-4xl`}>
+                    LIVE BROADCAST: SAMI TV (SAMI MULTIMEDIA LTD.)
                   </h2>
-                  <div className="flex flex-wrap items-center gap-6 text-sm">
-                    <div className={`flex items-center gap-2 px-3 py-1.5 ${isTheaterMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'} rounded-lg border`}>
-                      <MapPin size={16} className="text-sami-red" />
-                      <span className={`font-bold ${isTheaterMode ? 'text-gray-300' : 'text-gray-700'}`}>দিগপাইত, জামালপুর</span>
+                  <div className="flex flex-wrap items-center gap-8 pt-2">
+                    <div className={`flex items-center gap-3 px-4 py-2.5 ${isTheaterMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'} rounded-xl border group hover:border-sami-red/30 transition-colors`}>
+                      <MapPin size={20} className="text-sami-red group-hover:scale-110 transition-transform" />
+                      <span className={`font-black uppercase tracking-tight text-xs ${isTheaterMode ? 'text-gray-300' : 'text-gray-700'}`}>দিগপাইত, জামালপুর, বাংলাদেশ</span>
                     </div>
-                    <div className={`flex items-center gap-2 px-3 py-1.5 ${isTheaterMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'} rounded-lg border`}>
-                      <Clock size={16} className="text-sami-red" />
-                      <span className={`font-bold ${isTheaterMode ? 'text-gray-300' : 'text-gray-700'}`}>২৪ ঘণ্টা লাইভ</span>
+                    <div className={`flex items-center gap-3 px-4 py-2.5 ${isTheaterMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-100'} rounded-xl border group hover:border-sami-red/30 transition-colors`}>
+                      <Clock size={20} className="text-sami-red group-hover:rotate-12 transition-transform" />
+                      <span className={`font-black uppercase tracking-tight text-xs ${isTheaterMode ? 'text-gray-300' : 'text-gray-700'}`}>২৪ ঘণ্টা নিরবচ্ছিন্ন সম্প্রচার</span>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
+                <div className="flex items-center gap-4 shrink-0">
                   <button 
                     onClick={() => {
                       if (navigator.share) {
@@ -101,16 +104,16 @@ export const LiveTV: React.FC = () => {
                         });
                       }
                     }}
-                    className="flex items-center gap-3 bg-sami-red text-white px-8 py-4 rounded-2xl font-black text-sm hover:bg-sami-dark transition-all shadow-xl shadow-sami-red/20 hover:shadow-sami-red/40 active:scale-95"
+                    className="flex items-center justify-center gap-3 bg-sami-red text-white px-10 py-5 rounded-2xl font-black text-sm hover:bg-sami-dark transition-all shadow-[0_15px_30px_rgba(204,0,0,0.3)] hover:shadow-[0_20px_40px_rgba(204,0,0,0.4)] active:scale-95"
                   >
                     <Share2 size={20} /> শেয়ার করুন
                   </button>
                   {isTheaterMode && (
                     <button 
                       onClick={() => setIsTheaterMode(false)}
-                      className="w-14 h-14 bg-white/5 text-white border border-white/10 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all active:scale-95"
+                      className="w-16 h-16 bg-white/5 text-white border border-white/10 rounded-2xl flex items-center justify-center hover:bg-white/10 transition-all active:scale-95 shadow-2xl"
                     >
-                      <Layout size={24} />
+                      <Layout size={28} />
                     </button>
                   )}
                 </div>
@@ -163,43 +166,58 @@ export const LiveTV: React.FC = () => {
         {/* Sidebar Section */}
         <div className="space-y-8">
           {/* Program Schedule */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div className="p-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-sami-teal/10 rounded-xl flex items-center justify-center">
-                  <Calendar size={18} className="text-sami-teal" />
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden group">
+            <div className="p-6 border-b border-gray-100 bg-[#0a0a0a] text-white flex items-center justify-between overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                <Calendar size={100} />
+              </div>
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                  <Calendar size={20} className="text-sami-red" />
                 </div>
                 <div>
-                  <h3 className="font-black text-gray-900 text-sm">অনুষ্ঠান সূচী</h3>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tight">Today's Schedule</p>
+                  <h3 className="font-black text-base tracking-tight">অনুষ্ঠান সূচী</h3>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">Live Timeline</p>
                 </div>
               </div>
+              <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 relative z-10">
+                 <span className="text-[9px] font-black uppercase tracking-widest text-sami-red">Today</span>
+              </div>
             </div>
-            <div className="p-2 space-y-1">
+            <div className="p-4 space-y-2">
               {loadingSchedule ? (
-                <div className="p-8 text-center">
-                  <div className="w-8 h-8 border-4 border-sami-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Loading Schedule...</p>
+                <div className="p-12 text-center">
+                  <div className="w-12 h-12 border-4 border-sami-red border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.3em]">Synching Data...</p>
                 </div>
               ) : schedule.length > 0 ? (
                 schedule.map((prog, i) => (
                   <div 
                     key={prog.id} 
-                    className={`flex items-center gap-4 p-3 rounded-xl transition-all ${prog.active ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20' : 'hover:bg-gray-50'}`}
+                    className={`flex items-center gap-5 p-4 rounded-2xl transition-all duration-300 relative group/item ${prog.active ? 'bg-[#0a0a0a] text-white shadow-2xl transform scale-[1.02] z-10' : 'hover:bg-gray-50 border border-transparent hover:border-gray-100'}`}
                   >
-                    <div className={`text-[10px] font-black shrink-0 w-16 font-eng ${prog.active ? 'text-white/80' : 'text-gray-400'}`}>
+                    {prog.active && (
+                       <div className="absolute inset-0 bg-gradient-to-r from-sami-red/5 to-transparent rounded-2xl opacity-50"></div>
+                    )}
+                    <div className={`text-[11px] font-black shrink-0 w-20 text-center py-2 rounded-xl ${prog.active ? 'bg-sami-red text-white shadow-lg' : 'bg-gray-100 text-gray-400'}`}>
                       {prog.time}
                     </div>
                     <div className="flex-grow">
-                      <p className={`text-xs font-bold ${prog.active ? 'text-white' : 'text-gray-800'}`}>{prog.title}</p>
-                      {prog.active && <p className="text-[9px] font-black uppercase tracking-widest text-white/60 mt-0.5">এখন চলছে</p>}
+                      <p className={`text-sm font-black tracking-tight ${prog.active ? 'text-white' : 'text-gray-900 lg:group-hover/item:text-sami-red transition-colors'}`}>{prog.title}</p>
+                      {prog.active && (
+                        <div className="flex items-center gap-2 mt-1.5">
+                           <span className="w-2 h-2 bg-sami-red rounded-full animate-pulse shadow-lg shadow-sami-red/50"></span>
+                           <p className="text-[10px] font-black uppercase tracking-widest text-sami-red/80">এখন সম্প্রচাররত</p>
+                        </div>
+                      )}
                     </div>
-                    {prog.active && <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>}
+                    {prog.active && <ChevronRight size={18} className="text-white/20" />}
                   </div>
                 ))
               ) : (
-                <div className="p-8 text-center text-gray-400">
-                  <p className="text-xs font-bold italic">কোনো অনুষ্ঠান সূচী পাওয়া যায়নি</p>
+                <div className="p-12 text-center text-gray-400">
+                  <Calendar size={40} className="mx-auto mb-4 opacity-10" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] italic">Timeline Empty</p>
                 </div>
               )}
             </div>
@@ -213,7 +231,7 @@ export const LiveTV: React.FC = () => {
                   <MessageCircle size={20} className="text-sami-red" />
                 </div>
                 <div>
-                  <h3 className="font-black text-gray-900">লাইভ চ্যাট</h3>
+                  <h3 className="font-black text-gray-900">LIVE CHAT</h3>
                   <p className="text-[10px] text-gray-500 font-bold">দর্শকদের মতামত</p>
                 </div>
               </div>
@@ -223,25 +241,31 @@ export const LiveTV: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex-grow p-8 flex flex-col items-center justify-center text-center relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-              <div className="relative mb-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-sami-light to-white rounded-3xl flex items-center justify-center border-2 border-dashed border-sami-red/20 rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                  <MessageCircle size={40} className="text-sami-red/40 -rotate-12 group-hover:rotate-0 transition-transform duration-500" />
+            <div className="flex-grow p-8 flex flex-col items-center justify-center text-center relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-gray-50/30">
+              <div className="relative mb-8 group/icon">
+                <div className="w-28 h-28 bg-white rounded-[2rem] flex items-center justify-center border border-gray-100 shadow-2xl rotate-3 group-hover/icon:rotate-0 transition-transform duration-700 relative z-10">
+                  <MessageCircle size={44} className="text-sami-red transform -scale-x-100" />
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-xl shadow-lg">
-                  <X size={16} className="text-red-500" />
+                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-red-500 rounded-2xl shadow-xl flex items-center justify-center z-20 border-4 border-white">
+                  <X size={16} className="text-white" />
                 </div>
+                <div className="absolute inset-0 bg-sami-red/5 blur-3xl rounded-full scale-150 animate-pulse"></div>
               </div>
-              <h4 className="text-lg font-black text-gray-900 mb-2">চ্যাট বর্তমানে বন্ধ আছে</h4>
-              <p className="text-xs text-gray-500 leading-relaxed max-w-[200px] font-medium">সরাসরি আমাদের সাথে কথা বলতে ফেসবুক পেজে মেসেজ দিন।</p>
+              
+              <div className="max-w-xs mx-auto space-y-3">
+                <h4 className="text-xl font-black text-gray-900 tracking-tight">লাইভ চ্যাট সাময়িকভাবে বন্ধ</h4>
+                <p className="text-[11px] text-gray-500 leading-relaxed font-bold uppercase tracking-wide">সরাসরি নিউজ আপডেট পেতে আমাদের ফেসবুক পেজে মেসেজ করুন। আমাদের কমিউনিটির অংশ হতে নিচের লিংকে ক্লিক করুন।</p>
+              </div>
+              
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-8"></div>
               
               <a 
                 href="https://www.facebook.com/samitvbd" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="mt-8 group/btn flex items-center gap-3 bg-blue-600 text-white px-6 py-3 rounded-xl font-black text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20"
+                className="group/btn flex items-center gap-4 bg-[#1877F2] text-white px-8 py-4 rounded-2xl font-black text-xs hover:bg-[#166fe5] transition-all shadow-[0_10px_20px_rgba(24,119,242,0.3)] hover:shadow-[0_15px_30px_rgba(24,119,242,0.4)] active:scale-95"
               >
-                ফেসবুক পেজ <ChevronRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                ফেসবুক পেজ মেসেঞ্জার <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
               </a>
             </div>
 

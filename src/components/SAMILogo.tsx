@@ -21,9 +21,9 @@ export const SAMILogo: React.FC<{ className?: string }> = ({ className }) => {
         className="relative"
       >
         <img 
-          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
+          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFj9Vggz6K8alsU_HhjhzliEjiij0iQBXBHM8ZPRIMET8EjAd3_ebQcFGWGplZCq0LB0gWXmmRaa7MGS5qvVI1Qui8Y50J92sgykRMhdCJMgDnQJShoY6OW9ULSgHYWYA5Lhm4OcXzdN1VvsTcDYdV82Hlwxg7anOL6r1bdhtmnebJsQCQih6uKeVHPUbY/s1068/NEW%20LOGO.png" 
           alt="Sami TV Logo" 
-          className="h-28 w-auto object-contain drop-shadow-[0_8px_15px_rgba(255,0,0,0.1)] transition-all duration-500 group-hover:drop-shadow-[0_12px_20px_rgba(255,0,0,0.2)]"
+          className="h-24 w-auto object-contain drop-shadow-[0_12px_20px_rgba(204,0,0,0.3)] transition-all duration-500 group-hover:drop-shadow-[0_20px_35px_rgba(204,0,0,0.4)]"
           referrerPolicy="no-referrer"
         />
         

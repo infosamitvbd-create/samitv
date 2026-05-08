@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Youtube, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Youtube, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Layout } from 'lucide-react';
 import { SAMILogo } from './SAMILogo';
 
 export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
@@ -42,7 +42,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
             <h3 className="text-lg font-bold mb-6 border-l-4 border-sami-red pl-3">গুরুত্বপূর্ণ লিঙ্ক</h3>
             <ul className="space-y-3">
               {[
-                { label: 'লাইভ টিভি', path: '/live' },
+                { label: 'LIVE TV', path: '/live' },
                 { label: 'ডাউনলিংক প্যারামিটার', path: '/downlink' },
                 { label: 'শর্তাবলী', path: '/terms' },
                 { label: 'গোপনীয়তা নীতি', path: '/privacy' }
@@ -63,7 +63,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
           <div>
             <h3 className="text-lg font-bold mb-6 border-l-4 border-sami-red pl-3">বিভাগসমূহ</h3>
             <ul className="grid grid-cols-2 gap-3">
-              {['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'বিশ্ব', 'বাণিজ্য', 'সারাদেশ', 'খেলাধুলা', 'বিনোদন'].map((cat) => (
+              {['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'জামালপুর', 'সরিষাবাড়ী', 'সারাদেশ', 'খেলাধুলা', 'বিনোদন'].map((cat) => (
                 <li key={cat}>
                   <button 
                     onClick={() => onNavigate(`/category/${cat}`)}
@@ -79,7 +79,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-bold mb-6 border-l-4 border-sami-red pl-3">যোগাযোগ</h3>
-            <ul className="space-y-4">
+            <ul className="space-y-4 mb-6">
               <li className="flex items-start gap-3 text-gray-400 text-sm">
                 <MapPin size={18} className="text-sami-red shrink-0" />
                 <span>দিগপাইত, জামালপুর, বাংলাদেশ</span>
@@ -93,6 +93,24 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
                 <span className="font-eng">info.samitv.bd@gmail.com</span>
               </li>
             </ul>
+
+            <div className="pt-4 border-t border-white/5">
+               <h4 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Official Apps</h4>
+               <a 
+                 href="https://drive.google.com/file/d/1XRi5iMvvtLlyZNg9eYd9HynPS7FYBJi-/view?usp=drive_link" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-3 rounded-lg transition-all group"
+               >
+                 <div className="bg-sami-red p-2 rounded-lg group-hover:scale-110 transition-transform">
+                   <Layout size={16} className="text-white" />
+                 </div>
+                 <div className="text-left">
+                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none">Get it now</p>
+                   <p className="text-sm font-black text-white">SAMI TV APP</p>
+                 </div>
+               </a>
+            </div>
           </div>
         </div>
 

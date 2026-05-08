@@ -310,23 +310,39 @@ export const AdminPanel: React.FC = () => {
   }, []);
 
   const uploadFile = async (file: File, path: string) => {
+    console.log(`Starting upload for ${file.name} to ${path}...`);
     return new Promise<string>((resolve, reject) => {
-      const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+      const fileRef = ref(storage, `${path}/${fileName}`);
       const uploadTask = uploadBytesResumable(fileRef, file);
 
       uploadTask.on('state_changed', 
         (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setUploadProgress(progress);
+          console.log(`Upload progress: ${progress.toFixed(2)}%`);
         }, 
         (error) => {
-          console.error("Upload Error: ", error);
-          reject(error);
+          console.error("Firebase Storage Upload Error: ", error);
+          let userMessage = "আপলোড ব্যর্থ হয়েছে।";
+          if (error.code === 'storage/unauthorized') {
+            userMessage = "আপনার ছবি আপলোড করার অনুমতি নেই। অনুগ্রহ করে গুগল দিয়ে পুনরায় লগইন করুন।";
+          } else if (error.code === 'storage/canceled') {
+            userMessage = "আপলোড বাতিল করা হয়েছে।";
+          }
+          reject(new Error(userMessage));
         }, 
         async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setUploadProgress(0);
-          resolve(downloadURL);
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log("File uploaded successfully. URL:", downloadURL);
+            setUploadProgress(0);
+            resolve(downloadURL);
+          } catch (urlError) {
+            console.error("Error getting download URL:", urlError);
+            reject(new Error("URL পেতে সমস্যা হয়েছে।"));
+          }
         }
       );
     });
@@ -983,7 +999,17 @@ export const AdminPanel: React.FC = () => {
                       {newsUploadMode === 'url' ? (
                         <input type="url" required value={newsForm.imageUrl} onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবির ইউআরএল" />
                       ) : (
-                        <input type="file" required accept="image/*" onChange={(e) => setNewsImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
+                        <input 
+                          type="file" 
+                          required 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setNewsImageFile(file);
+                            if (file) setNewsUploadMode('file');
+                          }} 
+                          className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" 
+                        />
                       )}
                     </div>
 
@@ -1037,7 +1063,17 @@ export const AdminPanel: React.FC = () => {
                       {reporterUploadMode === 'url' ? (
                         <input type="url" required value={reporterForm.imageUrl} onChange={(e) => setReporterForm({...reporterForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবির ইউআরএল" />
                       ) : (
-                        <input type="file" required accept="image/*" onChange={(e) => setReporterImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
+                        <input 
+                          type="file" 
+                          required 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setReporterImageFile(file);
+                            if (file) setReporterUploadMode('file');
+                          }} 
+                          className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" 
+                        />
                       )}
                     </div>
 
@@ -1090,7 +1126,17 @@ export const AdminPanel: React.FC = () => {
                        {mediaUploadMode === 'url' ? (
                          <input type="url" required value={mediaForm.imageUrl} onChange={(e) => setMediaForm({...mediaForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="থাম্বনেইল ছবির ইউআরএল" />
                        ) : (
-                         <input type="file" required accept="image/*" onChange={(e) => setMediaImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
+                         <input 
+                          type="file" 
+                          required 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setMediaImageFile(file);
+                            if (file) setMediaUploadMode('file');
+                          }} 
+                          className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" 
+                        />
                        )}
                     </div>
 
@@ -1138,7 +1184,17 @@ export const AdminPanel: React.FC = () => {
                       {adUploadMode === 'url' ? (
                         <input type="url" required value={adForm.imageUrl} onChange={(e) => setAdForm({...adForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ব্যানার ছবির ইউআরএল" />
                       ) : (
-                        <input type="file" required accept="image/*" onChange={(e) => setAdImageFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" />
+                        <input 
+                          type="file" 
+                          required 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            setAdImageFile(file);
+                            if (file) setAdUploadMode('file');
+                          }} 
+                          className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" 
+                        />
                       )}
                     </div>
 

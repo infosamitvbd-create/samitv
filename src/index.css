@@ -7,15 +7,20 @@
   --font-eng: "Inter", "Outfit", sans-serif;
   --font-serif: "Cormorant+Garamond", "Times New Roman", serif;
   
-  --color-sami-red: #e31e24;
-  --color-sami-purple: #4a0e4e;
-  --color-sami-teal: #0a0a0a;
-  --color-sami-blue: #0f172a;
-  --color-sami-dark: #020617;
+  --color-sami-red: #cc0000;
+  --color-sami-purple: #990000;
+  --color-sami-teal: #ff4d4d;
+  --color-sami-blue: #cc0000;
+  --color-sami-dark: #1a1a1a;
   --color-sami-light: #ffffff;
-  --color-sami-accent: #facc15;
-  --color-red-600: #e31e24;
-  --color-teal-600: #0a0a0a;
+  --color-sami-accent: #fdf2f2;
+
+  /* Aliasing red variants to branding red for compatibility with hardcoded classes */
+  --color-red-100: #fdf2f2;
+  --color-red-500: #cc0000;
+  --color-red-600: #b30000;
+  --color-red-700: #990000;
+  --color-teal-600: #ff4d4d;
 }
 
 @layer base {
@@ -39,6 +44,10 @@
   
   .glass-card {
     @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+  
+  .premium-blur {
+    @apply backdrop-blur-xl bg-black/60 border border-white/10;
   }
   
   .bento-grid {
@@ -103,8 +112,14 @@
   @apply bg-gray-300;
 }
 
-.drop-cap::first-letter {
-  @apply float-left text-7xl font-black mr-3 mt-2 text-red-600 leading-none;
+.drop-cap-premium::first-letter {
+  @apply float-left text-9xl font-black mr-6 mt-4 text-gray-900 leading-[0.7];
+  text-shadow: 10px 10px 0px rgba(227,30,36,0.1);
+}
+
+.editorial-content {
+  @apply text-justify antialiased;
+  word-spacing: 0.1em;
 }
 
 .news-body-content p {

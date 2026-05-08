@@ -75,8 +75,11 @@ export const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ isTheaterMode, onTog
               </div>
               <div className="hidden sm:block h-5 w-[1px] bg-white/20"></div>
               <div className="flex flex-col">
-                <h4 className="text-white font-black text-xs md:text-sm uppercase tracking-wider drop-shadow-md">SAMI TV HD</h4>
-                <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest hidden sm:block">Streaming from Digital Hub</p>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-white font-black text-xs md:text-sm uppercase tracking-wider drop-shadow-md">SAMI TV ULTRA HD</h4>
+                  <span className="bg-yellow-500 text-black text-[8px] font-black px-1.5 py-0.5 rounded-sm tracking-tighter shadow-lg shadow-yellow-500/20">4K</span>
+                </div>
+                <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest hidden sm:block">Official 4K Broadcast Stream</p>
               </div>
             </div>
             
@@ -233,7 +236,10 @@ export const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ isTheaterMode, onTog
 
                 <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-red-600/10 rounded-lg border border-red-600/20">
                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full animate-ping"></span>
-                   <span className="text-[10px] text-red-500 font-black uppercase tracking-widest">Live HD @ 1080p</span>
+                   <span className="text-[10px] text-red-500 font-black uppercase tracking-widest flex items-center gap-2">
+                     Ultra HD <span className="text-white/40">|</span> 2160p 
+                     <span className="bg-white/10 px-1 rounded text-[8px]">4K</span>
+                   </span>
                 </div>
               </div>
 
@@ -248,13 +254,14 @@ export const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ isTheaterMode, onTog
                   
                   <AnimatePresence>
                     {showQualityMenu && (
-                      <motion.div 
+                        <motion.div 
                         initial={{ opacity: 0, scale: 0.9, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                        className="absolute bottom-full right-0 mb-3 bg-[#151515] border border-white/10 rounded-xl overflow-hidden shadow-2xl min-w-[120px]"
+                        className="absolute bottom-full right-0 mb-3 bg-[#0a0a0a] border border-white/10 rounded-xl overflow-hidden shadow-2xl min-w-[140px] premium-blur"
                       >
-                         {['1080p', '720p', '480p', 'Auto'].map((q) => (
+                         <div className="px-4 py-2 border-b border-white/5 bg-white/5 text-[9px] font-black text-white/40 uppercase tracking-widest">Quality Settings</div>
+                         {['4K (UHD)', '1080p (HD)', '720p', '480p', 'Auto'].map((q) => (
                            <button 
                             key={q}
                             onClick={() => { setQuality(q); setShowQualityMenu(false); }}
@@ -284,14 +291,16 @@ export const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ isTheaterMode, onTog
       <div className="absolute top-16 right-6 pointer-events-none opacity-20 group-hover:opacity-40 transition-all duration-700 z-20 md:top-24">
         <div className="flex flex-col items-end gap-1 scale-75 md:scale-100">
            <img 
-            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQ5UOEGSzZlZ-agaH9fVQiJVMVyMhv6aNEabwKq4kQwFEktnew6PgR7tfNMT-jOAwmfv6-JyQIvtx728t9h2OOIA8VirN8O6MBAB8ikV7jF5FYHU40mz1vEuHlgjVR863rTTc34-sHqGb3KAsGeWEVHEYVOfFsrAs7T-vQW6YmrqoFv0wV6CtnJx-buiSE/s1600/NEW%20LOGO.png" 
+            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFj9Vggz6K8alsU_HhjhzliEjiij0iQBXBHM8ZPRIMET8EjAd3_ebQcFGWGplZCq0LB0gWXmmRaa7MGS5qvVI1Qui8Y50J92sgykRMhdCJMgDnQJShoY6OW9ULSgHYWYA5Lhm4OcXzdN1VvsTcDYdV82Hlwxg7anOL6r1bdhtmnebJsQCQih6uKeVHPUbY/s1068/NEW%20LOGO.png" 
             alt="Sami TV" 
             className="h-10 w-auto grayscale brightness-200" 
             referrerPolicy="no-referrer"
           />
           <div className="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 backdrop-blur-sm rounded">
             <div className="w-1 h-1 bg-red-600 rounded-full"></div>
-            <span className="text-[10px] text-white/80 font-black uppercase tracking-[0.3em]">LIVE HD</span>
+            <span className="text-[10px] text-white/80 font-black uppercase tracking-[0.3em] flex items-center gap-2">
+              LIVE <span className="text-yellow-500">4K</span>
+            </span>
           </div>
         </div>
       </div>

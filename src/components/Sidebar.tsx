@@ -4,7 +4,7 @@ import { LiveTVPlayer } from './LiveTVPlayer';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, limit, orderBy } from 'firebase/firestore';
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate }) => {
   const [sidebarAds, setSidebarAds] = useState<any[]>([]);
   const [sdNews, setSdNews] = useState<any[]>([]);
 
@@ -79,16 +79,45 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
+      {/* App Download Section */}
+      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group">
+        <div className="bg-[#003366] text-white px-4 py-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Layout size={14} /> সামি টিভি অ্যাপস
+          </div>
+          <div className="flex gap-1">
+            <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+            <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+          </div>
+        </div>
+        <div className="p-4 bg-gray-50 border-b border-gray-100">
+          <p className="text-[11px] text-gray-600 font-bold mb-4 leading-tight">
+            সর্বশেষ সংবাদ ও সরাসরি সম্প্রচার দেখতে আমাদের অফিসিয়াল অ্যাপ ডাউনলোড করুন।
+          </p>
+          <a 
+            href="https://drive.google.com/file/d/1XRi5iMvvtLlyZNg9eYd9HynPS7FYBJi-/view?usp=drive_link" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full py-3.5 bg-[#003366] text-white text-[10px] font-black flex items-center justify-center gap-3 hover:bg-blue-800 transition-all rounded-sm shadow-lg shadow-gray-200 group/btn"
+          >
+            <div className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center group-hover/btn:scale-110 transition-transform">
+               <Radio size={14} className="text-white animate-pulse" />
+            </div>
+            DOWNLOAD NOW
+          </a>
+        </div>
+      </div>
+
       {/* Live TV Player Widget */}
       <div className="bg-white rounded-sm shadow-sm overflow-hidden border-t-4 border-red-600">
         <div className="bg-red-50 px-4 py-2 flex items-center justify-between border-b border-red-100">
           <div className="flex items-center gap-2">
             <Radio size={16} className="text-red-600" />
-            <span className="font-bold text-sm text-red-800 uppercase tracking-wider">লাইভ টিভি</span>
+            <span className="font-bold text-sm text-red-800 uppercase tracking-wider">LIVE TV</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
-            <span className="text-[10px] font-bold text-red-600 uppercase">সরাসরি</span>
+            <span className="text-[10px] font-bold text-red-600 uppercase">LIVE</span>
           </div>
         </div>
         <div className="p-2 bg-gray-50">
@@ -110,8 +139,9 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* User Specific Ads */}
+      {/* User Specific Ads */}
         <div className="flex flex-col gap-4">
           <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
             <img 
@@ -130,7 +160,6 @@ export const Sidebar: React.FC = () => {
             />
           </div>
         </div>
-      </div>
 
       {/* Sidebar Category Blocks */}
       {['জাতীয়', 'সারাদেশ', 'আন্তর্জাতিক'].map((cat, idx) => {

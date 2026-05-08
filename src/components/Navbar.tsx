@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, Layout } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface NavItem {
@@ -16,6 +16,7 @@ const mainNavItems: NavItem[] = [
   { label: 'সারা দেশ', href: '/category/সারা দেশ' },
   { label: 'আন্তর্জাতিক', href: '/category/আন্তর্জাতিক' },
   { label: 'জামালপুর', href: '/category/জামালপুর' },
+  { label: 'সরিষাবাড়ী', href: '/category/সরিষাবাড়ী' },
   { label: 'খেলা-ধুলা', href: '/category/খেলাধুলা' },
   { label: 'তথ্য-প্রযুক্তি', href: '/category/তথ্যপ্রযুক্তি' },
   { label: 'বিনোদন', href: '/category/বিনোদন' },
@@ -27,7 +28,7 @@ const otherNavItems: NavItem[] = [
   { label: 'যোগাযোগ', href: '/contact' },
   { label: 'ডাউনলিংক প্যারামিটার', href: '/downlink' },
   { label: 'আওয়ার ফ্যামিলি', href: '/family' },
-  { label: 'লাইভ টিভি', href: '/live' },
+  { label: 'LIVE TV', href: '/live' },
 ];
 
 export const Navbar: React.FC<{ 
@@ -130,6 +131,13 @@ export const Navbar: React.FC<{
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
+          <button 
+            onClick={() => handleNavClick('/live')}
+            className="flex items-center gap-1.5 bg-sami-red text-white px-3 py-1 rounded font-black text-[10px] uppercase tracking-wider hover:bg-red-700 transition-all animate-pulse"
+          >
+            <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+            LIVE
+          </button>
           <button className="p-2.5 hover:bg-white/5 rounded-full transition-all text-white/70 hover:text-white">
             <Search size={20} />
           </button>
@@ -152,9 +160,9 @@ export const Navbar: React.FC<{
                   <li key={item.label}>
                     <button 
                       onClick={() => handleNavClick(item.href)}
-                      className={`w-full text-left py-4 px-6 rounded-2xl transition-all font-black uppercase tracking-tighter text-sm ${
+                      className={`w-full text-left py-4 px-6 transition-all font-bold uppercase tracking-tight text-sm ${
                         isActive 
-                          ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20' 
+                          ? 'bg-sami-red text-white' 
                           : 'text-white/70 hover:bg-white/5 hover:text-white'
                       }`}
                     >
@@ -163,6 +171,19 @@ export const Navbar: React.FC<{
                   </li>
                 );
               })}
+              
+              {/* App Download Link for Mobile */}
+              <li className="mt-4 border-t border-white/10 pt-4">
+                <a 
+                  href="https://drive.google.com/file/d/1XRi5iMvvtLlyZNg9eYd9HynPS7FYBJi-/view?usp=drive_link" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mx-6 flex items-center justify-center gap-3 bg-white text-sami-dark py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl"
+                >
+                  <Layout size={18} className="text-sami-red" />
+                  Download App
+                </a>
+              </li>
             </ul>
           </motion.div>
         )}

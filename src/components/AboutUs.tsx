@@ -41,7 +41,7 @@ export const AboutUs: React.FC = () => {
             >
               <div className="flex items-center gap-3 mb-6">
                 <span className="w-12 h-[1px] bg-sami-red"></span>
-                <span className="text-sami-red font-eng font-black uppercase tracking-[0.5em] text-[10px]">Since 2014</span>
+                <span className="text-sami-red font-eng font-black uppercase tracking-[0.5em] text-[10px]">Since 2010</span>
               </div>
               <h1 className="text-6xl md:text-9xl font-display font-black text-white mb-8 tracking-tighter leading-[0.85]">
                 SAMI<br />
@@ -98,7 +98,7 @@ export const AboutUs: React.FC = () => {
               
               {/* Year Badge */}
               <div className="absolute top-12 left-0 -translate-x-1/2 bg-white p-8 rounded-full shadow-2xl z-20 hidden lg:flex items-center justify-center flex-col">
-                <span className="text-4xl font-display font-black text-sami-red">10</span>
+                <span className="text-4xl font-display font-black text-sami-red">16</span>
                 <span className="text-[8px] uppercase tracking-widest text-gray-400 font-bold mt-1">Years Excellence</span>
               </div>
             </motion.div>
@@ -116,8 +116,8 @@ export const AboutUs: React.FC = () => {
                 একটি স্বপ্নের <br /> <span className="text-sami-red underline decoration-wavy decoration-sami-red/20 underline-offset-8">পথচলা</span>
               </h2>
               <div className="space-y-8 text-lg text-gray-600 leading-relaxed font-medium">
-                <p>২০১৪ সাল থেকে সামি টেলিভিশন নিয়মিতভাবে সম্প্রচার (On Air) কার্যক্রম চালিয়ে আসছে। একটি সাহসী স্বপ্ন থেকে শুরু করে আজ বাংলাদেশের অন্যতম আধুনিক এবং নির্ভরযোগ্য সংবাদ মাধ্যমে পরিণত হয়েছে সামি টিভি। আমরা জন্মলগ্ন থেকেই চেয়েছি মানুষের দোরগোড়ায় নির্ভুল এবং সঠিক তথ্য পৌঁছে দিতে।</p>
-                <p>প্রযুক্তি এবং সৃজনশীলতার মেলবন্ধন ঘটিয়ে আমরা প্রতিনিয়ত নিজেদের ছাড়িয়ে যাওয়ার চেষ্টা করি। আমাদের ৫ শতাধিক প্রতিনিধি দেশজুড়ে নিবেদিত প্রাণ হয়ে কাজ করে যাচ্ছেন।</p>
+                <p>SAMI TV একটি বেসরকারি মালিকানাধীন বাংলাদেশি বাংলা ভাষার টেলিভিশন চ্যানেল, যা ১১ নভেম্বর ২০১০ সালে যাত্রা শুরু করে। চ্যানেলটির প্রধান কার্যালয় জামালপুর, ময়মনসিংহে অবস্থিত। যাত্রালগ্ন থেকেই SAMI TV সত্যনিষ্ঠ, দায়িত্বশীল ও সময়োপযোগী সংবাদ পরিবেশনের মাধ্যমে দর্শকদের আস্থা অর্জন করে চলেছে।</p>
+                <p>SAMI TV সংবাদ ও তথ্যভিত্তিক অনুষ্ঠানের পাশাপাশি বিনোদন, নাটক, টক শো, সঙ্গীত এবং সাংস্কৃতিক অনুষ্ঠান সম্প্রচার করে থাকে। আমাদের লক্ষ্য হলো দেশের ও বিশ্বের গুরুত্বপূর্ণ ঘটনা দ্রুত, নির্ভুল ও নিরপেক্ষভাবে দর্শকদের সামনে তুলে ধরা এবং একই সঙ্গে বাংলা সংস্কৃতি ও ঐতিহ্যকে সমুন্নত রাখা।</p>
               </div>
               
               <div className="grid grid-cols-2 gap-8 mt-12">
@@ -211,7 +211,7 @@ export const AboutUs: React.FC = () => {
                   <span className="text-sami-red font-eng font-black uppercase tracking-widest text-xs mb-6 block">Future Ready</span>
                   <h3 className="text-6xl font-display font-black mb-8 tracking-tighter uppercase leading-[0.9]">আমাদের <span className="text-sami-red">লক্ষ্য</span></h3>
                   <p className="text-2xl text-gray-400 leading-relaxed max-w-2xl font-medium">
-                    বস্তুনিষ্ঠ সংবাদ পরিবেশনের মাধ্যমে সমাজের দর্পণ হিসেবে কাজ করা এবং মানুষের তথ্য অধিকার নিশ্চিত করা। আধুনিক প্রযুক্তির সর্বোচ্চ ব্যবহারের মাধ্যমে আমরা প্রতিটি সংবাদের গভীর পর্যন্ত পৌঁছে যেতে চাই।
+                    জাতীয় ও আন্তর্জাতিক সংবাদ, রাজনীতি, অর্থনীতি, খেলাধুলা, বিনোদন, প্রযুক্তি এবং সামাজিক বিভিন্ন বিষয় নিয়ে SAMI TV নিয়মিত মানসম্মত কনটেন্ট তৈরি ও প্রচার করে। অভিজ্ঞ সাংবাদিক, উপস্থাপক ও কারিগরি দলের সম্মিলিত প্রচেষ্টায় আমরা বিশ্বাসযোগ্য সংবাদ পরিবেশনে প্রতিশ্রুতিবদ্ধ।
                   </p>
                 </div>
                 <div className="flex items-center gap-6 pt-12">
@@ -236,7 +236,7 @@ export const AboutUs: React.FC = () => {
             >
               <Zap size={40} className="mb-6" />
               <h4 className="text-4xl font-display font-black mb-4 uppercase tracking-tighter">সততা</h4>
-              <p className="text-red-100 text-lg font-medium leading-relaxed">নিরপেক্ষ সাংবাদিকতার মূল স্তম্ভ। আমরা কোনো দল বা গোষ্ঠীর পক্ষপাত করি না।</p>
+              <p className="text-red-100 text-lg font-medium leading-relaxed">SAMI TV বিশ্বাস করে—গণমাধ্যম শুধু তথ্য দেওয়ার মাধ্যম নয়, বরং সমাজের সচেতনতা বৃদ্ধি ও ইতিবাচক পরিবর্তনের একটি শক্তিশালী হাতিয়ার।</p>
               <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-125 transition-transform duration-700">
                 <ShieldCheck size={200} />
               </div>
