@@ -41,7 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick }) => {
       <div className="lg:col-span-8">
         <div 
           onClick={() => onNewsClick(featured)}
-          className="bg-white rounded-sm overflow-hidden border border-gray-200 group cursor-pointer h-full"
+          className="bg-white rounded-xl overflow-hidden border border-gray-100 group cursor-pointer h-full shadow-sm"
         >
           <div className="relative aspect-video sm:aspect-[16/10] overflow-hidden">
             <img 
@@ -51,8 +51,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick }) => {
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="p-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight group-hover:text-sami-red transition-colors">
+          <div className="p-5">
+            <h1 className="text-xl sm:text-[26px] font-black text-gray-900 leading-tight group-hover:text-red-600 transition-colors">
               {featured.title}
             </h1>
           </div>

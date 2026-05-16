@@ -56,27 +56,29 @@ export const NewsCategory: React.FC<NewsCategoryProps> = ({ category, onBack, on
       {loading ? (
         <div className="text-center py-20 text-gray-500">লোডিং...</div>
       ) : newsList.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {newsList.map((news) => (
             <div 
               key={news.id} 
-              className="group cursor-pointer"
+              className="group cursor-pointer bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
               onClick={() => onNewsClick(news)}
             >
-              <div className="aspect-video overflow-hidden rounded-sm mb-3">
+              <div className="aspect-video overflow-hidden">
                 <img 
                   src={news.imageUrl} 
                   alt={news.title} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   referrerPolicy="no-referrer"
                 />
               </div>
-              <h3 className="font-bold text-gray-900 leading-snug group-hover:text-sami-blue transition-colors line-clamp-2">
-                {news.title}
-              </h3>
-              <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                <Clock size={12} />
-                <span>{news.createdAt?.toDate().toLocaleDateString('bn-BD')}</span>
+              <div className="p-5">
+                <h3 className="font-bold text-gray-900 leading-snug group-hover:text-red-600 transition-colors line-clamp-2 text-[15px]">
+                  {news.title}
+                </h3>
+                <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-4 font-bold">
+                  <Clock size={12} className="text-red-500" />
+                  <span>{news.createdAt?.toDate().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                </div>
               </div>
             </div>
           ))}

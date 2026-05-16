@@ -137,7 +137,7 @@ export const Header: React.FC<{
                 Digital Edition
               </div>
               <span className="text-[11px] text-gray-500 font-bold italic tracking-wide">
-                সততার পথে অবিরাম...
+                বাংলায় কথা বলে...
               </span>
             </div>
           </div>
