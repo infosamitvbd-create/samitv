@@ -4,7 +4,7 @@ import { ArrowLeft, Clock, User, Share2, Tag, Printer, MapPin, Facebook, Twitter
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, where, doc, getDoc } from 'firebase/firestore';
 import { useParams, useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 interface NewsDetailProps {
   news: any;
@@ -125,19 +125,46 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
     
     setIsSaving(true);
     try {
-      const canvas = await html2canvas(saveRef.current, {
-        useCORS: true,
-        scale: 2,
+      // Generate high-quality PNG
+      const dataUrl = await toPng(saveRef.current, {
+        cacheBust: true,
         backgroundColor: '#ffffff',
-        logging: false,
+        pixelRatio: 2, // Double resolution for crystal clear text
+        quality: 1,
       });
       
-      const image = canvas.toDataURL('image/png', 1.0);
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `SAMI-TV-${news.title.slice(0, 30)}.png`;
-      link.click();
-      setIsLiked(true);
+      // Convert dataUrl to a File object for potential sharing
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const filename = `SAMI-TV-${news.title.slice(0, 20).replace(/\s+/g, '-')}.png`;
+      const file = new File([blob], filename, { type: 'image/png' });
+
+      // If Web Share API is available (primarily mobile), use it for "Save to Gallery"
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'SAMI TV Digital Edition',
+            text: news.title,
+          });
+          setIsLiked(true);
+        } catch (shareError) {
+          // If user cancels sharing, we don't necessarily want to fallback to download 
+          // unless it's a real error.
+          if ((shareError as Error).name !== 'AbortError') {
+            throw shareError;
+          }
+        }
+      } else {
+        // Standard download fallback for Desktop browsers
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setIsLiked(true);
+      }
     } catch (error) {
       console.error('Error saving image:', error);
     } finally {

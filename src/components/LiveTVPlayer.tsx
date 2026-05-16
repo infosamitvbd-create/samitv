@@ -286,24 +286,6 @@ export const LiveTVPlayer: React.FC<LiveTVPlayerProps> = ({ isTheaterMode, onTog
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Modern Watermark */}
-      <div className="absolute top-16 right-6 pointer-events-none opacity-20 group-hover:opacity-40 transition-all duration-700 z-20 md:top-24">
-        <div className="flex flex-col items-end gap-1 scale-75 md:scale-100">
-           <img 
-            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFj9Vggz6K8alsU_HhjhzliEjiij0iQBXBHM8ZPRIMET8EjAd3_ebQcFGWGplZCq0LB0gWXmmRaa7MGS5qvVI1Qui8Y50J92sgykRMhdCJMgDnQJShoY6OW9ULSgHYWYA5Lhm4OcXzdN1VvsTcDYdV82Hlwxg7anOL6r1bdhtmnebJsQCQih6uKeVHPUbY/s1068/NEW%20LOGO.png" 
-            alt="Sami TV" 
-            className="h-10 w-auto grayscale brightness-200" 
-            referrerPolicy="no-referrer"
-          />
-          <div className="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 backdrop-blur-sm rounded">
-            <div className="w-1 h-1 bg-red-600 rounded-full"></div>
-            <span className="text-[10px] text-white/80 font-black uppercase tracking-[0.3em] flex items-center gap-2">
-              LIVE <span className="text-yellow-500">4K</span>
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
