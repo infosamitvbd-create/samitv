@@ -174,15 +174,13 @@ export const Navbar: React.FC<{
               
               {/* App Download Link for Mobile */}
               <li className="mt-4 border-t border-white/10 pt-4">
-                <a 
-                  href="https://drive.google.com/file/d/1XRi5iMvvtLlyZNg9eYd9HynPS7FYBJi-/view?usp=drive_link" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="mx-6 flex items-center justify-center gap-3 bg-white text-sami-dark py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl"
+                <button 
+                  onClick={() => handleNavClick('/download-app')}
+                  className="w-full flex items-center justify-center gap-3 bg-white text-sami-dark py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl"
                 >
                   <Layout size={18} className="text-sami-red" />
                   Download App
-                </a>
+                </button>
               </li>
             </ul>
           </motion.div>

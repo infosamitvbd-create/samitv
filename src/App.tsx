@@ -15,6 +15,8 @@ import { AdminPanel } from './components/AdminPanel';
 import { Home } from './components/Home';
 import { LiveTV } from './components/LiveTV';
 import { ContactUs } from './components/ContactUs';
+import ComingSoon from './components/ComingSoon';
+import AppDownload from './components/AppDownload';
 import { Footer } from './components/Footer';
 import { DownlinkParameters } from './components/DownlinkParameters';
 import { TermsAndConditions } from './components/TermsAndConditions';
@@ -48,6 +50,7 @@ export default function App() {
           currentPage={location.pathname} 
           currentCategory={currentCategory} 
         />
+        <BreakingNews />
       </div>
       
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
@@ -70,6 +73,8 @@ export default function App() {
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/android-tv" element={<ComingSoon />} />
+              <Route path="/download-app" element={<AppDownload />} />
               <Route path="/news/:newsId" element={<NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />} />
               <Route path="/category/:category" element={<CategoryWrapper onNavigate={handleNavigate} onNewsClick={handleNewsClick} setCurrentCategory={setCurrentCategory} />} />
               <Route path="*" element={
@@ -91,7 +96,6 @@ export default function App() {
       </main>
 
       <footer className="mt-auto print:hidden">
-        <BreakingNews />
         <Footer onNavigate={handleNavigate} />
       </footer>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, User, Phone, Mail, Filter, ChevronRight, Users, Search, Globe, X, Send, CheckCircle, Upload, Clock } from 'lucide-react';
+import { MapPin, User, Phone, Mail, Filter, ChevronRight, Users, Search, Globe, X, Send, CheckCircle, Upload, Clock, Briefcase, Calendar } from 'lucide-react';
 import { db, storage } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -12,6 +12,20 @@ export const OurFamily: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDivision, setSelectedDivision] = useState('সব');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Convert numbers to Bengali
+  const convertToBn = (text: string | number): string => {
+    const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return text.toString().replace(/\d/g, (d) => bnNums[parseInt(d)]);
+  };
+
+  // Convert joining date to Bengali format
+  const getBnDate = (createdAt?: any) => {
+    if (!createdAt) return '১৮ মে, ২০২৩';
+    const date = createdAt.seconds ? new Date(createdAt.seconds * 1000) : new Date(0);
+    if (date.getTime() === 0) return '১৮ মে, ২০২৩';
+    return date.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
   
   // Application Modal State
   const [showModal, setShowModal] = useState(false);
@@ -233,129 +247,110 @@ export const OurFamily: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Professional Header Section - Premium Design */}
-      <div className="relative h-[60vh] flex items-center justify-center text-center overflow-hidden bg-gray-900 border-b border-white/5">
-        <div className="absolute inset-0">
+      {/* Professional Header Section - Simple & Premium Design */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-red-50/60 via-white to-red-50/30 border-b border-gray-150 py-20 md:py-28">
+        {/* Satellite ground station background image with light, elegant overlay */}
+        <div className="absolute inset-0 z-0">
           <img 
-            src="https://picsum.photos/seed/journalism/1920/1080?blur=4" 
-            className="w-full h-full object-cover opacity-40 scale-105"
+            src="https://images.unsplash.com/photo-1518364538800-6bcb3f25da49?auto=format&fit=crop&w=1600&q=80" 
+            alt="Satellite Ground Station Background" 
+            className="w-full h-full object-cover opacity-10 scale-105 grayscale"
             referrerPolicy="no-referrer"
-            alt="Journalism Background"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900/40 to-gray-900"></div>
-          
-          {/* Animated decorative elements */}
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-sami-red/20 rounded-full mix-blend-screen blur-[120px]"
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.2, 0.4, 0.2],
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-sami-teal/20 rounded-full mix-blend-screen blur-[150px]"
-          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white" />
+          {/* Subtle grid pattern background overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808006_1px,transparent_1px),linear-gradient(to_bottom,#80a0a006_1px,transparent_1px)] bg-[size:16px_28px] pointer-events-none" />
         </div>
-
-        <div className="relative z-10 max-w-4xl px-4">
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-sami-red text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8 shadow-2xl shadow-sami-red/40"
+            className="inline-flex items-center gap-2 bg-[#D92B2B]/10 text-[#D92B2B] border border-[#D92B2B]/20 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] mb-6"
           >
-            <Users size={14} /> Our Community
+            <Users size={12} className="animate-pulse" /> OUR PORTAL COMMUNITY
           </motion.div>
           
           <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-6xl md:text-8xl font-black text-white mb-8 tracking-tight leading-[0.9]"
+            className="text-4xl md:text-6xl font-black text-gray-950 mb-6 tracking-tight leading-tight"
           >
-            সামী টিভি <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sami-red to-sami-accent">পরিবার</span>
+            সামী টিভি <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D92B2B] to-[#FF4D4D]">ডিজিটাল পরিবার</span>
           </motion.h1>
 
           <motion.div 
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 1 }}
-            className="w-32 h-2 bg-white mx-auto rounded-full mb-8"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: 64 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="h-1 bg-[#D92B2B] mx-auto rounded-full mb-6"
           />
 
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed"
+            transition={{ delay: 0.3 }}
+            className="text-gray-700 max-w-2xl mx-auto text-base md:text-lg font-bold leading-relaxed font-sans"
           >
-            বস্তুনিষ্ঠ সাংবাদিকতার মূল কারিগর—আমাদের সাহসিক সংবাদকর্মীদের মিলনস্থল।
+            বস্তুনিষ্ঠ ও দায়িত্বশীল গণমাধ্যমের ধারা বজায় রাখতে দেশজুড়ে নিয়োজিত আমাদের গতিশীল সংবাদকর্মীদের তথ্যচিত্র ও গ্যালারি।
           </motion.p>
         </div>
-
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50/50 to-transparent"></div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-20 relative z-20 pb-32">
-        {/* Statistics Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto -mt-12 relative z-20 pb-32">
+        {/* Statistics Bar - Sleeker & Minimalist */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
-            { label: 'মোট সদস্য', value: filteredReporters.length, icon: Users, color: 'text-sami-red' },
-            { label: 'বিভাগ', value: divisions.length - 1, icon: Globe, color: 'text-sami-teal' },
-            { label: 'উপজেলা', value: '৫০+', icon: MapPin, color: 'text-sami-blue' },
-            { label: 'প্রচার সময়', value: '২৪/৭', icon: Clock, color: 'text-orange-500' }
+            { label: 'মোট সংবাদকর্মী', value: filteredReporters.length, icon: Users, color: 'text-[#D92B2B]', bg: 'hover:border-red-200' },
+            { label: 'সক্রিয় বিভাগ', value: divisions.length - 1, icon: Globe, color: 'text-emerald-500', bg: 'hover:border-emerald-200' },
+            { label: 'থানা ও জেলা', value: '৫০+', icon: MapPin, color: 'text-[#D92B2B]', bg: 'hover:border-red-200' },
+            { label: 'সম্প্রচার সময়', value: '২৪/৭', icon: Clock, color: 'text-amber-500', bg: 'hover:border-amber-200' }
           ].map((stat, i) => (
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + (i * 0.1) }}
+              transition={{ delay: 0.1 + (i * 0.05) }}
               key={i}
-              className="bg-white p-6 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center justify-center text-center group hover:bg-sami-dark transition-all duration-500"
+              className={`bg-white p-5 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-gray-150 flex items-center gap-4 transition-all duration-350 cursor-default ${stat.bg}`}
             >
-              <stat.icon className={`${stat.color} mb-3 group-hover:scale-110 transition-transform`} size={24} />
-              <p className="text-2xl font-black text-gray-900 group-hover:text-white transition-colors">{stat.value}</p>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 group-hover:text-gray-500">{stat.label}</p>
+              <div className={`w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100`}>
+                <stat.icon className={`${stat.color}`} size={18} />
+              </div>
+              <div>
+                <p className="text-xl font-black text-gray-900 leading-none">{stat.value}</p>
+                <p className="text-[10.5px] font-extrabold text-gray-400 uppercase tracking-wider mt-1.5 font-sans">{stat.label}</p>
+              </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Search & Filter - Redesigned for Premium Look */}
-        <div className="bg-white/80 backdrop-blur-2xl p-10 rounded-[3rem] shadow-2xl shadow-gray-200/40 border border-white mb-20">
-          <div className="flex flex-col lg:flex-row gap-12 items-end">
-            <div className="flex-1 w-full space-y-6">
-              <div className="flex items-center gap-3 text-gray-900 font-black text-[10px] uppercase tracking-[0.3em]">
-                <div className="w-1 h-4 bg-sami-red rounded-full"></div>
-                <span>সংবাদকর্মী অন্বেষণ করুন</span>
-              </div>
-              <div className="relative group">
-                <input 
-                  type="text" 
-                  placeholder="নাম, পদবী বা এলাকা দিয়ে খুঁজুন..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-16 pr-8 py-6 bg-gray-50/50 border-2 border-gray-100/50 rounded-3xl outline-none focus:bg-white focus:border-sami-red focus:ring-4 focus:ring-sami-red/5 transition-all text-lg font-bold placeholder:text-gray-300"
-                />
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-sami-red transition-colors" size={24} />
-              </div>
+        {/* Search & Filter - Clean, Inline Professional Search Box */}
+        <div className="bg-white border border-gray-150 p-5 rounded-2xl shadow-[0_5px_22px_rgba(0,0,0,0.015)] mb-12">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            {/* Search Input */}
+            <div className="relative flex-1 w-full">
+              <input 
+                type="text" 
+                placeholder="নাম, পদবী বা এলাকা দিয়ে খুঁজুন..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-3.5 bg-gray-50/70 hover:bg-white focus:bg-white border border-gray-200 focus:border-[#D92B2B] focus:ring-4 focus:ring-[#D92B2B]/5 rounded-xl transition-all text-[15px] font-bold outline-none placeholder:text-gray-400 font-sans"
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#D92B2B] transition-colors" size={16} />
             </div>
             
-            <div className="w-full lg:w-1/3 space-y-4">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] block px-2">বিভাগ সিলেক্ট করুন</label>
+            {/* Division Filter */}
+            <div className="w-full md:w-64">
               <div className="relative">
                 <select 
                   value={selectedDivision}
                   onChange={(e) => setSelectedDivision(e.target.value)}
-                  className="w-full appearance-none bg-gray-900 text-white pl-8 pr-12 py-6 rounded-3xl font-black text-sm cursor-pointer hover:bg-sami-dark transition-colors outline-none shadow-xl shadow-gray-900/20"
+                  className="w-full appearance-none bg-gray-900 hover:bg-gray-800 text-white pl-4 pr-10 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider cursor-pointer transition-colors outline-none font-sans"
                 >
-                  {divisions.map(div => <option key={div} value={div}>{div}</option>)}
+                  {divisions.map(div => <option key={div} value={div}>বিভাগ: {div}</option>)}
                 </select>
-                <ChevronRight size={20} className="absolute right-6 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none text-white/40" />
+                <ChevronRight size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 rotate-90 pointer-events-none text-white/60" />
               </div>
             </div>
           </div>
@@ -367,58 +362,90 @@ export const OurFamily: React.FC = () => {
             <p className="text-[10px] text-gray-400 font-black tracking-[0.4em] uppercase">গ্যালারি লোড হচ্ছে</p>
           </div>
         ) : filteredReporters.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
             <AnimatePresence mode="popLayout">
-              {filteredReporters.map((rep, idx) => (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  key={rep.id}
-                  className="group relative"
-                >
-                  <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden mb-6 shadow-xl transition-all duration-700 group-hover:-translate-y-4 group-hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)]">
-                    <img 
-                      src={rep.imageUrl || "https://picsum.photos/seed/user/800/1200"} 
-                      alt={rep.name} 
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000 ease-out" 
-                      referrerPolicy="no-referrer" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity"></div>
-                    
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <div className="inline-block px-3 py-1 bg-sami-red text-white text-[9px] font-black uppercase tracking-widest rounded mb-3">
-                        {rep.designation}
+              {filteredReporters.map((rep, idx) => {
+                const portalCity = rep.location ? (rep.location.split(',').pop()?.trim() || 'জামালপুর') : 'জামালপুর';
+                return (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05, ease: "easeOut" }}
+                    exit={{ opacity: 0, y: 15 }}
+                    key={rep.id}
+                    className="bg-white border border-gray-150 rounded-2xl flex flex-col shadow-[0_4px_16px_rgba(0,0,0,0.015)] hover:shadow-[0_16px_40px_rgba(217,43,43,0.06)] hover:border-red-200 transition-all duration-300 relative group overflow-hidden"
+                  >
+                    {/* Top Section: Full-Width Portrait Image with Floating Badges */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 border-b border-gray-100 shrink-0 select-none">
+                      <img 
+                        src={rep.imageUrl || "https://picsum.photos/seed/user/800/1200"} 
+                        alt={rep.name} 
+                        className="w-full h-full object-cover group-hover:scale-103 transition-all duration-700 ease-out" 
+                        referrerPolicy="no-referrer" 
+                      />
+                      
+                      {/* Premium Floating Badges */}
+                      <div className="absolute top-3 left-3 bg-gray-950/80 text-white backdrop-blur-md px-2.5 py-1.5 rounded-lg text-[10px] font-black border border-white/10 tracking-wider shadow-sm flex items-center gap-1.5 font-sans">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                        <span>ID NO: {convertToBn(rep.reporterId || (2601 + idx))}</span>
                       </div>
-                      <h3 className="text-xl font-black text-white leading-tight">{rep.name}</h3>
-                    </div>
-                  </div>
-                  
-                  <div className="px-2 space-y-3">
-                    <div className="flex items-center gap-3 text-gray-500 group-hover:text-gray-900 transition-colors">
-                      <MapPin size={14} className="text-sami-red shrink-0" />
-                      <span className="text-xs font-bold leading-none">{rep.location}</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 opacity-60 group-hover:opacity-100 transition-opacity">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">অনলাইন</span>
+
+                      <div className="absolute top-3 right-3 bg-white/90 text-gray-800 backdrop-blur-md px-2.5 py-1.5 rounded-lg text-[11px] font-bold border border-gray-200 shadow-sm flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#D92B2B] shrink-0 animate-bounce" />
+                        <span>{rep.location || 'জামালপুর'}</span>
                       </div>
-                      {rep.phone && (
-                        <a 
-                          href={`tel:${rep.phone}`} 
-                          className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-sami-red hover:text-white transition-all shadow-sm"
-                        >
-                          <Phone size={14} />
-                        </a>
-                      )}
+
+                      {/* Live Indicator overlay on image */}
+                      <div className="absolute bottom-3 left-3 bg-emerald-500/80 text-white backdrop-blur-md px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <span className="w-1 h-1 bg-white rounded-full"></span>
+                        <span>ACTIVE REPORTER</span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Bottom Section: Profile Metadata */}
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        {/* Reporter Name */}
+                        <h3 className="text-[17px] sm:text-[18px] font-black text-gray-950 leading-snug group-hover:text-[#D92B2B] transition-colors duration-200 truncate font-sans">
+                          {rep.name}
+                        </h3>
+
+                        {/* Designation Tag */}
+                        <div className="flex items-center gap-1.5 text-[11px] sm:text-[12px] font-extrabold text-[#D92B2B] bg-red-50/70 border border-red-100/40 px-2.5 py-0.5 rounded-md w-fit mt-1.5 select-none font-sans">
+                          <Briefcase className="w-3.5 h-3.5 text-[#D92B2B] shrink-0" />
+                          <span className="truncate">{rep.designation}</span>
+                        </div>
+                      </div>
+
+                      {/* Hairline Separated Action Links */}
+                      <div className="space-y-2 mt-4 select-none">
+                        {/* Phone call row */}
+                        {rep.phone && (
+                          <a 
+                            href={`tel:${rep.phone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-3 text-xs text-gray-500 hover:text-[#D92B2B] border-t border-gray-100 pt-3 transition-colors duration-200"
+                          >
+                            <div className="w-7 h-7 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-red-50 group-hover:border-red-100 transition-colors">
+                              <Phone className="w-3.5 h-3.5 text-gray-450 group-hover:text-[#D92B2B] transition-colors" />
+                            </div>
+                            <span className="font-mono font-bold leading-none">{convertToBn(rep.phone)}</span>
+                          </a>
+                        )}
+
+                        {/* Date of joining row */}
+                        <div className="flex items-center gap-3 text-[11px] text-gray-400 border-t border-gray-100 pt-3 font-sans">
+                          <div className="w-7 h-7 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                            <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          </div>
+                          <span className="font-bold leading-none">যুক্ত হয়েছেন: {getBnDate(rep.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         ) : (
@@ -437,29 +464,34 @@ export const OurFamily: React.FC = () => {
           </div>
         )}
 
-        {/* Recruitment Footer - High Impact */}
+        {/* Recruitment Footer - Sleek & Simple Professional Design */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-32 relative rounded-[3rem] overflow-hidden bg-gray-900 text-white"
+          transition={{ duration: 0.4 }}
+          className="mt-20 max-w-5xl mx-auto bg-gradient-to-r from-gray-50 to-slate-50/50 border border-gray-150 rounded-2xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_4px_24px_rgba(0,0,0,0.01)] hover:border-red-150 transition-all duration-300"
         >
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sami-red/10 rounded-full blur-[100px] -mr-64 -mt-64"></div>
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-sami-teal/10 rounded-full blur-[100px] -ml-64 -mb-64"></div>
-          
-          <div className="relative z-10 p-12 md:p-20 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full flex items-center justify-center mb-8">
-              <Users size={32} className="text-sami-red" />
+          <div className="flex-1 min-w-0 text-center md:text-left space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-500 border border-red-100/50 text-[10px] font-black uppercase tracking-wider rounded-md">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+              নিউজ পোর্টাল রিক্রুটমেন্ট
             </div>
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">আপনি কি আমাদের সংবাদকর্মী <br /> হতে চান?</h2>
-            <p className="text-gray-400 max-w-2xl text-lg font-medium leading-relaxed mb-12">
-              সাত-বিদেশের সত্য সংবাদ সঠিক সময়ে পৌঁছে দিতে সামী টিভি নিরলস কাজ করে যাচ্ছে। আমাদের এই যাত্রার অংশীদার হতে আজই আবেদন করুন।
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight leading-snug">
+              আপনি কি আমাদের সংবাদকর্মী হতে চান?
+            </h2>
+            <p className="text-gray-500 text-sm md:text-base font-bold leading-relaxed max-w-2xl">
+              সঠিক ও বস্তুনিষ্ঠ খবরের সহযাত্রী হতে সামী টিভি পরিবারের সাথে যুক্ত হন এবং আপনার এলাকার সত্য সংবাদ তুলে ধরুন।
             </p>
+          </div>
+          
+          <div className="shrink-0">
             <button 
               onClick={() => setShowModal(true)}
-              className="group bg-sami-red hover:bg-white hover:text-gray-900 text-white px-12 py-5 rounded-3xl font-black text-sm uppercase tracking-widest transition-all duration-500 shadow-2xl shadow-sami-red/30 flex items-center gap-4"
+              className="group bg-red-650 hover:bg-[#D92B2B] text-white px-7 py-4.5 rounded-xl font-black text-[13px] uppercase tracking-wider transition-all duration-300 shadow-md flex items-center gap-2.5"
             >
-              আবেদন ফরম পূরণ করুন <ChevronRight className="group-hover:translate-x-2 transition-transform" />
+              <span>আবেদন ফরম পূরণ করুন</span> 
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </motion.div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Facebook, Layout, Radio } from 'lucide-react';
+import { Facebook, Layout, Radio, Download, Smartphone } from 'lucide-react';
 import { LiveTVPlayer } from './LiveTVPlayer';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, limit, orderBy } from 'firebase/firestore';
@@ -75,35 +75,6 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
             className="w-full py-2 bg-[#1877F2] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#166fe5] transition-all rounded-sm font-eng shadow-sm"
           >
             <Facebook size={12} fill="currentColor" /> Visit samitvbd
-          </a>
-        </div>
-      </div>
-
-      {/* App Download Section */}
-      <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group">
-        <div className="bg-[#003366] text-white px-4 py-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Layout size={14} /> সামি টিভি অ্যাপস
-          </div>
-          <div className="flex gap-1">
-            <div className="w-1 h-1 bg-white/40 rounded-full"></div>
-            <div className="w-1 h-1 bg-white/40 rounded-full"></div>
-          </div>
-        </div>
-        <div className="p-4 bg-gray-50 border-b border-gray-100">
-          <p className="text-[11px] text-gray-600 font-bold mb-4 leading-tight">
-            সর্বশেষ সংবাদ ও সরাসরি সম্প্রচার দেখতে আমাদের অফিসিয়াল অ্যাপ ডাউনলোড করুন।
-          </p>
-          <a 
-            href="https://drive.google.com/file/d/1XRi5iMvvtLlyZNg9eYd9HynPS7FYBJi-/view?usp=drive_link" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-full py-3.5 bg-[#003366] text-white text-[10px] font-black flex items-center justify-center gap-3 hover:bg-blue-800 transition-all rounded-sm shadow-lg shadow-gray-200 group/btn"
-          >
-            <div className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center group-hover/btn:scale-110 transition-transform">
-               <Radio size={14} className="text-white animate-pulse" />
-            </div>
-            DOWNLOAD NOW
           </a>
         </div>
       </div>

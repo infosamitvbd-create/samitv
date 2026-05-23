@@ -305,7 +305,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                     >
-                      <div className="w-24 h-24 rounded-lg overflow-hidden shrink-0 border border-gray-100 shadow-sm">
+                      <div className="w-24 aspect-video rounded-lg overflow-hidden shrink-0 border border-gray-100 shadow-sm">
                         <img src={item.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
                       </div>
                       <div className="flex flex-col justify-center gap-1.5">
@@ -341,7 +341,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
                   }}
                 >
                   <div className="relative shrink-0">
-                    <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-100 shadow-sm">
+                    <div className="w-24 aspect-video rounded-lg overflow-hidden bg-gray-100 shadow-sm">
                       <img src={item.imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
                     </div>
                     <span className="absolute -top-2 -left-2 w-6 h-6 bg-red-600 text-white rounded-lg flex items-center justify-center text-[11px] font-black shadow-md border-2 border-white">{idx + 1}</span>

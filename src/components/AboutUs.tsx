@@ -1,330 +1,302 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Award, Target, Users, Quote, Facebook, Twitter, Linkedin, Mail, ShieldCheck, Zap, Globe, History, Radio, Cpu } from 'lucide-react';
+import { Award, Target, Users, Quote, Facebook, Mail, ShieldCheck, Zap, Globe, History, Radio, Cpu, Calendar, CheckCircle2 } from 'lucide-react';
 
 export const AboutUs: React.FC = () => {
   return (
     <motion.div 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
-      className="bg-[#fafafa] min-h-screen font-sans"
+      className="bg-gray-50/50 min-h-screen font-sans text-gray-800"
     >
-      {/* 1. Ultra-Premium Immersive Hero */}
-      <section className="relative h-[85vh] min-h-[600px] flex items-center bg-sami-dark overflow-hidden">
-        {/* Animated Background Layers */}
+      {/* 1. Sleek, Premium Hero Banner with Logo Integration */}
+      <section className="relative py-24 md:py-36 bg-gray-950 overflow-hidden border-b border-white/5">
+        {/* Subtle background image overlay */}
         <div className="absolute inset-0 z-0">
-          <motion.div 
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.2 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            className="absolute inset-0"
+          <img 
+            src="https://images.unsplash.com/photo-1495020689067-958852a7735e?auto=format&fit=crop&q=80&w=2070" 
+            alt="Newsroom Background" 
+            className="w-full h-full object-cover grayscale opacity-25 scale-102"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-950/95 via-gray-950/80 to-gray-950"></div>
+          {/* Elegant Tech Grid Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#80a0a00a_1px,transparent_1px)] bg-[size:16px_28px] pointer-events-none" />
+        </div>
+        
+        <div className="container mx-auto max-w-5xl px-6 relative z-10 text-center space-y-8">
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="flex flex-col items-center"
           >
-            <img 
-              src="https://images.unsplash.com/photo-1495020689067-958852a7735e?auto=format&fit=crop&q=80&w=2070" 
-              alt="Newsroom Background" 
-              className="w-full h-full object-cover grayscale"
-              referrerPolicy="no-referrer"
-            />
-          </motion.div>
-          <div className="absolute inset-0 bg-gradient-to-r from-sami-dark via-sami-dark/80 to-transparent"></div>
-          
-          {/* Decorative Grid Overlay */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px'}}></div>
-        </div>
-        
-        <div className="container mx-auto max-w-7xl px-4 relative z-10">
-          <div className="max-w-4xl">
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="w-12 h-[1px] bg-sami-red"></span>
-                <span className="text-sami-red font-eng font-black uppercase tracking-[0.5em] text-[10px]">Since 2010</span>
-              </div>
-              <h1 className="text-6xl md:text-9xl font-display font-black text-white mb-8 tracking-tighter leading-[0.85]">
-                SAMI<br />
-                <span className="text-sami-red">TELEVISION</span>
-              </h1>
-              <p className="text-gray-400 max-w-xl text-xl md:text-2xl font-medium leading-relaxed mb-12 border-l-4 border-sami-red/30 pl-8">
-                বস্তুনিষ্ঠ সাংবাদিকতা এবং আধুনিক প্রযুক্তির সমন্বয়ে সামি টিভিকে এগিয়ে নিয়ে যাচ্ছেন আমাদের দক্ষ নেতৃত্ব।
-              </p>
-              
-              <div className="flex flex-wrap gap-12 mt-16">
-                <div className="flex flex-col">
-                  <span className="text-4xl font-display font-black text-white">125K+</span>
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mt-1">Global Followers</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-4xl font-display font-black text-white">500+</span>
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mt-1">Reporters Nationwide</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-4xl font-display font-black text-white">24/7</span>
-                  <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mt-1">Live Broadcasting</span>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30"
-        >
-          <span className="text-[10px] uppercase tracking-widest text-white font-bold">Explore</span>
-          <div className="w-[1px] h-12 bg-white"></div>
-        </motion.div>
-      </section>
-
-      {/* 2. Asymmetric Split History Section */}
-      <section className="py-32 relative overflow-hidden bg-white">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <motion.div 
-              initial={{ x: -100, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="relative z-10 rounded-[40px] overflow-hidden shadow-3xl">
-                <img src="https://images.unsplash.com/photo-1579275542618-a1dfed5f54ba?auto=format&fit=crop&q=80&w=1287" alt="History" className="w-full aspect-[4/5] object-cover" referrerPolicy="no-referrer" />
-              </div>
-              <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-sami-red rounded-3xl -z-10 rotate-6 hidden md:block"></div>
-              <div className="absolute -top-10 -left-10 w-32 h-32 bg-sami-blue/10 rounded-full blur-2xl -z-10"></div>
-              
-              {/* Year Badge */}
-              <div className="absolute top-12 left-0 -translate-x-1/2 bg-white p-8 rounded-full shadow-2xl z-20 hidden lg:flex items-center justify-center flex-col">
-                <span className="text-4xl font-display font-black text-sami-red">16</span>
-                <span className="text-[8px] uppercase tracking-widest text-gray-400 font-bold mt-1">Years Excellence</span>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ x: 100, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <History className="text-sami-red" size={20} />
-                <span className="text-sami-red font-eng font-black uppercase tracking-widest text-xs">Our Journey</span>
-              </div>
-              <h2 className="text-5xl font-display font-black text-gray-900 mb-8 uppercase tracking-tighter leading-none">
-                একটি স্বপ্নের <br /> <span className="text-sami-red underline decoration-wavy decoration-sami-red/20 underline-offset-8">পথচলা</span>
-              </h2>
-              <div className="space-y-8 text-lg text-gray-600 leading-relaxed font-medium">
-                <p>SAMI TV একটি বেসরকারি মালিকানাধীন বাংলাদেশি বাংলা ভাষার টেলিভিশন চ্যানেল, যা ১১ নভেম্বর ২০১০ সালে যাত্রা শুরু করে। চ্যানেলটির প্রধান কার্যালয় জামালপুর, ময়মনসিংহে অবস্থিত। যাত্রালগ্ন থেকেই SAMI TV সত্যনিষ্ঠ, দায়িত্বশীল ও সময়োপযোগী সংবাদ পরিবেশনের মাধ্যমে দর্শকদের আস্থা অর্জন করে চলেছে।</p>
-                <p>SAMI TV সংবাদ ও তথ্যভিত্তিক অনুষ্ঠানের পাশাপাশি বিনোদন, নাটক, টক শো, সঙ্গীত এবং সাংস্কৃতিক অনুষ্ঠান সম্প্রচার করে থাকে। আমাদের লক্ষ্য হলো দেশের ও বিশ্বের গুরুত্বপূর্ণ ঘটনা দ্রুত, নির্ভুল ও নিরপেক্ষভাবে দর্শকদের সামনে তুলে ধরা এবং একই সঙ্গে বাংলা সংস্কৃতি ও ঐতিহ্যকে সমুন্নত রাখা।</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-8 mt-12">
-                <div className="p-6 rounded-2xl bg-gray-50 border border-gray-100">
-                  <Radio className="text-sami-blue mb-4" />
-                  <h4 className="font-bold text-gray-900 mb-2">ব্রডকাস্ট এক্সিলেন্স</h4>
-                  <p className="text-xs text-gray-500">উন্নত স্যাটেলাইট প্রযুক্তির মাধ্যমে নির্বিঘ্ন সেবা।</p>
-                </div>
-                <div className="p-6 rounded-2xl bg-gray-50 border border-gray-100">
-                  <Cpu className="text-sami-red mb-4" />
-                  <h4 className="font-bold text-gray-900 mb-2">ডিজিটাল ফার্স্ট</h4>
-                  <p className="text-xs text-gray-500">সোশ্যাল মিডিয়া এবং ওয়েবে দ্রুততম সংবাদ প্রচার।</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Leadership Redefined: Bold Minimalism */}
-      <section className="py-32 bg-gray-50">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="text-center mb-24">
-            <span className="text-sami-red font-eng font-black uppercase tracking-[0.5em] text-[10px] mb-4 block">Executive Board</span>
-            <h2 className="text-6xl font-display font-black text-gray-900 uppercase tracking-tighter">আমাদের <span className="text-sami-red">কর্ণধার</span></h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {[
-              {
-                name: "Md. Abul Kashem",
-                role: "Chairman",
-                img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjQIlNZaI7KugfIRmOXvHPu4i_B9xUhdTeG8JBDSYRlRQxJEJNhUWxdQUnWvTfJFCxvDnF9D3oiZtlJcYksYnrJPdGon084dAjJ38JQFjWj0iyFc8Ed-4zaELMmQk27qfCHswas0Rh5hfEvoZrlz6BQwcaWTvXnnByRZPjfSWpOcbtnlT2OthhwDgVN1lgE/s320/645363491_979533377908521_7060082878587727711_n.jpg",
-                quote: "সামি টেলিভিশনের স্বপ্নদ্রষ্টা এবং অভিভাবক। তাঁর বলিষ্ঠ নেতৃত্বে আমরা বস্তুনিষ্ঠ সাংবাদিকতার পথে এগিয়ে চলেছি।",
-                color: "sami-red",
-                icon: <Award size={32} />
-              },
-              {
-                name: "Emran Hasan Sami",
-                role: "Managing Director",
-                img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjVlW6FgrzRXXO0p0T_dpOUIYEoFxOB347KnDys4clH-LxgfPLiHHGbp49da2QV6XuOnATrk4HzEtHqEKwzfNPHvR5QwiaB-ML7zgOplLW7Ajz12gXuftT0oKofsXu4pfI74gOPr88xVZ_Si7X7wdimSxOgt17QKgCy6vzSXJfm6j7qGs7WXYd2hRcVzlj/s320/656002480_970541098659349_900311477486710105_n.jpg",
-                quote: "তরুণ ও উদ্যমী নেতৃত্ব। সামি টেলিভিশনের আধুনিকায়ন এবং প্রযুক্তিগত উৎকর্ষ সাধনে তাঁর ভূমিকা অপরিসীম।",
-                color: "sami-blue",
-                icon: <Target size={32} />
-              }
-            ].map((leader, i) => (
-              <motion.div 
-                key={i}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="bg-white rounded-[40px] p-4 shadow-xl shadow-gray-200/50 group"
-              >
-                <div className="flex flex-col md:flex-row items-center gap-10 p-6">
-                  <div className="relative shrink-0 w-64 h-80 rounded-3xl overflow-hidden shadow-2xl">
-                    <img src={leader.img} alt={leader.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
-                    <div className={`absolute inset-0 bg-${leader.color}/20 opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-                  </div>
-                  <div className="flex-1">
-                    <div className={`text-${leader.color} mb-4`}>{leader.icon}</div>
-                    <span className="text-[10px] font-eng font-black uppercase tracking-[0.3em] text-gray-400 block mb-2">{leader.role}</span>
-                    <h3 className="text-3xl font-display font-black text-gray-900 mb-6 tracking-tight leading-none">{leader.name}</h3>
-                    <p className="font-serif text-lg italic text-gray-600 leading-relaxed mb-8">"{leader.quote}"</p>
-                    <div className="flex gap-4">
-                      <a href="#" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-sami-dark hover:text-white transition-all"><Facebook size={20} /></a>
-                      <a href="#" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-sami-dark hover:text-white transition-all"><Twitter size={20} /></a>
-                      <a href="#" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-sami-dark hover:text-white transition-all"><Mail size={20} /></a>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Asymmetric Bento Grid Section */}
-      <section className="py-32 bg-white">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-1 md:grid-cols-12 auto-rows-[300px] gap-6">
-            <motion.div 
-              whileHover={{ y: -10 }}
-              className="md:col-span-8 md:row-span-2 bg-sami-dark rounded-[40px] p-16 text-white overflow-hidden relative group"
-            >
-              <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-1000">
-                <Globe size={300} />
-              </div>
-              <div className="relative z-10 flex flex-col h-full justify-between">
-                <div>
-                  <span className="text-sami-red font-eng font-black uppercase tracking-widest text-xs mb-6 block">Future Ready</span>
-                  <h3 className="text-6xl font-display font-black mb-8 tracking-tighter uppercase leading-[0.9]">আমাদের <span className="text-sami-red">লক্ষ্য</span></h3>
-                  <p className="text-2xl text-gray-400 leading-relaxed max-w-2xl font-medium">
-                    জাতীয় ও আন্তর্জাতিক সংবাদ, রাজনীতি, অর্থনীতি, খেলাধুলা, বিনোদন, প্রযুক্তি এবং সামাজিক বিভিন্ন বিষয় নিয়ে SAMI TV নিয়মিত মানসম্মত কনটেন্ট তৈরি ও প্রচার করে। অভিজ্ঞ সাংবাদিক, উপস্থাপক ও কারিগরি দলের সম্মিলিত প্রচেষ্টায় আমরা বিশ্বাসযোগ্য সংবাদ পরিবেশনে প্রতিশ্রুতিবদ্ধ।
-                  </p>
-                </div>
-                <div className="flex items-center gap-6 pt-12">
-                   <div className="flex -space-x-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="w-14 h-14 rounded-full border-4 border-sami-dark bg-gray-800 overflow-hidden">
-                        <img src={`https://picsum.photos/seed/face${i+20}/100/100`} alt="" referrerPolicy="no-referrer" />
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-xl font-display font-black text-white">1,25,000+</p>
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Total Community Members</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              className="md:col-span-4 bg-sami-red rounded-[40px] p-10 text-white relative overflow-hidden group cursor-pointer"
-            >
-              <Zap size={40} className="mb-6" />
-              <h4 className="text-4xl font-display font-black mb-4 uppercase tracking-tighter">সততা</h4>
-              <p className="text-red-100 text-lg font-medium leading-relaxed">SAMI TV বিশ্বাস করে—গণমাধ্যম শুধু তথ্য দেওয়ার মাধ্যম নয়, বরং সমাজের সচেতনতা বৃদ্ধি ও ইতিবাচক পরিবর্তনের একটি শক্তিশালী হাতিয়ার।</p>
-              <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-125 transition-transform duration-700">
-                <ShieldCheck size={200} />
-              </div>
-            </motion.div>
-
-            <motion.div 
-               whileHover={{ scale: 1.02 }}
-               className="md:col-span-4 bg-sami-blue rounded-[40px] p-10 text-white relative overflow-hidden group cursor-pointer"
-            >
-              <Award size={40} className="mb-6" />
-              <h4 className="text-4xl font-display font-black mb-4 uppercase tracking-tighter">সাফল্য</h4>
-              <p className="text-blue-100 text-lg font-medium leading-relaxed">অল্প সময়েই জামালপুরসহ সারাদেশে বিশ্বস্ত নিউজ পোর্টাল হিসেবে প্রতিষ্ঠিত।</p>
-              <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-125 transition-transform duration-700">
-                <Target size={200} />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Immersive Glassmorphism Founders Message */}
-      <section className="py-32 relative">
-        <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&q=80&w=2069" alt="" className="w-full h-full object-cover grayscale opacity-10" />
-        </div>
-        
-        <div className="container mx-auto max-w-7xl px-4 relative z-10">
-          <div className="bg-white/70 backdrop-blur-3xl rounded-[60px] p-12 lg:p-24 border border-white/50 shadow-2xl relative overflow-hidden">
-             <div className="max-w-4xl mx-auto text-center">
-                <Quote size={80} className="text-sami-red/20 mx-auto mb-12" />
-                <h3 className="font-serif text-3xl md:text-5xl italic text-gray-800 leading-[1.5] mb-16">
-                  "দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার নীতি মেনে সংবাদ সংগ্রহ ও প্রচারে বিশ্বাসী আমরা। এতে কোনো দল, গোষ্ঠী বা মতবাদের প্রতি পক্ষপাত করা হয় না। খবরের ভেতরের খবর ও বিশ্লেষণে সর্বোচ্চ উৎকর্ষতা বজায় রাখার চেষ্টা করে সামী টিভি।"
-                </h3>
-                
-                <div className="flex flex-col items-center">
-                  <div className="w-24 h-24 rounded-3xl overflow-hidden shadow-2xl mb-6 rotate-3 hover:rotate-0 transition-transform duration-500 cursor-pointer p-1 bg-white">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjVlW6FgrzRXXO0p0T_dpOUIYEoFxOB347KnDys4clH-LxgfPLiHHGbp49da2QV6XuOnATrk4HzEtHqEKwzfNPHvR5QwiaB-ML7zgOplLW7Ajz12gXuftT0oKofsXu4pfI74gOPr88xVZ_Si7X7wdimSxOgt17QKgCy6vzSXJfm6j7qGs7WXYd2hRcVzlj/s320/656002480_970541098659349_900311477486710105_n.jpg" alt="Founder" className="w-full h-full object-cover rounded-2xl" referrerPolicy="no-referrer" />
-                  </div>
-                  <h5 className="text-2xl font-display font-black text-gray-900 tracking-tight">Emran Hasan Sami</h5>
-                  <p className="text-sami-red font-bold text-sm mt-1">প্রতিষ্ঠাতা ও ম্যানেজিং ডিরেক্টর, সামি টিভি</p>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Contact/CTA Section: Bold & Direct */}
-      <section className="pb-32">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="bg-sami-red rounded-[40px] p-12 lg:p-24 text-white flex flex-col lg:flex-row items-center justify-between gap-12 text-center lg:text-left relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-              <Mail size={120} />
+            {/* Logo Badge */}
+            <div className="relative mb-6 p-4 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md shadow-2xl flex items-center justify-center">
+              <img 
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFj9Vggz6K8alsU_HhjhzliEjiij0iQBXBHM8ZPRIMET8EjAd3_ebQcFGWGplZCq0LB0gWXmmRaa7MGS5qvVI1Qui8Y50J92sgykRMhdCJMgDnQJShoY6OW9ULSgHYWYA5Lhm4OcXzdN1VvsTcDYdV82Hlwxg7anOL6r1bdhtmnebJsQCQih6uKeVHPUbY/s1068/NEW%20LOGO.png" 
+                alt="Sami TV Logo" 
+                className="h-16 md:h-20 object-contain drop-shadow-[0_8px_16px_rgba(217,43,43,0.3)]"
+                referrerPolicy="no-referrer"
+              />
             </div>
-            <div className="relative z-10 lg:max-w-xl">
-              <h2 className="text-5xl md:text-6xl font-display font-black mb-4 tracking-tighter uppercase leading-[0.9]">আমাদের সাথে <br /><span className="text-sami-dark">যোগাযোগ</span> করুন</h2>
-              <p className="text-red-100 text-xl font-medium mb-8">বস্তুনিষ্ঠ সাংবাদিকতায় আমাদের সহযাত্রী হোন।</p>
+
+            <div className="inline-flex items-center gap-2 bg-[#D92B2B]/10 border border-[#D92B2B]/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.25em] text-[#D92B2B] mb-4">
+              <Radio size={12} className="animate-pulse" /> Established Since 2010
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-none uppercase">
+              SAMI <span className="text-[#D92B2B]">TELEVISION</span>
+            </h1>
+            
+            <p className="text-gray-300 max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed font-sans pt-3">
+              বস্তুনিষ্ঠ ও দায়িত্বশীল সাংবাদিকতা এবং আধুনিক সম্প্রচার প্রযুক্তির মিলনে এক যুগেরও বেশি সময় ধরে দর্শকদের বিশ্বস্ত তথ্যচিত্র।
+            </p>
+          </motion.div>
+
+          {/* Elegant Stats Segment */}
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="grid grid-cols-3 gap-6 max-w-3xl mx-auto pt-8 border-t border-white/10"
+          >
+            <div className="text-center group">
+              <span className="block text-2xl md:text-4xl font-black text-white group-hover:text-[#D92B2B] transition-colors">১২৫কে+</span>
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 font-extrabold mt-1.5 block">অনলাইন ফলোয়ার</span>
+            </div>
+            <div className="text-center group">
+              <span className="block text-2xl md:text-4xl font-black text-[#D92B2B] pointer-events-none">৫০০+</span>
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 font-extrabold mt-1.5 block">সক্রিয় সংবাদকর্মী</span>
+            </div>
+            <div className="text-center group">
+              <span className="block text-2xl md:text-4xl font-black text-white group-hover:text-[#D92B2B] transition-colors">২৪/৭</span>
+              <span className="text-[10px] uppercase tracking-wider text-gray-500 font-extrabold mt-1.5 block">লাইভ সম্প্রচার</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 2. Legacy Journey Details */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto max-w-5xl px-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+            {/* Visual Left Block */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="md:col-span-5 relative"
+            >
+              <div className="rounded-2xl overflow-hidden border border-gray-150 shadow-md relative aspect-[4/5] bg-slate-50">
+                <img 
+                  src="https://images.unsplash.com/photo-1579275542618-a1dfed5f54ba?auto=format&fit=crop&q=80&w=1287" 
+                  alt="Journalism Legacy" 
+                  className="w-full h-full object-cover grayscale brightness-95" 
+                  referrerPolicy="no-referrer" 
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-widest text-[#D92B2B] block mb-1">JOURNALISM OF INTEGRITY</span>
+                  <span className="text-xs font-bold font-sans text-gray-300">১১ নভেম্বর ২০১০ থেকে শুরু হওয়া এক অন্তহীন যাত্রা</span>
+                </div>
+              </div>
+              <div className="absolute -bottom-4 -right-4 w-48 h-48 bg-red-500/5 rounded-2xl -z-10 border border-[#D92B2B]/10"></div>
+            </motion.div>
+
+            {/* Explanatory Right Block */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="md:col-span-7 space-y-6"
+            >
+              <div className="flex items-center gap-2 text-[#D92B2B]">
+                <History className="shrink-0" size={16} />
+                <span className="font-extrabold text-[11px] uppercase tracking-widest">Our Legacy</span>
+              </div>
               
-              <div className="space-y-4 text-left">
-                <div className="flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-2xl bg-sami-dark/20 flex items-center justify-center shrink-0">
-                    <Mail size={20} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-red-200 font-bold">Email</p>
-                    <p className="text-lg font-bold font-eng">info.samitv.bd@gmail.com</p>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight leading-tight">
+                আমাদের <span className="text-[#D92B2B]">পথচলা ও ইতিহাস</span>
+              </h2>
+              
+              <div className="space-y-4 text-[15px] text-gray-600 font-bold leading-relaxed font-sans">
+                <p>
+                  SAMI TV একটি বেসরকারি মালিকানাধীন বাংলাদেশি বাংলা ভাষার টেলিভিশন চ্যানেল, যা ১১ নভেম্বর ২০১০ সালে যাত্রা শুরু করে। চ্যানেলটির প্রধান কার্যালয় জামালপুর, ময়মনসিংহে অবস্থিত। যাত্রালগ্ন থেকেই সামী টিভি সত্যনিষ্ঠ, দায়িত্বশীল ও সময়োপযোগী সংবাদ পরিবেশনের মাধ্যমে দর্শকদের আস্থা অর্জন করে চলেছে।
+                </p>
+                <p>
+                  সংবাদ ও তথ্যভিত্তিক অনুষ্ঠানের পাশাপাশি বিনোদন, নাটক, টক শো, সঙ্গীত এবং সাংস্কৃতিক অনুষ্ঠান সম্প্রচার করে থাকে। আমাদের লক্ষ্য হলো দেশের ও বিশ্বের গুরুত্বপূর্ণ ঘটনা দ্রুত, নির্ভুল ও নিরপেক্ষভাবে দর্শকদের সামনে তুলে ধরা এবং একই সঙ্গে বাংলা সংস্কৃতি ও ঐতিহ্যকে সমুন্নত রাখা।
+                </p>
+              </div>
+
+              {/* Verified badges */}
+              <div className="grid grid-cols-2 gap-3 pt-4">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 size={16} className="text-[#D92B2B] shrink-0 mt-0.5" />
+                  <span className="text-xs font-bold text-gray-700">নিরপেক্ষ সংবাদ বিশ্লেষণ</span>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 size={16} className="text-[#D92B2B] shrink-0 mt-0.5" />
+                  <span className="text-xs font-bold text-gray-700">ডিজিটাল ও লাইভ ব্রডকাস্ট</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Leadership Chairman Abul Kashem Section */}
+      <section className="py-20 bg-slate-55 border-y border-gray-200/60 relative">
+        <div className="container mx-auto max-w-5xl px-6">
+          <div className="text-center mb-16 space-y-2">
+            <span className="text-[#D92B2B] text-[10px] font-black uppercase tracking-[0.2em] block">Board of Directors</span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight">আমাদের <span className="text-[#D92B2B]">অভিভাবক</span></h2>
+            <p className="text-gray-400 text-xs font-bold font-sans">সামী টিভির মূল চালিকাশক্তি ও স্বপ্নদ্রষ্টা</p>
+          </div>
+
+          <div className="max-w-3xl mx-auto">
+            <motion.div 
+              initial={{ y: 25, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="bg-white rounded-2xl p-6 sm:p-10 border border-gray-150 shadow-[0_5px_24px_rgba(0,0,0,0.015)] relative group overflow-hidden"
+            >
+              {/* Overlay accent */}
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-[#D92B2B]"></div>
+              
+              <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+                {/* Image block */}
+                <div className="relative shrink-0 w-44 h-56 rounded-xl overflow-hidden border border-gray-150 shadow-sm bg-gray-100">
+                  <img 
+                    src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjQIlNZaI7KugfIRmOXvHPu4i_B9xUhdTeG8JBDSYRlRQxJEJNhUWxdQUnWvTfJFCxvDnF9D3oiZtlJcYksYnrJPdGon084dAjJ38JQFjWj0iyFc8Ed-4zaELMmQk27qfCHswas0Rh5hfEvoZrlz6BQwcaWTvXnnByRZPjfSWpOcbtnlT2OthhwDgVN1lgE/s320/645363491_979533377908521_7060082878587727711_n.jpg" 
+                    alt="Md. Abul Kashem" 
+                    className="w-full h-full object-cover scale-101 group-hover:scale-103 transition-transform duration-500" 
+                    referrerPolicy="no-referrer" 
+                  />
+                  <div className="absolute bottom-2 left-2 bg-gray-950/80 text-white backdrop-blur-md px-2 py-1 rounded text-[9px] font-black">
+                    CHAIRMAN
                   </div>
                 </div>
-                <div className="flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-2xl bg-sami-dark/20 flex items-center justify-center shrink-0">
-                    <History size={20} className="rotate-90" />
-                  </div>
+
+                {/* Info block */}
+                <div className="flex-1 text-center md:text-left space-y-4">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-red-200 font-bold">Phone</p>
-                    <p className="text-lg font-bold font-eng">01912618994</p>
+                    <span className="text-[10px] font-extrabold text-[#D92B2B] tracking-widest uppercase bg-red-50 border border-red-100/40 px-2.5 py-1 rounded">CHAIRMAN & PATRON</span>
+                    <h3 className="text-2xl md:text-3xl font-black text-gray-950 mt-2 tracking-tight">Md. Abul Kashem</h3>
+                    <p className="text-gray-400 text-xs font-bold mt-1 font-sans">চেয়ারম্যান, সামী টিভি গ্রুপ</p>
                   </div>
+                  
+                  <blockquote className="relative">
+                    <Quote className="absolute -top-3 -left-3 text-red-500/10 w-8 h-8 pointer-events-none" />
+                    <p className="font-serif text-[15.5px] italic text-gray-600 leading-relaxed font-sans relative z-10 pl-2">
+                      "সামী টেলিভিশনের স্বপ্নদ্রষ্টা এবং অভিভাবক। তাঁর বলিষ্ঠ নেতৃত্বে আমরা গত এক যুগেরও বেশি সময় ধরে বস্তুনিষ্ঠ সাংবাদিকতার পথে নিরবিচ্ছিন্নভাবে এগিয়ে চলেছি।"
+                    </p>
+                  </blockquote>
+                  
+                  <div className="flex justify-center md:justify-start gap-3 pt-2">
+                    <a href="#" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#D92B2B] hover:text-white border border-gray-150 hover:border-transparent transition-all"><Facebook size={14} /></a>
+                    <a href="mailto:info.samitv.bd@gmail.com" className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-[#D92B2B] hover:text-white border border-gray-150 hover:border-transparent transition-all"><Mail size={14} /></a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Core Values Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto max-w-5xl px-6">
+          <div className="text-center mb-16 space-y-2">
+            <span className="text-[#D92B2B] text-[10px] font-black uppercase tracking-[0.2em] block">Our Values</span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-950 tracking-tight">আমাদের <span className="text-[#D92B2B]">মূল আদর্শ</span></h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 bg-gray-50/50 border border-gray-150 rounded-2xl hover:border-red-200 hover:bg-white hover:shadow-[0_8px_32px_rgba(217,43,43,0.03)] transition-all duration-300 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center border border-red-100">
+                <Zap className="text-[#D92B2B]" size={22} />
+              </div>
+              <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">সাংবাদিকতার সততা</h3>
+              <p className="text-gray-500 text-sm font-bold font-sans leading-relaxed">SAMI TV বিশ্বাস করে—গণমাধ্যম শুধু তথ্য দেওয়ার মাধ্যম নয়, বরং সমাজের ইতিবাচক কাঠামোগত পরিবর্তনের একটি শক্তিশালী হাতিয়ার।</p>
+            </div>
+
+            <div className="p-6 bg-gray-50/50 border border-gray-150 rounded-2xl hover:border-red-200 hover:bg-white hover:shadow-[0_8px_32px_rgba(217,43,43,0.03)] transition-all duration-300 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
+                <Award className="text-emerald-500" size={22} />
+              </div>
+              <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">সাফল্য ও নির্ভরযোগ্যতা</h3>
+              <p className="text-gray-500 text-sm font-bold font-sans leading-relaxed">অল্প সময়ের ব্যবধানে জামালপুরসহ সারাদেশে সত্যনিষ্ঠ ও নির্ভীক সংবাদ প্রচারের ধারা বজায় রেখে একটি প্রথম সারির ডিজিটাল প্ল্যাটফর্ম হিসেবে সম্মানিত।</p>
+            </div>
+
+            <div className="p-6 bg-gray-50/50 border border-gray-150 rounded-2xl hover:border-red-200 hover:bg-white hover:shadow-[0_8px_32px_rgba(217,43,43,0.03)] transition-all duration-300 space-y-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
+                <Cpu className="text-blue-500" size={22} />
+              </div>
+              <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">কারিগরি এক্সিলেন্স</h3>
+              <p className="text-gray-500 text-sm font-bold font-sans leading-relaxed">উন্নত কারিগরি ও গতিশীল সম্প্রচার মাধ্যমে তাৎক্ষণিক ব্রেকিং সহ দেশ-বিদেশের প্রতিটি সংবাদ দ্রুততম সময়ের মধ্যে নিখুঁতভাবে উপস্থাপনে সর্বদা প্রতিশ্রুতিবদ্ধ।</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Editorial Vision Statement (Premium Banner Overlay) */}
+      <section className="py-24 bg-gray-950 overflow-hidden relative text-white border-y border-white/5">
+        {/* Subtle geometric grid background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#80808010_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none opacity-40"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#D92B2B]/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="container mx-auto max-w-4xl px-6 text-center space-y-6 relative z-10">
+          <Quote size={40} className="text-[#D92B2B]/40 mx-auto" />
+          <h3 className="font-serif text-lg md:text-2xl italic text-gray-200 leading-relaxed font-sans max-w-3xl mx-auto">
+            "দেশ-বিদেশের সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি। সাংবাদিকতার সর্বজনীন নীতি মেনে পক্ষপাতহীন সংবাদ সংগ্রহ ও প্রচারে আমরা চিরকাল অঙ্গীকারবদ্ধ। সমাজের প্রতিটি কোণের ইতিবাচক ঘটনা ও মানুষের কথা তুলে ধরাই আমাদের প্রধান নৈতিক দায়িত্ব।"
+          </h3>
+          <div className="pt-4 border-t border-dashed border-white/10 w-24 mx-auto"></div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#D92B2B]">SAMI TV Editorial Board</p>
+            <h5 className="text-[15px] font-black text-white mt-1">সম্পাদকীয় পর্ষদ, সামী টিভি</h5>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Contact Grid Section */}
+      <section className="py-20 bg-gray-50/20">
+        <div className="container mx-auto max-w-5xl px-6">
+          <div className="bg-white border border-gray-150 rounded-2xl p-8 md:p-12 shadow-[0_4px_24px_rgba(0,0,0,0.01)] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none select-none">
+              <Mail size={160} className="text-[#D92B2B]" />
+            </div>
+            
+            <div className="relative z-10 text-center md:text-left space-y-4 max-w-lg">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#D92B2B] bg-red-50 border border-red-100/50 px-2 py-0.5 rounded">CONNECT WITH US</span>
+              <h2 className="text-3xl font-black text-gray-950 tracking-tight leading-none mt-2">আমাদের সাথে <span className="text-[#D92B2B]">যোগাযোগ</span> করুন</h2>
+              <p className="text-gray-500 font-bold text-sm md:text-base font-sans leading-relaxed">বস্তুনিষ্ঠ ও দায়িত্বশীল খবরের সহযাত্রী হিসেবে বিজ্ঞাপন বা যেকোনো তথ্যের জন্য লিখুন অথবা যোগ দিন।</p>
+              
+              <div className="space-y-4 pt-4 text-left text-sm font-sans font-bold text-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0 border border-red-100">
+                    <Mail size={14} className="text-[#D92B2B]" />
+                  </div>
+                  <span>info.samitv.bd@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0 border border-red-100">
+                    <Globe size={14} className="text-[#D92B2B]" />
+                  </div>
+                  <span>www.samitvbd.com</span>
                 </div>
               </div>
             </div>
             
-            <div className="relative z-10 w-full lg:w-auto h-full flex flex-col items-center lg:items-end justify-center">
-              <div className="bg-sami-dark p-8 rounded-[32px] text-center border border-white/10 shadow-2xl mb-8 w-full lg:w-64">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-black mb-2">Advertisements</p>
-                <h4 className="text-xl font-display font-black text-sami-red leading-none mb-1">HOTLINE</h4>
-                <p className="text-xs font-bold text-white uppercase tracking-widest">COMING SOON</p>
+            <div className="relative z-10 w-full md:w-auto flex flex-col items-center justify-center">
+              <div className="bg-gray-950 border border-white/5 p-6 rounded-2xl text-center w-64 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-[#D92B2B]/10 rounded-full blur-xl pointer-events-none"></div>
+                <span className="text-[9px] uppercase tracking-widest text-[#D92B2B] font-black block">Corporate Helpline</span>
+                <span className="text-lg font-black text-white mt-2 block tracking-tight">COMING SOON</span>
+                <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider mt-1 block">হটলাইন চালু হচ্ছে দ্রুত</span>
               </div>
-              <button className="bg-white text-sami-red px-12 py-6 rounded-full font-display font-black text-xl hover:bg-sami-dark hover:text-white transition-all shadow-2xl scale-110">
-                যোগাযোগ করুন
-              </button>
             </div>
           </div>
         </div>
@@ -332,6 +304,7 @@ export const AboutUs: React.FC = () => {
     </motion.div>
   );
 };
+
 
 const LogoMinimal: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 100 100" fill="currentColor" className={className}>

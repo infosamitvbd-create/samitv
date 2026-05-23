@@ -132,8 +132,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col gap-8">
-        <HeroSection onNewsClick={onNewsClick} />
+      <div className="flex-grow flex flex-col gap-8">
+        <HeroSection onNewsClick={onNewsClick} onNavigate={onNavigate} />
         
         {/* Category: 'রাজনীতি' Style 1 (3 in a row) */}
         <div className="flex flex-col gap-4">
@@ -156,7 +156,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
                 onClick={() => onNewsClick(news)}
                 className="bg-white group cursor-pointer"
               >
-                <div className="aspect-[4/3] overflow-hidden mb-2 border border-gray-100">
+                <div className="aspect-video overflow-hidden mb-2 border border-gray-100">
                   <img 
                     src={news.imageUrl} 
                     alt={news.title} 
@@ -181,7 +181,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1 }}
-              className="w-full h-full cursor-pointer"
+              className="w-full h-full cursor-pointer flex items-center justify-center"
             >
               <img 
                 src={bannerAds[activeBannerIndex]} 
@@ -240,7 +240,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, onNewsClick }) => {
                   onClick={() => onNewsClick(news)}
                   className="flex gap-2 group cursor-pointer items-start border-b border-gray-100 pb-2 last:border-0"
                 >
-                  <div className="w-16 h-12 shrink-0 overflow-hidden border border-gray-100">
+                  <div className="w-20 aspect-video shrink-0 overflow-hidden border border-gray-100">
                     <img src={news.imageUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                   <h4 className="text-[11px] font-bold leading-tight group-hover:text-sami-red transition-colors line-clamp-2">
