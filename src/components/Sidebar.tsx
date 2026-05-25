@@ -116,14 +116,6 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
         <div className="flex flex-col gap-4">
           <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
             <img 
-              src="https://plain-apac-prod-public.komododecks.com/202604/20/FxZqG7iijsxZeM6vLjIR/image.jpg" 
-              alt="Sidebar Ad 1" 
-              className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
-            <img 
               src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-052.jpg" 
               alt="Sidebar Ad 2" 
               className="w-full h-auto group-hover:scale-105 transition-transform duration-500"

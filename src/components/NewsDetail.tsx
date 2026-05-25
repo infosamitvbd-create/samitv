@@ -25,7 +25,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
   const [activeSidebarTab, setActiveSidebarTab] = useState<'latest' | 'popular'>('latest');
   const [isLiked, setIsLiked] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const calculateReadingTime = (text: string) => {
     const wordsPerMinute = 200;
     const words = text.trim().split(/\s+/).length;

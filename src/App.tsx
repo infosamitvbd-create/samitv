@@ -53,7 +53,7 @@ export default function App() {
         <BreakingNews />
       </div>
       
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+      <main className={(location.pathname === '/download-app' || location.pathname === '/family') ? "flex-grow w-full" : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl"}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

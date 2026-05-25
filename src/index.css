@@ -44,6 +44,23 @@
     width: max-content;
   }
   
+  @keyframes scan {
+    0% { transform: translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(166px); opacity: 0; }
+  }
+  .animate-scan {
+    animation: scan 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+  .animate-shimmer {
+    animation: shimmer 2.2s infinite;
+  }
+  
   .glass-card {
     @apply bg-white/80 backdrop-blur-md border border-white/20;
   }
