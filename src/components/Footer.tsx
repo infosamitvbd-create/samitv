@@ -133,7 +133,7 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
         <div className="pt-3.5 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-gray-500 font-bold">
           <p>© {currentYear} সামি টেলিভিশন। সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex items-center gap-3">
-            <p className="font-sans">DEVELOPED BY <span className="text-gray-300">Emran Hasan Sami</span></p>
+            <p className="font-sans">DEVELOPED BY <a href="https://mahmudulhasansami12.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer">Emran Hasan Sami</a></p>
             <span className="text-gray-700">|</span>
             <button 
               onClick={() => onNavigate('/admin')}

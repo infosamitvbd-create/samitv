@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Facebook, Layout, Radio, Download, Smartphone } from 'lucide-react';
+import { Facebook, Layout, Radio, Download, Smartphone, Sparkles, Moon, ArrowRight } from 'lucide-react';
 import { LiveTVPlayer } from './LiveTVPlayer';
 import { db } from '../lib/firebase';
 import { collection, query, where, onSnapshot, limit, orderBy } from 'firebase/firestore';
@@ -77,6 +77,38 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
             <Facebook size={12} fill="currentColor" /> Visit samitvbd
           </a>
         </div>
+      </div>
+
+      {/* Festival poster sidebar card */}
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-rose-700 to-amber-600 text-white shadow-xl border border-red-500/20 p-5 flex flex-col items-center text-center gap-4 hover:shadow-2xl hover:shadow-red-600/20 transition-all duration-300">
+        {/* Background glow and sparkles */}
+        <div className="absolute -top-6 -right-6 opacity-10 pointer-events-none">
+          <Moon size={100} className="text-yellow-200 fill-yellow-200" />
+        </div>
+        <div className="absolute top-2 left-2 opacity-25 pointer-events-none animate-spin duration-[10s]">
+          <Sparkles size={24} className="text-amber-300" />
+        </div>
+
+        <div className="z-10 flex flex-col items-center gap-1.5">
+          <div className="inline-flex items-center gap-1 bg-yellow-400/25 backdrop-blur-md text-yellow-300 px-2.5 py-0.5 rounded-full text-[10px] font-black border border-yellow-300/30">
+            <Sparkles size={10} className="animate-spin" />
+            <span>উৎসব পোস্টার</span>
+          </div>
+          <h3 className="text-base font-black text-white leading-tight drop-shadow-sm font-sans mt-1">
+            ঈদ আসছে উৎসব পোস্টার বানান!
+          </h3>
+          <p className="text-[11px] text-amber-50 font-bold max-w-xs leading-relaxed">
+            নিজের ছবি ও নাম দিয়ে আকর্ষণীয় ঈদ পোস্টার তৈরি করুন এখনই সম্পূর্ণ ফ্রিতে।
+          </p>
+        </div>
+
+        <button
+          onClick={() => onNavigate?.('/festival-poster')}
+          className="z-10 w-full py-2.5 bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-red-950 font-black text-xs rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-1.5 group cursor-pointer"
+        >
+          পোস্টার তৈরি করুন 
+          <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform duration-300" />
+        </button>
       </div>
 
       {/* Live TV Player Widget */}

@@ -17,6 +17,7 @@ import { LiveTV } from './components/LiveTV';
 import { ContactUs } from './components/ContactUs';
 import ComingSoon from './components/ComingSoon';
 import AppDownload from './components/AppDownload';
+import { FestivalPoster } from './components/FestivalPoster';
 import { Footer } from './components/Footer';
 import { DownlinkParameters } from './components/DownlinkParameters';
 import { TermsAndConditions } from './components/TermsAndConditions';
@@ -75,6 +76,7 @@ export default function App() {
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/android-tv" element={<ComingSoon />} />
               <Route path="/download-app" element={<AppDownload />} />
+              <Route path="/festival-poster" element={<FestivalPoster onNavigate={handleNavigate} />} />
               <Route path="/news/:newsId" element={<NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />} />
               <Route path="/category/:category" element={<CategoryWrapper onNavigate={handleNavigate} onNewsClick={handleNewsClick} setCurrentCategory={setCurrentCategory} />} />
               <Route path="*" element={

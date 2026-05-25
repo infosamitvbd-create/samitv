@@ -23,6 +23,7 @@ const mainNavItems: NavItem[] = [
 ];
 
 const otherNavItems: NavItem[] = [
+  { label: 'উৎসব পোস্টার (Poster Maker)', href: '/festival-poster' },
   { label: 'মিডিয়া', href: '/media' },
   { label: 'আমাদের সম্পর্কে', href: '/about' },
   { label: 'যোগাযোগ', href: '/contact' },

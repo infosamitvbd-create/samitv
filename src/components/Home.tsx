@@ -4,7 +4,7 @@ import { Sidebar } from './Sidebar';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, X, Image as ImageIcon, Layout } from 'lucide-react';
+import { Clock, X, Image as ImageIcon, Layout, Sparkles, Moon, ArrowRight } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
