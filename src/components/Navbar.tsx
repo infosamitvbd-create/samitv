@@ -27,7 +27,7 @@ const otherNavItems: NavItem[] = [
   { label: 'মিডিয়া', href: '/media' },
   { label: 'আমাদের সম্পর্কে', href: '/about' },
   { label: 'যোগাযোগ', href: '/contact' },
-  { label: 'ডাউনলিংক প্যারামিটার', href: '/downlink' },
+  { label: 'আকাশ ডিটিএইচ (DTH)', href: '/downlink' },
   { label: 'আওয়ার ফ্যামিলি', href: '/family' },
   { label: 'LIVE TV', href: '/live' },
 ];
