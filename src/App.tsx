@@ -19,7 +19,6 @@ import ComingSoon from './components/ComingSoon';
 import AppDownload from './components/AppDownload';
 import { FestivalPoster } from './components/FestivalPoster';
 import { Footer } from './components/Footer';
-import { DownlinkParameters } from './components/DownlinkParameters';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { motion, AnimatePresence } from 'motion/react';
@@ -70,7 +69,6 @@ export default function App() {
               <Route path="/media" element={<Media />} />
               <Route path="/live" element={<LiveTV />} />
               <Route path="/contact" element={<ContactUs />} />
-              <Route path="/downlink" element={<DownlinkParameters />} />
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/admin" element={<AdminPanel />} />

@@ -183,12 +183,12 @@ export const Header: React.FC<{
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex-grow w-full lg:max-w-[728px] h-[90px] bg-black rounded-lg border border-gray-700/40 shadow-md overflow-hidden group relative cursor-pointer select-none"
+          className="flex-grow w-full lg:max-w-[728px] h-[90px] bg-transparent overflow-hidden group relative cursor-pointer select-none"
           title="বিজ্ঞাপন"
         >
           {/* Breathing image with continuous animation */}
           <motion.img 
-            src="https://tpc.googlesyndication.com/simgad/7639802920549966978" 
+            src="https://tpc.googlesyndication.com/simgad/7099438121384168982" 
             alt="Advertisement" 
             animate={{
               scale: [1, 1.015, 1],
@@ -198,7 +198,7 @@ export const Header: React.FC<{
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="w-full h-full object-contain sm:object-cover transition-transform duration-700"
+            className="w-full h-full object-contain transition-transform duration-700"
             referrerPolicy="no-referrer"
           />
 

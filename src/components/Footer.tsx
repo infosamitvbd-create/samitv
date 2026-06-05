@@ -47,7 +47,6 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
               <ul className="space-y-1.5">
                 {[
                   { label: 'লাইভ সম্প্রচার', path: '/live' },
-                  { label: 'আকাশ ডিটিএইচ (DTH)', path: '/downlink' },
                   { label: 'শর্তাবলী ও নীতি', path: '/terms' },
                   { label: 'গোপনীয়তা নীতি', path: '/privacy' }
                 ].map((link) => (
