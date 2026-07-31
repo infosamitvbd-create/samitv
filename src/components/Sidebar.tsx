@@ -7,6 +7,14 @@ import { collection, query, where, onSnapshot, limit, orderBy } from 'firebase/f
 export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onNavigate }) => {
   const [sidebarAds, setSidebarAds] = useState<any[]>([]);
   const [sdNews, setSdNews] = useState<any[]>([]);
+  const [archiveDate, setArchiveDate] = useState<string>(new Date().toISOString().split('T')[0]);
+
+  const handleArchiveSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (archiveDate && onNavigate) {
+      onNavigate(`/archive?date=${archiveDate}`);
+    }
+  };
 
   useEffect(() => {
     // Sidebar Ads
@@ -37,17 +45,29 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
   }, []);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="hidden lg:flex flex-col gap-6">
       {/* Archive Section */}
       <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm">
-        <div className="bg-[#004a7c] text-white px-4 py-2 font-bold text-sm font-eng">Archive</div>
-        <div className="p-4">
-          <div className="flex flex-col gap-2">
-            <select className="flex-1 border border-gray-300 rounded-sm px-2 py-2 text-[11px] font-bold focus:outline-none focus:border-sami-red bg-white text-gray-700 font-eng">
-              <option>Select Your Date</option>
-            </select>
-            <button className="bg-[#1d70b8] text-white px-6 py-1.5 text-xs font-bold rounded-sm hover:bg-blue-700 transition-colors shadow-sm font-eng">Search</button>
-          </div>
+        <div className="bg-[#004a7c] text-white px-4 py-2 font-bold text-sm flex items-center justify-between">
+          <span>সংবাদ আর্কাইভ (Archive)</span>
+        </div>
+        <div className="p-3.5 bg-gray-50/50">
+          <form onSubmit={handleArchiveSearch} className="flex flex-col gap-2">
+            <label className="text-[11px] font-bold text-gray-600">তারিখ নির্বাচন করুন:</label>
+            <input 
+              type="date"
+              value={archiveDate}
+              max={new Date().toISOString().split('T')[0]}
+              onChange={(e) => setArchiveDate(e.target.value)}
+              className="w-full border border-gray-300 rounded-sm px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:border-sami-red bg-white text-gray-800 cursor-pointer shadow-inner"
+            />
+            <button 
+              type="submit"
+              className="w-full bg-[#1d70b8] hover:bg-[#004a7c] text-white px-4 py-2 text-xs font-black rounded-sm transition-colors shadow-sm flex items-center justify-center gap-1.5 mt-1"
+            >
+              সংবাদ খুঁজুন (Search)
+            </button>
+          </form>
         </div>
       </div>
 
@@ -79,8 +99,8 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
         </div>
       </div>
 
-      {/* Live TV Player Widget */}
-      <div className="bg-white rounded-sm shadow-sm overflow-hidden border-t-4 border-red-600">
+      {/* Live TV Player Widget - Hidden on Mobile */}
+      <div className="hidden lg:block bg-white rounded-sm shadow-sm overflow-hidden border-t-4 border-red-600">
         <div className="bg-red-50 px-4 py-2 flex items-center justify-between border-b border-red-100">
           <div className="flex items-center gap-2">
             <Radio size={16} className="text-red-600" />
@@ -96,8 +116,8 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
         </div>
       </div>
 
-      {/* Information Ad */}
-      <div className="flex flex-col gap-4">
+      {/* Information Ad - Hidden on Mobile */}
+      <div className="hidden lg:flex flex-col gap-4">
         <div className="p-2 border-2 border-yellow-400 bg-yellow-50 rounded-sm shadow-sm">
           <div className="bg-white p-3 border border-yellow-200 rounded-sm">
             <h6 className="text-[10px] font-bold text-red-600 mb-2 text-center uppercase tracking-widest">বিজ্ঞপ্তি</h6>
@@ -112,17 +132,22 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
         </div>
       </div>
 
-      {/* User Specific Ads */}
-        <div className="flex flex-col gap-4">
-          <div className="bg-white border border-gray-200 rounded-sm overflow-hidden shadow-sm group cursor-pointer">
+      {/* User Specific Ads - Hidden on Mobile */}
+      <div className="hidden lg:flex flex-col gap-4">
+        <div className="bg-white border-2 border-sami-red/30 rounded-md overflow-hidden shadow-md group cursor-pointer relative p-1 bg-gradient-to-b from-gray-50 to-white">
+          <div className="relative w-full overflow-hidden rounded-sm">
             <img 
-              src="https://images.weserv.nl/?url=https://www.globaltvbd.com/uploads/ads/2021_Finalsss_For_GTV-052.jpg" 
-              alt="Sidebar Ad 2" 
-              className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+              src="https://globaltvbd.com/storage/advertisements/01KVZ4HKPS9DT08924H9Q9Y4GZ.jpg" 
+              alt="Sponsored Ad" 
+              className="w-full h-auto object-cover group-hover:scale-102 transition-transform duration-500 block"
               referrerPolicy="no-referrer"
             />
+            <div className="absolute top-2 right-2 bg-sami-red text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider shadow-md">
+              Sponsored Ad
+            </div>
           </div>
         </div>
+      </div>
 
       {/* Sidebar Category Blocks */}
       {['জাতীয়', 'সারাদেশ', 'আন্তর্জাতিক'].map((cat, idx) => {
@@ -162,26 +187,28 @@ export const Sidebar: React.FC<{ onNavigate?: (page: string) => void }> = ({ onN
         );
       })}
 
-      {/* Sidebar Image Ads */}
-      {sidebarAds.map((ad) => (
-        <a 
-          key={ad.id} 
-          href={ad.link || '#'} 
-          target={ad.link ? "_blank" : "_self"} 
-          rel="noopener noreferrer"
-          className="block bg-white rounded-sm shadow-sm overflow-hidden group border border-gray-200"
-        >
-          <div className="relative overflow-hidden">
-            <img 
-              src={ad.imageUrl} 
-              alt={ad.title} 
-              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
-              referrerPolicy="no-referrer" 
-            />
-            <div className="absolute top-1 right-1 bg-black/50 text-white text-[8px] px-1 rounded uppercase">AD</div>
-          </div>
-        </a>
-      ))}
+      {/* Sidebar Image Ads - Hidden on Mobile */}
+      <div className="hidden lg:flex flex-col gap-4">
+        {sidebarAds.map((ad) => (
+          <a 
+            key={ad.id} 
+            href={ad.link || '#'} 
+            target={ad.link ? "_blank" : "_self"} 
+            rel="noopener noreferrer"
+            className="block bg-white rounded-sm shadow-sm overflow-hidden group border border-gray-200"
+          >
+            <div className="relative overflow-hidden">
+              <img 
+                src={ad.imageUrl} 
+                alt={ad.title} 
+                className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
+                referrerPolicy="no-referrer" 
+              />
+              <div className="absolute top-1 right-1 bg-black/50 text-white text-[8px] px-1 rounded uppercase">AD</div>
+            </div>
+          </a>
+        ))}
+      </div>
     </div>
   );
 };

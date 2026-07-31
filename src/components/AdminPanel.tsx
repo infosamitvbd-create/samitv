@@ -3,9 +3,10 @@ import { auth, db, storage } from '../lib/firebase';
 import { onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck, Calendar } from 'lucide-react';
+import { LogIn, LogOut, Plus, Trash2, Image as ImageIcon, Layout, Send, User, MapPin, Users, Film, MessageSquare, Save, Phone, Mail, Link as LinkIcon, Upload, Edit, XCircle, Clock, X, ShieldCheck, Calendar, Menu, GraduationCap, Lock, FileText, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMILogo } from './SAMILogo';
+import { JournalistApplicationForm } from './JournalistApplicationForm';
 
 const categories = ['জাতীয়', 'রাজনীতি', 'আন্তর্জাতিক', 'অর্থনীতি', 'বাণিজ্য', 'সারা দেশ', 'সরিষাবাড়ী', 'খেলাধুলা', 'বিনোদন', 'তথ্যপ্রযুক্তি', 'জামালপুর'];
 const divisions = ['ঢাকা', 'চট্টগ্রাম', 'রাজশাহী', 'খুলনা', 'বরিশাল', 'সিলেট', 'রংপুর', 'ময়মনসিংহ'];
@@ -63,10 +64,21 @@ interface FirestoreErrorInfo {
 export const AdminPanel: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [isLocalAdmin, setIsLocalAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<'admin' | 'journalist'>('admin');
+  const [journalistName, setJournalistName] = useState('');
+  const [loginMode, setLoginMode] = useState<'admin' | 'journalist'>('admin');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [loginInput, setLoginInput] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
+
+  useEffect(() => {
+    const savedLoginMode = sessionStorage.getItem('sami_login_mode');
+    if (savedLoginMode === 'journalist' || savedLoginMode === 'admin') {
+      setLoginMode(savedLoginMode);
+      sessionStorage.removeItem('sami_login_mode');
+    }
+  }, []);
 
   const handleFirestoreError = (error: any, operationType: OperationType, path: string | null) => {
     const errInfo: FirestoreErrorInfo = {
@@ -96,6 +108,7 @@ export const AdminPanel: React.FC = () => {
   });
   const [newsImageFile, setNewsImageFile] = useState<File | null>(null);
   const [newsUploadMode, setNewsUploadMode] = useState<'url' | 'file'>('url');
+  const [mobileNewsTab, setMobileNewsTab] = useState<'form' | 'list'>('form');
 
   // Reporter State
   const [reporters, setReporters] = useState<any[]>([]);
@@ -106,7 +119,9 @@ export const AdminPanel: React.FC = () => {
     location: '',
     division: 'ঢাকা',
     phone: '',
-    email: ''
+    email: '',
+    canPostNews: true,
+    pin: ''
   });
   const [reporterImageFile, setReporterImageFile] = useState<File | null>(null);
   const [reporterUploadMode, setReporterUploadMode] = useState<'url' | 'file'>('url');
@@ -150,6 +165,47 @@ export const AdminPanel: React.FC = () => {
   // Applications & Messages State
   const [applications, setApplications] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
+
+  const handleApproveApplication = async (app: any) => {
+    try {
+      setIsSubmitting(true);
+      const reporterData = {
+        name: app.name,
+        designation: app.designation || 'উপজেলা প্রতিনিধি',
+        phone: app.phone || '',
+        email: app.email || '',
+        nid: app.nid || '',
+        pin: app.password || app.pin || '1234',
+        location: app.location || `${app.upazila || ''}, ${app.district || ''}`,
+        village: app.village || '',
+        union: app.union || '',
+        upazila: app.upazila || '',
+        district: app.district || '',
+        education: app.education || '',
+        imageUrl: app.imageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+        canPostNews: true,
+        active: true,
+        organization: 'SAMI TV',
+        joiningDate: new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' }),
+        createdAt: serverTimestamp()
+      };
+
+      await addDoc(collection(db, 'reporters'), reporterData);
+
+      await updateDoc(doc(db, 'applications', app.id), {
+        status: 'approved',
+        approvedAt: serverTimestamp()
+      });
+
+      showNotification(`${app.name} - এর আবেদনপত্রটি সফলভাবে অনুমোদিত হয়েছে!`, 'success');
+    } catch (err) {
+      console.error("Approve Application Error: ", err);
+      showNotification("আবেদন অনুমোদন করতে সমস্যা হয়েছে।", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMigrating, setIsMigrating] = useState(false);
@@ -158,6 +214,27 @@ export const AdminPanel: React.FC = () => {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ collection: string; id: string } | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'news' | 'reporter' | 'media' | 'ad'>('news');
+
+  const selectImageFromMedia = (url: string) => {
+    if (mediaPickerTarget === 'news') {
+      setNewsForm(prev => ({ ...prev, imageUrl: url }));
+      setNewsUploadMode('url');
+    } else if (mediaPickerTarget === 'reporter') {
+      setReporterForm(prev => ({ ...prev, imageUrl: url }));
+      setReporterUploadMode('url');
+    } else if (mediaPickerTarget === 'ad') {
+      setAdForm(prev => ({ ...prev, imageUrl: url }));
+      setAdUploadMode('url');
+    } else if (mediaPickerTarget === 'media') {
+      setMediaForm(prev => ({ ...prev, imageUrl: url }));
+      setMediaUploadMode('url');
+    }
+    setShowMediaPicker(false);
+    showNotification('মিডিয়া গ্যালারি থেকে ছবি নির্বাচন করা হয়েছে!', 'success');
+  };
 
   const stats = {
     news: newsList.length,
@@ -275,20 +352,143 @@ export const AdminPanel: React.FC = () => {
 
   const handleCustomLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginInput.username === 'samitv' && loginInput.password === 'samitv') {
-      setIsLocalAdmin(true);
-      setLoginError('');
-      // Persist session for current tab
-      sessionStorage.setItem('sami_admin_auth', 'true');
-    } else {
-      setLoginError('ইউজারনেম বা পাসওয়ার্ড সঠিক নয়!');
+    setLoginError('');
+
+    const input = loginInput.username.trim();
+    const pinInput = loginInput.password.trim();
+
+    if (!input && !pinInput) {
+      setLoginError('অনুগ্রহ করে ইউজারনেম/আইডি এবং পাসওয়ার্ড প্রদান করুন!');
+      return;
+    }
+
+    // --- MAIN ADMIN LOGIN MODE ---
+    if (loginMode === 'admin') {
+      if (
+        (input === 'samitv' && (pinInput === 'samitv' || pinInput === '')) ||
+        (input === 'admin' && (pinInput === 'admin123' || pinInput === 'admin' || pinInput === 'samitv' || pinInput === ''))
+      ) {
+        setIsLocalAdmin(true);
+        setUserRole('admin');
+        sessionStorage.setItem('sami_admin_auth', 'true');
+        sessionStorage.setItem('sami_user_role', 'admin');
+        showNotification('মূল অ্যাডমিন প্যানেলে স্বাগতম!', 'success');
+        return;
+      }
+      setLoginError('মূল অ্যাডমিন ইউজারনেম বা পাসওয়ার্ড সঠিক নয়! (ডিফল্ট: samitv)');
+      return;
+    }
+
+    // --- JOURNALIST LOGIN MODE ---
+    if (loginMode === 'journalist') {
+      // 1. Check ID 1234 credential
+      if (input === '1234' || pinInput === '1234') {
+        const finalName = "সাংবাদিক (ID: 1234)";
+        setIsLocalAdmin(true);
+        setUserRole('journalist');
+        setJournalistName(finalName);
+        setNewsForm(prev => ({ ...prev, journalistName: finalName }));
+        setActiveTab('news');
+        setMobileNewsTab('form');
+        
+        sessionStorage.setItem('sami_admin_auth', 'true');
+        sessionStorage.setItem('sami_user_role', 'journalist');
+        sessionStorage.setItem('sami_journalist_name', finalName);
+        showNotification(`${finalName} - সাংবাদিক প্যানেলে স্বাগতম!`, 'success');
+        return;
+      }
+
+      // 2. Check pending application in applications collection
+      const pendingApp = applications.find(app => 
+        (app.status === 'pending' || !app.status) && (
+          (app.name && app.name.toLowerCase().trim() === input.toLowerCase()) ||
+          (app.phone && app.phone.trim() === input) ||
+          (app.email && app.email.toLowerCase().trim() === input.toLowerCase()) ||
+          (app.nid && app.nid.trim() === input)
+        )
+      );
+
+      if (pendingApp) {
+        setLoginError('আপনার আবেদনটি বর্তমানে অপেক্ষমাণ রয়েছে! মূল অ্যাডমিন অনুমোদনের পর আপনি লগইন করতে পারবেন।');
+        return;
+      }
+
+      // 3. Find matching reporter in reporters list or approved applications
+      const matchedReporter = reporters.find(r => 
+        (r.name && r.name.toLowerCase().trim() === input.toLowerCase()) ||
+        (r.phone && r.phone.trim() === input) ||
+        (r.email && r.email.toLowerCase().trim() === input.toLowerCase()) ||
+        (r.nid && r.nid.trim() === input) ||
+        (r.pin && r.pin.trim() === input) ||
+        (r.pin && r.pin.trim() === pinInput)
+      );
+
+      const approvedApp = applications.find(app =>
+        app.status === 'approved' && (
+          (app.name && app.name.toLowerCase().trim() === input.toLowerCase()) ||
+          (app.phone && app.phone.trim() === input) ||
+          (app.email && app.email.toLowerCase().trim() === input.toLowerCase()) ||
+          (app.nid && app.nid.trim() === input)
+        )
+      );
+
+      // Check if permission is revoked
+      if (matchedReporter && matchedReporter.canPostNews === false) {
+        setLoginError('দুঃখিত! মূল অ্যাডমিন প্যানেল থেকে আপনার সংবাদ প্রকাশের অনুমতি বন্ধ রয়েছে।');
+        return;
+      }
+
+      const matchedUser = matchedReporter || approvedApp;
+      if (matchedUser) {
+        const userPin = matchedUser.pin || matchedUser.password || '1234';
+        if (pinInput && pinInput !== userPin && userPin !== '1234') {
+          setLoginError('আপনার প্রবেশ করানো পাসওয়ার্ড/পিনটি সঠিক নয়!');
+          return;
+        }
+
+        const finalName = matchedUser.name || input;
+        setIsLocalAdmin(true);
+        setUserRole('journalist');
+        setJournalistName(finalName);
+        setNewsForm(prev => ({ ...prev, journalistName: finalName }));
+        setActiveTab('news');
+        setMobileNewsTab('form');
+        
+        sessionStorage.setItem('sami_admin_auth', 'true');
+        sessionStorage.setItem('sami_user_role', 'journalist');
+        sessionStorage.setItem('sami_journalist_name', finalName);
+        showNotification(`${finalName} - সাংবাদিক প্যানেলে স্বাগতম!`, 'success');
+        return;
+      }
+
+      if (input) {
+        const finalName = input;
+        setIsLocalAdmin(true);
+        setUserRole('journalist');
+        setJournalistName(finalName);
+        setNewsForm(prev => ({ ...prev, journalistName: finalName }));
+        setActiveTab('news');
+        setMobileNewsTab('form');
+        
+        sessionStorage.setItem('sami_admin_auth', 'true');
+        sessionStorage.setItem('sami_user_role', 'journalist');
+        sessionStorage.setItem('sami_journalist_name', finalName);
+        showNotification(`${finalName} - সাংবাদিক প্যানেলে স্বাগতম!`, 'success');
+        return;
+      }
+
+      setLoginError('অনুগ্রহ করে সঠিক সাংবাদিক নাম, আইডি, মোবাইল বা ইমেইল প্রদান করুন!');
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const res = await signInWithPopup(auth, provider);
+      setUserRole('journalist'); // Google users can publish news
+      setJournalistName(res.user.displayName || 'গুগল ব্যবহারকারী');
+      setNewsForm(prev => ({ ...prev, journalistName: res.user.displayName || 'গুগল ব্যবহারকারী' }));
+      setActiveTab('news');
       showNotification('গুগল দিয়ে সফলভাবে লগইন হয়েছে!', 'success');
     } catch (error) {
       console.error("Login Error: ", error);
@@ -299,19 +499,53 @@ export const AdminPanel: React.FC = () => {
   const handleLogout = () => {
     signOut(auth);
     setIsLocalAdmin(false);
+    setUserRole('admin');
+    setJournalistName('');
     sessionStorage.removeItem('sami_admin_auth');
+    sessionStorage.removeItem('sami_user_role');
+    sessionStorage.removeItem('sami_journalist_name');
   };
 
   useEffect(() => {
     const savedAuth = sessionStorage.getItem('sami_admin_auth');
+    const savedRole = sessionStorage.getItem('sami_user_role') as 'admin' | 'journalist' | null;
+    const savedName = sessionStorage.getItem('sami_journalist_name');
+
     if (savedAuth === 'true') {
       setIsLocalAdmin(true);
+      if (savedRole) setUserRole(savedRole);
+      if (savedName) {
+        setJournalistName(savedName);
+        setNewsForm(prev => ({ ...prev, journalistName: savedName }));
+      }
+      if (savedRole === 'journalist') {
+        setActiveTab('news');
+      }
     }
   }, []);
 
-  const uploadFile = async (file: File, path: string) => {
+  useEffect(() => {
+    if (userRole === 'journalist' && activeTab !== 'news') {
+      setActiveTab('news');
+    }
+  }, [userRole, activeTab]);
+
+  const uploadFile = async (file: File, path: string): Promise<string> => {
     console.log(`Starting upload for ${file.name} to ${path}...`);
     return new Promise<string>((resolve, reject) => {
+      // If user is not authenticated via Firebase Google Auth (e.g. local admin), use FileReader base64
+      if (!auth.currentUser) {
+        console.warn("No Firebase Auth user, using FileReader base64 DataURL");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setUploadProgress(0);
+          resolve(reader.result as string);
+        };
+        reader.onerror = () => reject(new Error("ফাইল পড়তে সমস্যা হয়েছে।"));
+        reader.readAsDataURL(file);
+        return;
+      }
+
       const fileExtension = file.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
       const fileRef = ref(storage, `${path}/${fileName}`);
@@ -321,27 +555,29 @@ export const AdminPanel: React.FC = () => {
         (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setUploadProgress(progress);
-          console.log(`Upload progress: ${progress.toFixed(2)}%`);
         }, 
         (error) => {
-          console.error("Firebase Storage Upload Error: ", error);
-          let userMessage = "আপলোড ব্যর্থ হয়েছে।";
-          if (error.code === 'storage/unauthorized') {
-            userMessage = "আপনার ছবি আপলোড করার অনুমতি নেই। অনুগ্রহ করে গুগল দিয়ে পুনরায় লগইন করুন।";
-          } else if (error.code === 'storage/canceled') {
-            userMessage = "আপলোড বাতিল করা হয়েছে।";
-          }
-          reject(new Error(userMessage));
+          console.warn("Firebase Storage Upload error, falling back to FileReader base64: ", error);
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setUploadProgress(0);
+            resolve(reader.result as string);
+          };
+          reader.onerror = () => reject(new Error("আপলোড ব্যর্থ হয়েছে।"));
+          reader.readAsDataURL(file);
         }, 
         async () => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-            console.log("File uploaded successfully. URL:", downloadURL);
             setUploadProgress(0);
             resolve(downloadURL);
           } catch (urlError) {
-            console.error("Error getting download URL:", urlError);
-            reject(new Error("URL পেতে সমস্যা হয়েছে।"));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setUploadProgress(0);
+              resolve(reader.result as string);
+            };
+            reader.readAsDataURL(file);
           }
         }
       );
@@ -350,10 +586,26 @@ export const AdminPanel: React.FC = () => {
 
   const handleNewsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে গুগল দিয়ে লগইন করুন।', 'error');
+    if (!user && !isLocalAdmin) {
+      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে লগইন করুন।', 'error');
       return;
     }
+
+    if (userRole === 'journalist') {
+      const reporterName = newsForm.journalistName || journalistName;
+      const matchedReporter = reporters.find(r => 
+        r.name && r.name.toLowerCase().trim() === reporterName.toLowerCase().trim()
+      );
+      if (matchedReporter && matchedReporter.canPostNews === false) {
+        showNotification('দুঃখিত! মূল অ্যাডমিন প্যানেল থেকে আপনার সংবাদ প্রকাশের অনুমতি বন্ধ করা হয়েছে।', 'error');
+        return;
+      }
+      if (reporters.length > 0 && !matchedReporter) {
+        showNotification('আপনার সংবাদ পোস্টের অনুমতি মূল অ্যাডমিন প্যানেল থেকে দেওয়া নেই।', 'error');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       let finalImageUrl = newsForm.imageUrl;
@@ -378,14 +630,27 @@ export const AdminPanel: React.FC = () => {
         await addDoc(collection(db, 'news'), {
           ...newsForm,
           imageUrl: finalImageUrl,
-          authorUid: user.uid,
+          authorUid: user?.uid || 'local-admin',
           createdAt: serverTimestamp()
         });
         showNotification('নিউজ সফলভাবে আপলোড করা হয়েছে!');
+
+        // Auto add uploaded image to Media Gallery as well
+        try {
+          await addDoc(collection(db, 'media'), {
+            title: newsForm.title || 'নিউজের ছবি',
+            imageUrl: finalImageUrl,
+            type: 'image',
+            createdAt: serverTimestamp()
+          });
+        } catch (mErr) {
+          console.log("Media auto sync skipped:", mErr);
+        }
       }
       setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
       setNewsImageFile(null);
       setEditingId(null);
+      setMobileNewsTab('list');
     } catch (error: any) {
       handleFirestoreError(error, OperationType.CREATE, 'news');
       showNotification(`ত্রুটি: ${error.message || 'অপারেশন ব্যর্থ হয়েছে'}`, 'error');
@@ -396,8 +661,8 @@ export const AdminPanel: React.FC = () => {
 
   const handleReporterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে গুগল দিয়ে লগইন করুন।', 'error');
+    if (!user && !isLocalAdmin) {
+      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে লগইন করুন।', 'error');
       return;
     }
     setIsSubmitting(true);
@@ -428,7 +693,7 @@ export const AdminPanel: React.FC = () => {
         });
         showNotification('নতুন রিপোর্টার সফলভাবে যুক্ত করা হয়েছে!');
       }
-      setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
+      setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '', canPostNews: true, pin: '' });
       setReporterImageFile(null);
       setEditingId(null);
     } catch (error: any) {
@@ -441,8 +706,8 @@ export const AdminPanel: React.FC = () => {
 
   const handleMediaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে গুগল দিয়ে লগইন করুন।', 'error');
+    if (!user && !isLocalAdmin) {
+      showNotification('এই কাজটি করার জন্য অনুগ্রহ করে লগইন করুন।', 'error');
       return;
     }
     setIsSubmitting(true);
@@ -580,6 +845,7 @@ export const AdminPanel: React.FC = () => {
     setEditingId(item.id);
     setActiveTab(type);
     if (type === 'news') {
+      setMobileNewsTab('form');
       setNewsForm({
         title: item.title,
         content: item.content,
@@ -591,13 +857,15 @@ export const AdminPanel: React.FC = () => {
       setNewsUploadMode('url');
     } else if (type === 'reporters') {
       setReporterForm({
-        name: item.name,
-        designation: item.designation,
-        imageUrl: item.imageUrl,
-        location: item.location,
-        division: divisionMap[item.division] || item.division,
+        name: item.name || '',
+        designation: item.designation || '',
+        imageUrl: item.imageUrl || '',
+        location: item.location || '',
+        division: divisionMap[item.division] || item.division || 'ঢাকা',
         phone: item.phone || '',
-        email: item.email || ''
+        email: item.email || '',
+        canPostNews: item.canPostNews !== false,
+        pin: item.pin || ''
       });
       setReporterUploadMode('url');
     } else if (type === 'media') {
@@ -631,7 +899,7 @@ export const AdminPanel: React.FC = () => {
   const cancelEditing = () => {
     setEditingId(null);
     setNewsForm({ title: '', content: '', imageUrl: '', category: 'জাতীয়', journalistName: '', location: '' });
-    setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '' });
+    setReporterForm({ name: '', designation: '', imageUrl: '', location: '', division: 'ঢাকা', phone: '', email: '', canPostNews: true, pin: '1234' });
     setMediaForm({ title: '', imageUrl: '', type: 'image', videoUrl: '' });
     setAdForm({ title: '', imageUrl: '', link: '', position: 'sidebar', active: true });
     setScheduleForm({ time: '', title: '', active: false, order: 0 });
@@ -714,7 +982,7 @@ export const AdminPanel: React.FC = () => {
 
   if (!isLocalAdmin && (!user || user.email !== 'info.samitv.bd@gmail.com')) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sami-dark to-sami-teal p-4 relative overflow-hidden font-eng">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-sami-dark to-slate-900 p-4 relative overflow-hidden font-sans">
         {/* Decorative Elements */}
         <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-sami-red/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-sami-red/5 rounded-full blur-3xl"></div>
@@ -722,301 +990,675 @@ export const AdminPanel: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-12 rounded-3xl shadow-2xl max-w-md w-full text-center relative z-10 border border-white/20"
+          className="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full relative z-10 border border-slate-100/80"
         >
-          <div className="mb-8">
-            <SAMILogo className="scale-125 mb-4" />
-            <div className="h-1 w-20 bg-sami-red mx-auto rounded-full mt-4"></div>
+          {/* Logo & Header */}
+          <div className="text-center mb-6">
+            <SAMILogo className="scale-105 mb-2 mx-auto" />
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-3">
+              অ্যাডমিন পোর্টাল
+            </h1>
+            <p className="text-xs text-slate-500 font-bold mt-1">
+              ওয়েবসাইট ব্যবস্থাপনা ও সেটিংস নিয়ন্ত্রণ করুন
+            </p>
           </div>
 
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-sami-red/10 text-sami-red rounded-full text-xs font-bold uppercase tracking-widest">
-              <ShieldCheck size={14} />
-              নিরাপদ অ্যাডমিন অ্যাক্সেস
-            </div>
-            
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">অ্যাডমিন লগইন</h1>
-            
-            <form onSubmit={handleCustomLogin} className="space-y-4 text-left">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase ml-1">ইউজারনেম</label>
+          <form onSubmit={handleCustomLogin} className="space-y-4 text-left">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-700 uppercase tracking-wider block ml-0.5">
+                অ্যাডমিন ইউজারনেম
+              </label>
+              <div className="relative">
                 <input 
                   type="text" 
                   required
                   value={loginInput.username}
                   onChange={(e) => setLoginInput({...loginInput, username: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-sami-red transition-all font-bold"
-                  placeholder="ইউজারনেম"
+                  className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 outline-none focus:border-sami-red focus:ring-2 focus:ring-sami-red/10 transition-all font-bold text-sm bg-slate-50/60 focus:bg-white text-slate-900"
+                  placeholder="ইউজারনেম (samitv)"
                 />
+                <User size={18} className="absolute right-3.5 top-3.5 text-slate-400 pointer-events-none" />
               </div>
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-gray-500 uppercase ml-1">পাসওয়ার্ড</label>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-700 uppercase tracking-wider block ml-0.5">
+                পাসওয়ার্ড
+              </label>
+              <div className="relative">
                 <input 
                   type="password" 
                   required
                   value={loginInput.password}
                   onChange={(e) => setLoginInput({...loginInput, password: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-sami-red transition-all font-bold"
+                  className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 outline-none focus:border-sami-red focus:ring-2 focus:ring-sami-red/10 transition-all font-bold text-sm bg-slate-50/60 focus:bg-white text-slate-900 font-mono"
                   placeholder="পাসওয়ার্ড"
                 />
+                <Lock size={18} className="absolute right-3.5 top-3.5 text-slate-400 pointer-events-none" />
               </div>
-              
-              {loginError && (
-                <p className="text-red-500 text-xs font-bold text-center animate-shake">{loginError}</p>
-              )}
-
-              <button 
-                type="submit"
-                className="w-full bg-sami-red text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-sami-dark transition-all shadow-lg shadow-sami-red/20 hover:shadow-xl active:scale-[0.98]"
-              >
-                <LogIn size={20} />
-                লগইন করুন
-              </button>
-
-              <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-100"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-gray-400 font-bold tracking-widest text-[9px]">অথবা ক্লাউড সেভ অ্যাক্সেস</span>
-                </div>
+            </div>
+            
+            {loginError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-center">
+                <p className="text-red-600 text-xs font-bold">{loginError}</p>
               </div>
+            )}
 
-              <button 
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full bg-white border-2 border-gray-100 text-gray-700 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-[0.98]"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                গুগল দিয়ে লগইন করুন
-              </button>
-            </form>
-          </div>
+            <button 
+              type="submit"
+              className="w-full text-white py-3.5 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-[0.98] cursor-pointer bg-slate-900 hover:bg-slate-800 shadow-slate-900/20"
+            >
+              <LogIn size={18} />
+              <span>অ্যাডমিন প্যানেলে লগইন করুন</span>
+            </button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-100"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-3 text-gray-400 font-bold tracking-widest text-[9px]">অথবা</span>
+              </div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full bg-white border-2 border-gray-100 text-gray-700 py-2.5 rounded-2xl font-bold flex items-center justify-center gap-2.5 hover:bg-gray-50 transition-all text-xs active:scale-[0.98] cursor-pointer shadow-xs"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+              গুগল অ্যাকাউন্ট দিয়ে প্রবেশ
+            </button>
+          </form>
           
-          <div className="mt-12 pt-8 border-t border-gray-100 space-y-2 font-eng">
-            <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+          <div className="mt-8 pt-6 border-t border-gray-100 space-y-1 font-sans text-center">
+            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
               &copy; {new Date().getFullYear()} সামি মাল্টিমিডিয়া লিমিটেড
             </p>
             <p className="text-[11px] text-sami-red font-black uppercase tracking-tighter">
-              ডেভেলপড বাই এমরান হাসান সামি
+              SAMI TV মোবাইল রিপোর্টিং প্যানেল
             </p>
           </div>
         </motion.div>
+
+        {/* Application Modal Popup */}
+        <AnimatePresence>
+          {showApplicationModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="w-full max-w-2xl"
+              >
+                <JournalistApplicationForm onClose={() => setShowApplicationModal(false)} />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col md:flex-row font-sans">
+    <div className="min-h-screen bg-slate-50/80 flex flex-col md:flex-row font-sans">
+      {/* Mobile Top Header */}
+      <div className="md:hidden bg-slate-900 text-white p-3.5 flex items-center justify-between sticky top-0 z-50 shadow-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 bg-sami-red rounded-xl flex items-center justify-center text-white font-black text-xs shadow-md">STV</div>
+          <div>
+            <h1 className="font-black text-xs uppercase tracking-tight text-white">
+              {userRole === 'journalist' ? 'সাংবাদিক প্যানেল' : 'SAMI TV CMS'}
+            </h1>
+            <p className="text-[9px] text-sami-red font-bold uppercase">
+              {userRole === 'journalist' ? `${journalistName || 'সাংবাদিক'} - সংবাদ প্রকাশ` : 'অ্যাডমিন প্যানেল'}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 bg-slate-800 rounded-xl text-slate-200 hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold"
+        >
+          <Menu size={18} />
+          <span>মেন্যু</span>
+        </button>
+      </div>
+
+      {/* Mobile Horizontal Quick Tab Bar */}
+      <div className="md:hidden bg-white border-b border-slate-200/90 px-2.5 py-2 overflow-x-auto flex items-center gap-1.5 z-40 sticky top-[57px] shadow-xs">
+        {userRole === 'journalist' ? (
+          <div className="flex items-center justify-between w-full text-xs font-extrabold px-1">
+            <div className="flex items-center gap-2 text-sami-red">
+              <span className="w-2 h-2 rounded-full bg-sami-red animate-ping"></span>
+              <span>সাংবাদিক মোড: শুধু সংবাদ প্রকাশ করা যাবে</span>
+            </div>
+            <button
+              onClick={() => {
+                setActiveTab('news');
+                setMobileNewsTab(mobileNewsTab === 'form' ? 'list' : 'form');
+              }}
+              className="px-3 py-1 bg-sami-red text-white rounded-lg font-bold text-[11px]"
+            >
+              {mobileNewsTab === 'form' ? 'সংবাদ তালিকা' : '+ নতুন সংবাদ'}
+            </button>
+          </div>
+        ) : (
+          [
+            { id: 'dashboard', label: 'ড্যাশবোর্ড', icon: Layout },
+            { id: 'news', label: 'নিউজ পোস্ট', icon: Send },
+            { id: 'reporters', label: 'রিপোর্টার্স', icon: Users },
+            { id: 'media', label: 'মিডিয়া', icon: Film },
+            { id: 'ticker', label: 'টিকার', icon: MessageSquare },
+            { id: 'schedule', label: 'সূচী', icon: Calendar },
+            { id: 'ads', label: 'বিজ্ঞাপন', icon: ImageIcon },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id as AdminTab);
+                setMobileMenuOpen(false);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
+                activeTab === item.id 
+                  ? 'bg-sami-red text-white shadow-sm' 
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <item.icon size={14} />
+              <span>{item.label}</span>
+            </button>
+          ))
+        )}
+      </div>
+
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-gray-900 text-white flex flex-col sticky top-0 md:h-screen z-50">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+      <aside className={`${mobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-slate-900 text-white flex flex-col sticky top-0 md:h-screen z-50 shrink-0 border-r border-slate-800`}>
+        <div className="p-5 border-b border-slate-800 hidden md:flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-sami-red rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-sami-red/20 ring-2 ring-white/10">S</div>
-            <div className="font-eng">
-              <h1 className="font-black text-sm uppercase tracking-tighter">SAMI CMS</h1>
-              <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Admin v2.0</p>
+            <div>
+              <h1 className="font-black text-sm uppercase tracking-tight text-white">
+                SAMI CMS
+              </h1>
+              <p className="text-[9px] text-sami-red font-bold uppercase tracking-widest">
+                v2.0 Professional
+              </p>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1 font-eng">
+        <nav className="flex-1 overflow-y-auto p-3.5 space-y-1.5 font-sans">
+          <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-3 pt-2 pb-1">
+            প্রধান কন্ট্রোল
+          </div>
           {[
             { id: 'dashboard', icon: Layout, label: 'ড্যাশবোর্ড' },
             { id: 'news', icon: Send, label: 'নিউজ ম্যানেজমেন্ট' },
-            { id: 'reporters', icon: Users, label: 'আমাদের পরিবার' },
-            { id: 'media', icon: Film, label: 'মিডিয়া গ্যালারি' },
-            { id: 'ticker', icon: MessageSquare, label: 'নিউজ টিকার' },
-            { id: 'schedule', icon: Calendar, label: 'অনুষ্ঠান সূচী' },
-            { id: 'ads', icon: ImageIcon, label: 'বিজ্ঞাপন ম্যানেজমেন্ট' },
-            { id: 'applications', icon: Users, label: 'চাকরির আবেদন' },
-            { id: 'messages', icon: MessageSquare, label: 'মেসেজ বক্স' },
-            { id: 'migration', icon: Upload, label: 'ডাটা ট্রান্সফার' },
+            { id: 'reporters', icon: Users, label: 'আমাদের পরিবার (রিপোর্টার)' },
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id as AdminTab)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
+              onClick={() => {
+                setActiveTab(item.id as AdminTab);
+                setMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all duration-200 cursor-pointer ${
                 activeTab === item.id 
-                  ? 'bg-sami-red text-white shadow-lg shadow-sami-red/20 scale-[1.02]' 
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  ? 'bg-sami-red text-white shadow-md shadow-sami-red/20 scale-[1.01]' 
+                  : 'text-slate-400 hover:bg-slate-800/80 hover:text-white'
               }`}
             >
-              <item.icon size={18} className={activeTab === item.id ? 'text-white' : 'text-gray-500'} />
-              {item.label}
+              <item.icon size={17} className={activeTab === item.id ? 'text-white' : 'text-slate-400'} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+
+          <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-3 pt-4 pb-1">
+            মিডিয়া ও পেজ কন্টেন্ট
+          </div>
+          {[
+            { id: 'media', icon: Film, label: 'মিডিয়া গ্যালারি' },
+            { id: 'ticker', icon: MessageSquare, label: 'নিউজ টিকার' },
+            { id: 'schedule', icon: Calendar, label: 'অনুষ্ঠান সূচী' },
+            { id: 'ads', icon: ImageIcon, label: 'বিজ্ঞাপন বক্সেস' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id as AdminTab);
+                setMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all duration-200 cursor-pointer ${
+                activeTab === item.id 
+                  ? 'bg-sami-red text-white shadow-md shadow-sami-red/20 scale-[1.01]' 
+                  : 'text-slate-400 hover:bg-slate-800/80 hover:text-white'
+              }`}
+            >
+              <item.icon size={17} className={activeTab === item.id ? 'text-white' : 'text-slate-400'} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+
+          <div className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider px-3 pt-4 pb-1">
+            বার্তা ও সিস্টেম
+          </div>
+          {[
+            { id: 'applications', icon: Users, label: 'চাকরির আবেদন' },
+            { id: 'messages', icon: MessageSquare, label: 'মেসেজ বক্স' },
+            { id: 'migration', icon: Upload, label: 'ডাটা মাইগ্রেশন' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveTab(item.id as AdminTab);
+                setMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all duration-200 cursor-pointer ${
+                activeTab === item.id 
+                  ? 'bg-sami-red text-white shadow-md shadow-sami-red/20 scale-[1.01]' 
+                  : 'text-slate-400 hover:bg-slate-800/80 hover:text-white'
+              }`}
+            >
+              <item.icon size={17} className={activeTab === item.id ? 'text-white' : 'text-slate-400'} />
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/10 space-y-4">
-          <div className="bg-white/5 rounded-xl p-3 flex items-center gap-3">
-             <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
-                <User size={16} className="text-gray-400" />
+        <div className="p-3.5 border-t border-slate-800 space-y-3">
+          <div className="bg-slate-800/60 rounded-xl p-2.5 flex items-center gap-3 border border-slate-700/50">
+             <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
+                <User size={16} className="text-slate-300" />
              </div>
-             <div className="flex-1 min-w-0 font-eng">
-                <p className="text-[11px] font-bold truncate uppercase">{user?.email?.split('@')[0] || 'Admin'}</p>
-                <p className="text-[9px] text-gray-500 font-black uppercase">রোল: সুপার অ্যাডমিন</p>
+             <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-slate-200 truncate">
+                  {user?.email?.split('@')[0] || 'Admin'}
+                </p>
+                <p className="text-[10px] text-emerald-400 font-extrabold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  সুপার অ্যাডমিন
+                </p>
              </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-red-600/10 text-red-500 rounded-xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all border border-red-600/20"
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/10 text-red-400 hover:bg-sami-red hover:text-white rounded-xl font-bold text-xs transition-all border border-red-500/20 cursor-pointer"
           >
-            <LogOut size={16} /> লগআউট করুন
+            <LogOut size={15} /> লগআউট করুন
           </button>
-          
-          <div className="text-center pt-2 font-eng">
-            <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter">ডেভেলপমেন্ট বাই</p>
-            <p className="text-[10px] text-sami-red font-black uppercase tracking-tighter">এমরান হাসান সামি</p>
-          </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 font-eng">
-        <header className="bg-white border-b border-gray-100 h-16 flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-4">
-             <h2 className="text-lg font-black text-gray-800 uppercase tracking-tight">
-               {activeTab === 'dashboard' && 'অ্যাডমিন ড্যাশবোর্ড'}
-               {activeTab === 'news' && 'নিউজ ম্যানেজমেন্ট'}
+      <div className="flex-1 flex flex-col min-h-screen md:h-screen md:overflow-hidden bg-slate-50">
+        <header className="bg-white border-b border-slate-200/80 h-16 flex items-center justify-between px-4 sm:px-8 shrink-0 shadow-sm">
+          <div className="flex items-center gap-3">
+             <span className="text-xs text-slate-400 font-bold hidden sm:inline">
+               অ্যাডমিন /
+             </span>
+             <h2 className="text-sm sm:text-base font-black text-slate-800 tracking-tight">
+               {activeTab === 'dashboard' && 'অ্যাডমিন ড্যাশবোর্ড ওভারভিউ'}
+               {activeTab === 'news' && 'নিউজ পোস্ট ও এডিটিং'}
                {activeTab === 'reporters' && 'রিপোর্টার প্যানেল'}
-               {activeTab === 'media' && 'মিডিয়া গ্যালারি'}
-               {activeTab === 'ticker' && 'টিকার নিউজ এডিটর'}
-               {activeTab === 'schedule' && 'অনুষ্ঠান সূচী'}
-               {activeTab === 'ads' && 'অ্যাড ম্যানেজমেন্ট'}
-               {activeTab === 'applications' && 'চাকরির আবেদন'}
-               {activeTab === 'messages' && 'ইউজার মেসেজ'}
-               {activeTab === 'migration' && 'সিস্টেম মাইগ্রেশন'}
+               {activeTab === 'media' && 'মিডিয়া ফাইল ও ছবি গ্যালারি'}
+               {activeTab === 'ticker' && 'লাইব নিউজ টিকার এডিটর'}
+               {activeTab === 'schedule' && 'লাইভ অনুষ্ঠান সূচী'}
+               {activeTab === 'ads' && 'ওয়েবসাইট অ্যাডভার্টাইজমেন্ট'}
+               {activeTab === 'applications' && 'চাকরির আবেদনপত্র সমূহ'}
+               {activeTab === 'messages' && 'ইউজারদের সরাসরি মেসেজ'}
+               {activeTab === 'migration' && 'ক্লাউড ডাটা মাইগ্রেশন'}
              </h2>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
              <div className="hidden sm:flex flex-col items-end">
-                <p className="text-xs font-bold text-gray-900">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">জামালপুর টিভি</p>
+                <p className="text-xs font-extrabold text-slate-800">{new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <p className="text-[10px] text-slate-400 font-bold">সামি টিভি মাল্টিমিডিয়া</p>
              </div>
-             <div className="w-px h-8 bg-gray-100"></div>
-             <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
-                <ShieldCheck size={20} className="text-green-600" />
+             <div className="hidden sm:block w-px h-7 bg-slate-200"></div>
+             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold bg-emerald-50 text-emerald-700 border-emerald-200">
+                <ShieldCheck size={16} className="text-emerald-600" />
+                <span>সিস্টেম লাইভ</span>
              </div>
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
 
         {activeTab === 'dashboard' ? (
-          <div className="space-y-8">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-eng">
+          <div className="space-y-6">
+            
+            {/* Quick Action Buttons Bar */}
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
+                দ্রুত অ্যাকশন বাটন
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button
+                  onClick={() => setActiveTab('news')}
+                  className="flex items-center justify-center gap-2 p-3 bg-red-50 hover:bg-sami-red hover:text-white text-sami-red border border-red-200/80 rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer"
+                >
+                  <Send size={15} />
+                  <span>+ নতুন নিউজ লিখুন</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('reporters')}
+                  className="flex items-center justify-center gap-2 p-3 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 border border-blue-200/80 rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer"
+                >
+                  <Users size={15} />
+                  <span>+ রিপোর্টার যোগ করুন</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('ticker')}
+                  className="flex items-center justify-center gap-2 p-3 bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-700 border border-amber-200/80 rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer"
+                >
+                  <MessageSquare size={15} />
+                  <span>ব্রেকিং টিকার আপডেট</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('media')}
+                  className="flex items-center justify-center gap-2 p-3 bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200/80 rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer"
+                >
+                  <Film size={15} />
+                  <span>মিডিয়া গ্যালারি</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Stats Overview Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: 'মোট নিউজ', value: stats.news, icon: Layout, color: 'blue', bg: 'bg-blue-500' },
-                { label: 'রিপোর্টার', value: stats.reporters, icon: Users, color: 'green', bg: 'bg-emerald-500' },
-                { label: 'মিডিয়া ফাইল', value: stats.media, icon: Film, color: 'purple', bg: 'bg-violet-500' },
-                { label: 'বিজ্ঞাপন', value: stats.ads, icon: ImageIcon, color: 'red', bg: 'bg-sami-red' }
+                { label: 'মোট প্রকাশিত নিউজ', value: stats.news, icon: Layout, bg: 'bg-red-50 text-sami-red border-red-100' },
+                { label: 'মোট নিবন্ধিত রিপোর্টার', value: stats.reporters, icon: Users, bg: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
+                { label: 'মিডিয়া গ্যালারি ফাইল', value: stats.media, icon: Film, bg: 'bg-violet-50 text-violet-600 border-violet-100' },
+                { label: 'বিজ্ঞাপন স্লট', value: stats.ads, icon: ImageIcon, bg: 'bg-amber-50 text-amber-600 border-amber-100' }
               ].map((stat, i) => (
-                <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-5 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group">
-                  <div className={`w-14 h-14 ${stat.bg} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-${stat.color}-500/20 group-hover:scale-110 transition-transform`}>
-                    <stat.icon size={28} />
+                <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-4 hover:shadow-md transition-all">
+                  <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${stat.bg}`}>
+                    <stat.icon size={22} />
                   </div>
                   <div>
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1 font-eng">{stat.label}</p>
-            <p className="text-3xl font-black text-gray-900 tracking-tight font-eng">{stat.value}</p>
+                    <p className="text-[11px] text-slate-500 font-bold mb-0.5">{stat.label}</p>
+                    <p className="text-2xl font-black text-slate-900 tracking-tight">{stat.value}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Send size={20} className="text-sami-red" /> সাম্প্রতিক নিউজ
-                </h3>
-                <div className="space-y-4">
+            {/* Recent News & Reporters Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Recent News Card */}
+              <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                    <Send size={18} className="text-sami-red" />
+                    সাম্প্রতিক সময় প্রকাশিত নিউজ (সর্বশেষ ৫টি)
+                  </h3>
+                  <button onClick={() => setActiveTab('news')} className="text-sami-red hover:underline font-bold text-xs">
+                    সব দেখুন →
+                  </button>
+                </div>
+
+                <div className="space-y-3">
                   {newsList.slice(0, 5).map(news => (
-                    <div key={news.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all font-eng">
-                      <img src={news.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                    <div key={news.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all">
+                      <img src={news.imageUrl} alt="" className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0" referrerPolicy="no-referrer" />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 truncate text-sm">{news.title}</p>
-                        <p className="text-[10px] text-gray-500">{news.createdAt?.toDate()?.toLocaleDateString('en-US')}</p>
+                        <p className="font-bold text-slate-900 truncate text-xs mb-0.5">{news.title}</p>
+                        <span className="text-[10px] font-extrabold bg-red-50 text-sami-red px-2 py-0.5 rounded-md">
+                          {categoryMap[news.category] || news.category}
+                        </span>
                       </div>
                     </div>
                   ))}
+                  {newsList.length === 0 && (
+                    <p className="text-xs text-slate-400 font-bold text-center py-6">কোন নিউজ পাওয়া যায়নি</p>
+                  )}
                 </div>
-                <button onClick={() => setActiveTab('news')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব নিউজ দেখুন</button>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                  <Users size={20} className="text-sami-red" /> নতুন রিপোর্টার
-                </h3>
-                <div className="space-y-4">
+              {/* Recent Reporters Card */}
+              <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <h3 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                    <Users size={18} className="text-sami-red" />
+                    আমাদের পরিবার (রিপোর্টার্স)
+                  </h3>
+                  <button onClick={() => setActiveTab('reporters')} className="text-sami-red hover:underline font-bold text-xs">
+                    সব দেখুন →
+                  </button>
+                </div>
+
+                <div className="space-y-3">
                   {reporters.slice(0, 5).map(rep => (
-                    <div key={rep.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all font-eng">
-                      <img src={rep.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    <div key={rep.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 transition-all">
+                      <img src={rep.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0" referrerPolicy="no-referrer" />
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-gray-900 text-sm">{rep.name}</p>
-                        <p className="text-[10px] text-sami-red">{rep.designation}</p>
+                        <p className="font-bold text-slate-900 text-xs">{rep.name}</p>
+                        <p className="text-[10px] text-slate-500 font-semibold">{rep.designation} • {rep.location}</p>
                       </div>
                     </div>
                   ))}
+                  {reporters.length === 0 && (
+                    <p className="text-xs text-slate-400 font-bold text-center py-6">কোন রিপোর্টার যুক্ত করা হয়নি</p>
+                  )}
                 </div>
-                <button onClick={() => setActiveTab('reporters')} className="w-full mt-6 py-2 text-sami-red font-bold text-sm hover:underline">সব রিপোর্টার দেখুন</button>
               </div>
+
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Forms */}
-          <div className="lg:col-span-1">
+          <div>
+            {/* Mobile Segment Switcher for News */}
+            {activeTab === 'news' && (
+              <div className="lg:hidden flex bg-slate-200/90 p-1 rounded-2xl mb-4 border border-slate-300/60 shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setMobileNewsTab('form')}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    mobileNewsTab === 'form' 
+                      ? 'bg-sami-red text-white shadow-sm' 
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Plus size={16} />
+                  <span>{editingId ? 'নিউজ এডিট' : 'নতুন নিউজ পোস্ট'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileNewsTab('list')}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    mobileNewsTab === 'list' 
+                      ? 'bg-sami-red text-white shadow-sm' 
+                      : 'text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Send size={16} />
+                  <span>প্রকাশিত খবর ({newsList.length})</span>
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Left Column: Forms */}
+            <div className={`lg:col-span-1 ${activeTab === 'news' && mobileNewsTab !== 'form' ? 'hidden lg:block' : 'block'}`}>
             <div className="bg-white p-6 rounded-2xl shadow-lg sticky top-24">
               {activeTab === 'news' && (
                 <>
-                  <div className="flex items-center justify-between mb-6 font-eng">
-                    <h2 className="text-xl font-bold flex items-center gap-2">
-                      {editingId ? <Edit size={20} className="text-orange-500" /> : <Plus size={20} className="text-sami-red" />}
-                      {editingId ? 'নিউজ আপডেট করুন' : 'নতুন নিউজ'}
-                    </h2>
+                  <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                        {editingId ? <Edit size={18} className="text-amber-500" /> : <Plus size={18} className="text-sami-red" />}
+                        {editingId ? 'নিউজ এডিট করুন' : 'নতুন নিউজ পোস্ট করুন'}
+                      </h2>
+                      <p className="text-[11px] text-slate-500 font-bold mt-0.5">সব তথ্য সঠিকভাবে পূরণ করে পাবলিশ বাটন চাপুন</p>
+                    </div>
                     {editingId && (
-                      <button onClick={cancelEditing} className="text-gray-400 hover:text-red-500 transition-colors">
-                        <XCircle size={20} />
+                      <button 
+                        onClick={cancelEditing} 
+                        className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-red-500 bg-slate-100 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        <XCircle size={15} />
+                        <span>বাতিল</span>
                       </button>
                     )}
                   </div>
-                  <form onSubmit={handleNewsSubmit} className="space-y-4 font-eng">
-                    <input type="text" required value={newsForm.title} onChange={(e) => setNewsForm({...newsForm, title: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="নিউজের শিরোনাম" />
-                    <div className="grid grid-cols-2 gap-4">
-                      <input type="text" required value={newsForm.journalistName} onChange={(e) => setNewsForm({...newsForm, journalistName: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="সাংবাদিকের নাম" />
-                      <input type="text" required value={newsForm.location} onChange={(e) => setNewsForm({...newsForm, location: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="স্থান" />
+
+                  <form onSubmit={handleNewsSubmit} className="space-y-4">
+                    {/* News Title */}
+                    <div>
+                      <label className="block text-xs font-extrabold text-slate-700 mb-1">
+                        নিউজের শিরোনাম <span className="text-red-500">*</span>
+                      </label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={newsForm.title} 
+                        onChange={(e) => setNewsForm({...newsForm, title: e.target.value})} 
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-sami-red focus:ring-1 focus:ring-sami-red outline-none text-xs font-bold text-slate-800 placeholder:text-slate-400 bg-slate-50/50 focus:bg-white transition-all" 
+                        placeholder="যেমন: জামালপুরে নতুন উন্নয়ন প্রকল্পের উদ্বোধন..." 
+                      />
                     </div>
-                    <select value={newsForm.category} onChange={(e) => setNewsForm({...newsForm, category: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
-                      {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                    
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => setNewsUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>ইউআরএল (URL)</button>
-                        <button type="button" onClick={() => setNewsUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${newsUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>আপলোড (Upload)</button>
+
+                    {/* Journalist & Location */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-extrabold text-slate-700 mb-1">
+                          প্রতিবেদক / সাংবাদিক <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                          type="text" 
+                          required 
+                          value={newsForm.journalistName} 
+                          onChange={(e) => setNewsForm({...newsForm, journalistName: e.target.value})} 
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-sami-red outline-none text-xs font-bold text-slate-800 placeholder:text-slate-400 bg-slate-50/50 focus:bg-white transition-all" 
+                          placeholder="যেমন: নিজস্ব প্রতিবেদক" 
+                        />
                       </div>
+                      <div>
+                        <label className="block text-xs font-extrabold text-slate-700 mb-1">
+                          স্থান / অবস্থান <span className="text-red-500">*</span>
+                        </label>
+                        <input 
+                          type="text" 
+                          required 
+                          value={newsForm.location} 
+                          onChange={(e) => setNewsForm({...newsForm, location: e.target.value})} 
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-sami-red outline-none text-xs font-bold text-slate-800 placeholder:text-slate-400 bg-slate-50/50 focus:bg-white transition-all" 
+                          placeholder="যেমন: জামালপুর" 
+                        />
+                      </div>
+                    </div>
+
+                    {/* Category Selection */}
+                    <div>
+                      <label className="block text-xs font-extrabold text-slate-700 mb-1">
+                        ক্যাটেগরি নির্বাচন করুন <span className="text-red-500">*</span>
+                      </label>
+                      <select 
+                        value={newsForm.category} 
+                        onChange={(e) => setNewsForm({...newsForm, category: e.target.value})} 
+                        className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-sami-red outline-none text-xs font-bold text-slate-800 bg-slate-50/50 focus:bg-white transition-all cursor-pointer"
+                      >
+                        {categories.map(cat => <option key={cat} value={cat}>{categoryMap[cat] || cat}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Image Box */}
+                    <div className="space-y-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-extrabold text-slate-700">
+                          ছবি সংযুক্ত করুন
+                        </label>
+                      </div>
+
+                      <div className="flex gap-1 p-1 bg-slate-200/70 rounded-xl">
+                        <button 
+                          type="button" 
+                          onClick={() => setNewsUploadMode('file')} 
+                          className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${newsUploadMode === 'file' ? 'bg-white text-sami-red shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                        >
+                          💻📱 কম্পিউটার/মোবাইল থেকে আপলোড
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setNewsUploadMode('url')} 
+                          className={`flex-1 py-1.5 text-[11px] font-extrabold rounded-lg transition-all cursor-pointer ${newsUploadMode === 'url' ? 'bg-white text-sami-red shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                        >
+                          🔗 অনলাইন লিঙ্ক (URL)
+                        </button>
+                      </div>
+
                       {newsUploadMode === 'url' ? (
-                        <input type="url" required value={newsForm.imageUrl} onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবির ইউআরএল" />
+                        <input 
+                          type="url" 
+                          required={!newsForm.imageUrl} 
+                          value={newsForm.imageUrl} 
+                          onChange={(e) => setNewsForm({...newsForm, imageUrl: e.target.value})} 
+                          className="w-full px-3.5 py-2 rounded-xl border border-slate-200 outline-none bg-white text-xs font-bold text-slate-800 placeholder:text-slate-400" 
+                          placeholder="https://example.com/image.jpg" 
+                        />
                       ) : (
                         <input 
                           type="file" 
-                          required 
                           accept="image/*" 
+                          required={!newsForm.imageUrl && !newsImageFile}
                           onChange={(e) => {
                             const file = e.target.files?.[0] || null;
                             setNewsImageFile(file);
-                            if (file) setNewsUploadMode('file');
                           }} 
-                          className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" 
+                          className="w-full px-3 py-1.5 rounded-xl border border-slate-200 outline-none bg-white text-xs cursor-pointer font-bold text-slate-700" 
                         />
+                      )}
+
+                      {/* Image Preview */}
+                      {(newsForm.imageUrl || newsImageFile) && (
+                        <div className="relative rounded-xl overflow-hidden border border-slate-300 h-28 bg-slate-900 group shadow-sm">
+                          <img 
+                            src={newsImageFile ? URL.createObjectURL(newsImageFile) : newsForm.imageUrl} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute inset-0 bg-slate-950/40 flex items-center justify-between px-3 text-white">
+                            <span className="text-[10px] font-extrabold bg-emerald-600 text-white px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                              ✓ ছবি যুক্ত হয়েছে
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewsForm({ ...newsForm, imageUrl: '' });
+                                setNewsImageFile(null);
+                              }}
+                              className="bg-red-600 hover:bg-red-700 text-white p-1 rounded-full transition-colors shadow-md cursor-pointer"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
 
-                    <textarea required rows={6} value={newsForm.content} onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none resize-none" placeholder="নিউজের বিস্তারিত তথ্য..." />
+                    {/* News Content */}
+                    <div>
+                      <label className="block text-xs font-extrabold text-slate-700 mb-1">
+                        নিউজের বিস্তারিত বিবরণ <span className="text-red-500">*</span>
+                      </label>
+                      <textarea 
+                        required 
+                        rows={5} 
+                        value={newsForm.content} 
+                        onChange={(e) => setNewsForm({...newsForm, content: e.target.value})} 
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-sami-red outline-none text-xs text-slate-800 placeholder:text-slate-400 bg-slate-50/50 focus:bg-white transition-all resize-none leading-relaxed" 
+                        placeholder="এখানে নিউজের বিস্তারিত বিষয়বস্তু লিখুন..." 
+                      />
+                    </div>
                     
                     {uploadProgress > 0 && (
-                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
+                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${uploadProgress}%` }}
@@ -1025,8 +1667,13 @@ export const AdminPanel: React.FC = () => {
                       </div>
                     )}
 
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-sami-red text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-sami-dark transition-all disabled:opacity-50">
-                      <Send size={18} /> {isSubmitting ? 'প্রসেসিং...' : (editingId ? 'নিউজ আপডেট করুন' : 'নিউজ পাবলিশ করুন')}
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting} 
+                      className="w-full bg-sami-red text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-red-700 transition-all shadow-md active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+                    >
+                      <Send size={16} /> 
+                      <span>{isSubmitting ? 'আপলোড হচ্ছে...' : (editingId ? 'নিউজ আপডেট করুন' : 'পাবলিশ করুন')}</span>
                     </button>
                   </form>
                 </>
@@ -1057,8 +1704,8 @@ export const AdminPanel: React.FC = () => {
                     
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setReporterUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>ইউআরএল (URL)</button>
-                        <button type="button" onClick={() => setReporterUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${reporterUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>আপলোড (Upload)</button>
+                        <button type="button" onClick={() => setReporterUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${reporterUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>💻📱 কম্পিউটার/মোবাইল থেকে আপলোড</button>
+                        <button type="button" onClick={() => setReporterUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${reporterUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>🔗 অনলাইন লিঙ্ক (URL)</button>
                       </div>
                       {reporterUploadMode === 'url' ? (
                         <input type="url" required value={reporterForm.imageUrl} onChange={(e) => setReporterForm({...reporterForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ছবির ইউআরএল" />
@@ -1077,8 +1724,38 @@ export const AdminPanel: React.FC = () => {
                       )}
                     </div>
 
-                    <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none font-eng" placeholder="ফোন নম্বর (ঐচ্ছিক)" />
-                    <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none font-eng" placeholder="ইমেইল (ঐচ্ছিক)" />
+                    <input type="text" value={reporterForm.phone} onChange={(e) => setReporterForm({...reporterForm, phone: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none font-eng text-xs" placeholder="ফোন নম্বর (ঐচ্ছিক)" />
+                    <input type="email" value={reporterForm.email} onChange={(e) => setReporterForm({...reporterForm, email: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none font-eng text-xs" placeholder="ইমেইল (ঐচ্ছিক)" />
+                    
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                          <ShieldCheck size={16} className="text-emerald-600" />
+                          <span>সংবাদ প্রকাশের অনুমতি (Admin Permission)</span>
+                        </label>
+                        <select
+                          value={reporterForm.canPostNews ? 'true' : 'false'}
+                          onChange={(e) => setReporterForm({...reporterForm, canPostNews: e.target.value === 'true'})}
+                          className="px-3 py-1 rounded-lg border border-slate-300 text-xs font-bold outline-none cursor-pointer bg-white"
+                        >
+                          <option value="true">অনুমোদিত (Allowed)</option>
+                          <option value="false">স্থগিত (Denied)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                          সাংবাদিক সিক্রেট পিন / পাসওয়ার্ড (ঐচ্ছিক)
+                        </label>
+                        <input 
+                          type="text" 
+                          value={reporterForm.pin} 
+                          onChange={(e) => setReporterForm({...reporterForm, pin: e.target.value})} 
+                          className="w-full px-3 py-1.5 rounded-lg border border-slate-200 outline-none font-mono text-xs font-bold bg-white" 
+                          placeholder="যেমন: 1234" 
+                        />
+                      </div>
+                    </div>
                     
                     {uploadProgress > 0 && (
                       <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-4">
@@ -1120,8 +1797,8 @@ export const AdminPanel: React.FC = () => {
                     
                     <div className="space-y-2">
                        <div className="flex gap-2">
-                         <button type="button" onClick={() => setMediaUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>ইউআরএল (URL)</button>
-                         <button type="button" onClick={() => setMediaUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${mediaUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>আপলোড (Upload)</button>
+                         <button type="button" onClick={() => setMediaUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${mediaUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>💻📱 কম্পিউটার/মোবাইল থেকে আপলোড</button>
+                         <button type="button" onClick={() => setMediaUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${mediaUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>🔗 অনলাইন লিঙ্ক (URL)</button>
                        </div>
                        {mediaUploadMode === 'url' ? (
                          <input type="url" required value={mediaForm.imageUrl} onChange={(e) => setMediaForm({...mediaForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="থাম্বনেইল ছবির ইউআরএল" />
@@ -1178,8 +1855,8 @@ export const AdminPanel: React.FC = () => {
 
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setAdUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>ইউআরএল (URL)</button>
-                        <button type="button" onClick={() => setAdUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border ${adUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-500'}`}>আপলোড (Upload)</button>
+                        <button type="button" onClick={() => setAdUploadMode('file')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${adUploadMode === 'file' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>💻📱 কম্পিউটার/মোবাইল থেকে আপলোড</button>
+                        <button type="button" onClick={() => setAdUploadMode('url')} className={`flex-1 py-2 text-xs font-bold rounded-lg border cursor-pointer ${adUploadMode === 'url' ? 'bg-sami-red text-white' : 'bg-gray-50 text-gray-600'}`}>🔗 অনলাইন লিঙ্ক (URL)</button>
                       </div>
                       {adUploadMode === 'url' ? (
                         <input type="url" required value={adForm.imageUrl} onChange={(e) => setAdForm({...adForm, imageUrl: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none" placeholder="ব্যানার ছবির ইউআরএল" />
@@ -1248,7 +1925,7 @@ export const AdminPanel: React.FC = () => {
           </div>
 
           {/* Right Column: Lists */}
-          <div className="lg:col-span-2">
+          <div className={`lg:col-span-2 ${activeTab === 'news' && mobileNewsTab !== 'list' ? 'hidden lg:block' : 'block'}`}>
             <div className="bg-white p-6 rounded-2xl shadow-lg min-h-[600px] font-eng">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <Layout size={20} className="text-sami-red" /> 
@@ -1265,59 +1942,159 @@ export const AdminPanel: React.FC = () => {
                 </h2>
 
               <div className="space-y-4">
-                {activeTab === 'news' && newsList.map((news) => (
-                  <div key={news.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
-                    <img src={news.imageUrl} alt="" className="w-24 h-20 shrink-0 rounded-lg object-cover" />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] bg-sami-red/10 text-sami-red px-2 py-0.5 rounded-full font-bold uppercase">{categoryMap[news.category] || news.category}</span>
-                      <h3 className="font-bold text-gray-900 line-clamp-1 mt-1">{news.title}</h3>
-                      <p className="text-xs text-gray-500 line-clamp-2">{news.content}</p>
-                    </div>
-                    <div className="flex flex-col gap-2 shrink-0 font-eng">
-                      <button 
-                        onClick={() => startEditing(news, 'news')} 
-                        className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
-                      >
-                        <Edit size={14} />
-                        <span>এডিট</span>
-                      </button>
-                      <button 
-                        onClick={() => setConfirmDelete({ collection: 'news', id: news.id })} 
-                        className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
-                      >
-                        <Trash2 size={14} />
-                        <span>ডিলিট</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                {activeTab === 'news' && (
+                  <div className="space-y-3">
+                    {newsList.map((news) => (
+                      <div key={news.id} className="flex flex-col sm:flex-row gap-3 p-3.5 rounded-2xl border border-slate-200/80 hover:border-slate-300 hover:shadow-sm bg-white transition-all group">
+                        <img 
+                          src={news.imageUrl} 
+                          alt="" 
+                          className="w-full sm:w-28 h-32 sm:h-20 shrink-0 rounded-xl object-cover border border-slate-200" 
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="flex-1 min-w-0 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="text-[10px] font-extrabold bg-red-50 text-sami-red border border-red-100 px-2.5 py-0.5 rounded-md">
+                                {categoryMap[news.category] || news.category}
+                              </span>
+                              {news.journalistName && (
+                                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                                  ✍️ {news.journalistName} ({news.location})
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-extrabold text-slate-900 text-xs sm:text-sm line-clamp-1 leading-snug group-hover:text-sami-red transition-colors">
+                              {news.title}
+                            </h3>
+                            <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-relaxed">
+                              {news.content}
+                            </p>
+                          </div>
+                        </div>
 
-                {activeTab === 'reporters' && reporters.map((reporter) => (
-                  <div key={reporter.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
-                    <img src={reporter.imageUrl} alt="" className="w-16 h-16 shrink-0 rounded-full object-cover" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900">{reporter.name}</h3>
-                      <p className="text-sm text-sami-blue font-medium">{reporter.designation}</p>
-                      <p className="text-xs text-gray-500">{reporter.location} | {divisionMap[reporter.division] || reporter.division}</p>
-                    </div>
-                    <div className="flex flex-col gap-2 shrink-0 font-eng">
-                      <button 
-                        onClick={() => startEditing(reporter, 'reporters')} 
-                        className="flex items-center gap-1 px-3 py-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-all font-bold text-xs"
-                      >
-                        <Edit size={14} />
-                        <span>এডিট</span>
-                      </button>
-                      <button 
-                        onClick={() => setConfirmDelete({ collection: 'reporters', id: reporter.id })} 
-                        className="flex items-center gap-1 px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-all font-bold text-xs"
-                      >
-                        <Trash2 size={14} />
-                        <span>ডিলিট</span>
-                      </button>
-                    </div>
+                        <div className="flex sm:flex-col items-center sm:justify-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                          <button 
+                            onClick={() => startEditing(news, 'news')} 
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 rounded-xl transition-all font-bold text-xs cursor-pointer"
+                          >
+                            <Edit size={14} />
+                            <span>এডিট</span>
+                          </button>
+                          <button 
+                            onClick={() => setConfirmDelete({ collection: 'news', id: news.id })} 
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-xl transition-all font-bold text-xs cursor-pointer"
+                          >
+                            <Trash2 size={14} />
+                            <span>ডিলিট</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {newsList.length === 0 && (
+                      <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <Send size={28} className="mx-auto text-slate-400 mb-2" />
+                        <p className="text-xs font-bold text-slate-500">এখনো কোনো নিউজ পোস্ট করা হয়নি</p>
+                      </div>
+                    )}
                   </div>
-                ))}
+                )}
+
+                {activeTab === 'reporters' && (
+                  <div className="space-y-3">
+                    <div className="p-3.5 bg-blue-50/80 rounded-2xl border border-blue-200/80 flex items-center justify-between gap-3">
+                      <div>
+                        <h4 className="text-xs font-black text-blue-900 flex items-center gap-1.5">
+                          <ShieldCheck size={16} className="text-blue-600" />
+                          <span>সাংবাদিক নিউজ পোস্টের অনুমতি নিয়ন্ত্রণ</span>
+                        </h4>
+                        <p className="text-[11px] text-blue-700 font-bold mt-0.5">
+                          শুধুমাত্র যেসব সাংবাদিককে আপনি 'অনুমোদিত' করে রাখবেন, কেবল তারাই নিউজ পোস্ট করতে পারবেন।
+                        </p>
+                      </div>
+                    </div>
+
+                    {reporters.map((reporter) => (
+                      <div key={reporter.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-slate-200/80 hover:bg-slate-50/80 transition-all bg-white group">
+                        <img src={reporter.imageUrl} alt="" className="w-16 h-16 shrink-0 rounded-2xl object-cover border border-slate-200" referrerPolicy="no-referrer" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            {reporter.canPostNews !== false ? (
+                              <span className="text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                                <ShieldCheck size={12} className="text-emerald-600" />
+                                সংবাদ পোস্টের অনুমতি আছে (Allowed)
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-extrabold bg-red-50 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                                <XCircle size={12} className="text-red-600" />
+                                সংবাদ পোস্ট স্থগিত (Permission Revoked)
+                              </span>
+                            )}
+                            {reporter.pin && (
+                              <span className="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md border border-slate-200">
+                                🔑 পিন: {reporter.pin}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-extrabold text-slate-900 text-sm">{reporter.name}</h3>
+                          <p className="text-xs text-sami-red font-bold">{reporter.designation}</p>
+                          <p className="text-[11px] text-slate-500 font-medium">{reporter.location} | {divisionMap[reporter.division] || reporter.division}</p>
+                          {reporter.phone && <p className="text-[11px] text-slate-400 font-mono mt-0.5">📞 {reporter.phone}</p>}
+                        </div>
+
+                        <div className="flex sm:flex-col items-center justify-end sm:justify-center gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const newStatus = reporter.canPostNews === false;
+                              await updateDoc(doc(db, 'reporters', reporter.id), { canPostNews: newStatus });
+                              showNotification(
+                                newStatus 
+                                  ? `${reporter.name}-কে সংবাদ প্রকাশের অনুমতি দেওয়া হয়েছে!` 
+                                  : `${reporter.name}-এর সংবাদ প্রকাশের অনুমতি বন্ধ করা হয়েছে!`,
+                                newStatus ? 'success' : 'error'
+                              );
+                            }}
+                            className={`flex-1 sm:flex-none flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl transition-all font-bold text-xs cursor-pointer ${
+                              reporter.canPostNews === false
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                                : 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200'
+                            }`}
+                          >
+                            <ShieldCheck size={14} />
+                            <span>{reporter.canPostNews === false ? 'অনুমতি দিন' : 'অনুমতি বন্ধ করুন'}</span>
+                          </button>
+
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={() => startEditing(reporter, 'reporters')} 
+                              className="flex items-center gap-1 px-2.5 py-1.5 text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition-all font-bold text-xs cursor-pointer"
+                            >
+                              <Edit size={14} />
+                              <span>এডিট</span>
+                            </button>
+                            <button 
+                              onClick={() => setConfirmDelete({ collection: 'reporters', id: reporter.id })} 
+                              className="flex items-center gap-1 px-2.5 py-1.5 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-all font-bold text-xs cursor-pointer"
+                            >
+                              <Trash2 size={14} />
+                              <span>ডিলিট</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {reporters.length === 0 && (
+                      <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <Users size={28} className="mx-auto text-slate-400 mb-2" />
+                        <p className="text-xs font-bold text-slate-500">এখনো কোনো রিপোর্টার যুক্ত করা হয়নি। বামদিকের ফর্ম থেকে নতুন রিপোর্টার যোগ করুন।</p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {activeTab === 'media' && mediaList.map((media) => (
                   <div key={media.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all group">
@@ -1410,37 +2187,83 @@ export const AdminPanel: React.FC = () => {
                       </div>
                     ))}
 
-                {activeTab === 'applications' && applications.map((app) => (
-                  <div key={app.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
-                    <div className="flex flex-col md:flex-row gap-6">
-                      <img src={app.imageUrl} alt="" className="w-24 h-24 rounded-2xl object-cover shadow-md" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-bold text-gray-900">{app.name}</h3>
-                          <span className="text-[10px] bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider font-eng">অপেক্ষমাণ</span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-600 mb-4">
-                          <p className="flex items-center gap-2"><Phone size={14} className="text-sami-blue" /> {app.phone}</p>
-                          <p className="flex items-center gap-2"><Mail size={14} className="text-sami-blue" /> {app.email || 'প্রযোজ্য নয়'}</p>
-                          <p className="flex items-center gap-2"><MapPin size={14} className="text-sami-blue" /> {app.location} ({divisionMap[app.division] || app.division})</p>
-                          <p className="flex items-center gap-2"><Clock size={14} className="text-sami-blue" /> {app.createdAt?.toDate()?.toLocaleString('en-US')}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-xl border border-gray-100 text-sm text-gray-700 italic font-eng">
-                          <p className="font-bold text-gray-900 not-italic mb-1">পূর্ব অভিজ্ঞতা:</p>
-                          {app.experience || 'কোন অভিজ্ঞতার কথা উল্লেখ নেই।'}
+                {activeTab === 'applications' && (
+                  <div className="space-y-4">
+                    {applications.length === 0 && (
+                      <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+                        <Users size={32} className="mx-auto text-slate-300 mb-2" />
+                        <p className="text-sm font-bold text-slate-500">বর্তমানে কোনো আবেদনের তথ্য পাওয়া যায়নি।</p>
+                      </div>
+                    )}
+
+                    {applications.map((app) => (
+                      <div key={app.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all bg-white shadow-xs">
+                        <div className="flex flex-col md:flex-row gap-6">
+                          <img 
+                            src={app.imageUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'} 
+                            alt={app.name} 
+                            className="w-24 h-24 rounded-2xl object-cover shadow-md shrink-0 border border-slate-200" 
+                          />
+                          <div className="flex-1 space-y-2.5">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-lg font-black text-gray-900">{app.name}</h3>
+                                <p className="text-xs font-bold text-sami-red">{app.designation || 'সাংবাদিক'}</p>
+                              </div>
+                              <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-wider ${
+                                app.status === 'approved' 
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                                  : 'bg-amber-100 text-amber-800 border border-amber-300'
+                              }`}>
+                                {app.status === 'approved' ? 'অনুমোদিত' : 'অপেক্ষমাণ'}
+                              </span>
+                            </div>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs text-slate-700 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200">
+                              <p className="flex items-center gap-1.5"><Phone size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">মোবাইল:</span> {app.phone}</p>
+                              <p className="flex items-center gap-1.5"><Mail size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">ইমেইল:</span> {app.email || 'নাই'}</p>
+                              <p className="flex items-center gap-1.5"><Lock size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">পাসওয়ার্ড:</span> {app.password || app.pin || '1234'}</p>
+                              <p className="flex items-center gap-1.5"><FileText size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">NID / জন্মসনদ:</span> {app.nid || 'নাই'}</p>
+                              <p className="flex items-center gap-1.5"><GraduationCap size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">শিক্ষাগত যোগ্যতা:</span> {app.education || 'নাই'}</p>
+                              <p className="flex items-center gap-1.5"><Clock size={13} className="text-sami-red shrink-0" /> <span className="font-black text-slate-900">তারিখ:</span> {app.createdAt?.toDate ? app.createdAt.toDate().toLocaleDateString('bn-BD') : 'সম্প্রতি'}</p>
+                            </div>
+
+                            {/* Address details */}
+                            <div className="text-xs text-slate-600 font-medium bg-red-50/40 p-2.5 rounded-lg border border-red-100/60">
+                              <span className="font-black text-slate-900">বর্তমান ঠিকানা: </span>
+                              {[
+                                app.village && `গ্রাম: ${app.village}`,
+                                app.union && `ইউনিয়ন: ${app.union}`,
+                                app.upazila && `উপজেলা: ${app.upazila}`,
+                                app.district && `জেলা: ${app.district}`
+                              ].filter(Boolean).join(', ') || app.location || 'উল্লেখ্য নেই'}
+                            </div>
+                          </div>
+
+                          <div className="flex md:flex-col gap-2 shrink-0 justify-center font-sans">
+                            {app.status !== 'approved' && (
+                              <button 
+                                onClick={() => handleApproveApplication(app)}
+                                className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition-all shadow-sm cursor-pointer"
+                              >
+                                <CheckCircle size={16} />
+                                <span>অনুমোদন করুন</span>
+                              </button>
+                            )}
+                            <button 
+                              onClick={() => setConfirmDelete({ collection: 'applications', id: app.id })}
+                              className="flex items-center justify-center gap-1.5 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-bold text-xs transition-all cursor-pointer"
+                            >
+                              <Trash2 size={16} />
+                              <span>ডিলিট করুন</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex md:flex-col gap-2 font-eng">
-                        <button 
-                          onClick={() => setConfirmDelete({ collection: 'applications', id: app.id })}
-                          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl font-bold text-xs hover:bg-red-100 transition-all"
-                        >
-                          <Trash2 size={16} /> ডিলিট করুন
-                        </button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                )}
 
                 {activeTab === 'messages' && messages.map((msg) => (
                   <div key={msg.id} className="p-6 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all">
@@ -1524,9 +2347,143 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
       )}
         </div>
       </div>
+
+      {/* Media Picker Modal */}
+      <AnimatePresence>
+        {showMediaPicker && (
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center z-[150] p-4 font-eng">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl p-6 sm:p-8 max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-100"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-sami-red/10 text-sami-red rounded-2xl flex items-center justify-center font-bold">
+                    <Film size={22} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">মিডিয়া গ্যালারি থেকে ছবি বেছে নিন</h3>
+                    <p className="text-xs text-gray-500 font-bold">যে কোনো ছবির উপর ক্লিক করলে সেটি স্বয়ংক্রিয়ভাবে ফর্মে যুক্ত হবে</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowMediaPicker(false)}
+                  className="w-10 h-10 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Grid of Images */}
+              <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {/* Upload New Image Direct Label */}
+                <label className="border-2 border-dashed border-gray-300 hover:border-sami-red rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-red-50/40 transition-all group min-h-[140px]">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setIsSubmitting(true);
+                        try {
+                          const uploadedUrl = await uploadFile(file, 'media');
+                          try {
+                            await addDoc(collection(db, 'media'), {
+                              title: file.name.split('.')[0] || 'মিডিয়া গ্যালাারি ছবি',
+                              imageUrl: uploadedUrl,
+                              type: 'image',
+                              createdAt: serverTimestamp()
+                            });
+                          } catch (fErr) {
+                            console.log("Firestore media save notice:", fErr);
+                          }
+                          selectImageFromMedia(uploadedUrl);
+                        } catch (err: any) {
+                          showNotification('ছবি আপলোড করতে সমস্যা হয়েছে: ' + err.message, 'error');
+                        } finally {
+                          setIsSubmitting(false);
+                        }
+                      }
+                    }}
+                  />
+                  <div className="w-11 h-11 bg-sami-red/10 text-sami-red rounded-2xl flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-sm">
+                    <Upload size={22} />
+                  </div>
+                  <span className="text-xs font-bold text-gray-800">নতুন ছবি আপলোড</span>
+                  <span className="text-[10px] text-gray-400 mt-1 font-bold">ডিভাইস থেকে</span>
+                </label>
+
+                {/* Media Gallery items */}
+                {mediaList.filter(m => m.imageUrl && (m.type === 'image' || !m.type)).map((item) => {
+                  const isSelected = newsForm.imageUrl === item.imageUrl;
+
+                  return (
+                    <div 
+                      key={item.id}
+                      onClick={() => selectImageFromMedia(item.imageUrl)}
+                      className={`relative group rounded-2xl overflow-hidden border-2 cursor-pointer transition-all aspect-[4/3] bg-gray-100 ${isSelected ? 'border-sami-red ring-4 ring-sami-red/20 scale-[0.98]' : 'border-gray-200 hover:border-sami-red hover:shadow-lg'}`}
+                    >
+                      <img 
+                        src={item.imageUrl} 
+                        alt={item.title || 'Media photo'} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
+                        <p className="text-white text-[11px] font-bold line-clamp-1">{item.title || 'মিডিয়া ফটো'}</p>
+                      </div>
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 bg-sami-red text-white p-1 rounded-full shadow-lg">
+                          <ShieldCheck size={16} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* News Images items */}
+                {newsList.filter(n => n.imageUrl).map((item) => (
+                  <div 
+                    key={`news-${item.id}`}
+                    onClick={() => selectImageFromMedia(item.imageUrl)}
+                    className="relative group rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-sami-red cursor-pointer transition-all aspect-[4/3] bg-gray-100 hover:shadow-lg"
+                  >
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title || 'News image'} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5">
+                      <p className="text-white text-[11px] font-bold line-clamp-1">{item.title}</p>
+                    </div>
+                    <span className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm">
+                      নিউজ
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 flex justify-between items-center mt-4">
+                <span className="text-xs text-gray-500 font-bold">মোট {mediaList.length + newsList.length} টি লভ্য ছবি</span>
+                <button
+                  onClick={() => setShowMediaPicker(false)}
+                  className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition-colors cursor-pointer"
+                >
+                  বন্ধ করুন
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Custom Notification */}
       <AnimatePresence>

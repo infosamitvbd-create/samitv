@@ -1,111 +1,219 @@
-import React from 'react';
-import { Facebook, Youtube, Twitter, Instagram, Linkedin, MapPin, Calendar, Search, PlayCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Facebook, Youtube, Twitter, Instagram, Linkedin, MapPin, Calendar, Search, PlayCircle, MoreVertical, X, Grid, ChevronRight, UserCheck, User, PenTool, Clock, CloudSun } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SAMILogo } from './SAMILogo';
+
+const allCategoriesList = [
+  { name: 'প্রচ্ছদ', href: '/' },
+  { name: 'জাতীয়', href: '/category/জাতীয়' },
+  { name: 'রাজনীতি', href: '/category/রাজনীতি' },
+  { name: 'অর্থনীতি', href: '/category/অর্থনীতি' },
+  { name: 'সারা দেশ', href: '/category/সারা দেশ' },
+  { name: 'আন্তর্জাতিক', href: '/category/আন্তর্জাতিক' },
+  { name: 'জামালপুর', href: '/category/জামালপুর' },
+  { name: 'সরিষাবাড়ী', href: '/category/সরিষাবাড়ী' },
+  { name: 'খেলাধুলা', href: '/category/খেলাধুলা' },
+  { name: 'তথ্য-প্রযুক্তি', href: '/category/তথ্যপ্রযুক্তি' },
+  { name: 'বিনোদন', href: '/category/বিনোদন' },
+  { name: 'শিক্ষা', href: '/category/শিক্ষা' },
+  { name: 'মতামত', href: '/category/মতামত' },
+  { name: 'লাইফস্টাইল', href: '/category/লাইফস্টাইল' },
+  { name: 'আর্কাইভ', href: '/archive' },
+  { name: 'মিডিয়া গ্যালারি', href: '/media' },
+  { name: 'লাইভ টিভি', href: '/live' },
+  { name: 'আমাদের পরিবার', href: '/family' },
+];
 
 export const Header: React.FC<{ 
   onNavigate: (page: string) => void;
   currentPage: string;
 }> = ({ onNavigate, currentPage }) => {
-  const [searchOpen, setSearchOpen] = React.useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = currentTime.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  const formattedDateEng = currentTime.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   const today = new Date();
   
   // Bengali Date Logic
   const bnOptions: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
   const bnDate = today.toLocaleDateString('bn-BD', bnOptions);
-  
-  // Rough Hijri & Bengali Year Calculation
-  // In a real app, one would use a library like 'hijri-converter' or 'moment-hijri'
-  // For design purposes, we'll provide an approximate calculation or stable display
-  const getBengaliYear = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    let bnYear = year - 593;
-    if (month < 4 || (month === 4 && day < 14)) bnYear -= 1;
-    return bnYear.toLocaleString('bn-BD');
-  };
-
-  const getHijriDate = () => {
-    // This is a placeholder for the Hijri date as shown in the static image logic
-    return '০ জিলকদ ১৪৪৭'; 
-  };
-
-  const getBengaliMonthDay = () => {
-    return '৫ বৈশাখ';
-  };
 
   return (
     <header className="bg-white">
-      {/* Top Bar */}
-      <div className="border-b border-gray-100 bg-[#fdfdfd] py-1.5 px-4 font-sans">
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-2 max-w-7xl">
-          <motion.div 
-            initial={{ opacity: 0, x: -15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-[14px] font-medium text-gray-700 flex flex-wrap justify-center items-center gap-1"
-          >
-            <span>ঢাকা, </span>
-            <span>{bnDate}</span>
-            <span className="mx-1 text-gray-300">|</span>
-            <span>{getBengaliMonthDay()} {getBengaliYear(today)}</span>
-            <span className="mx-1 text-gray-300">|</span>
-            <span>{getHijriDate()}</span>
-          </motion.div>
+      {/* Mobile Top Header Bar (Hidden on PC view) */}
+      <div className="lg:hidden border-b border-gray-100 bg-white py-2 px-3 sm:px-4 font-sans text-xs">
+        <div className="container mx-auto flex flex-col gap-2 max-w-[1650px]">
+          {/* Main Top Row for Mobile */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Left: 3-Dot Category Menu Button & Brand Title with SAMI TV Logo */}
+            <div className="flex items-center gap-2.5">
+              <button 
+                onClick={() => setCategoryDrawerOpen(!categoryDrawerOpen)}
+                className="md:hidden p-1.5 bg-red-50 hover:bg-sami-red text-sami-red hover:text-white rounded-xl transition-all cursor-pointer flex items-center justify-center border border-red-100 shadow-xs"
+                title="সকল বিষয়শ্রেণী ও ক্যাটাগরি"
+                aria-label="Category Menu"
+              >
+                <MoreVertical size={20} className="stroke-[2.5px]" />
+              </button>
 
-          <motion.div 
-            initial={{ opacity: 0, x: 15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex items-center gap-4"
-          >
-            <motion.button 
-              onClick={() => onNavigate('/live')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-2 bg-sami-red text-white px-3 py-1 rounded-full text-xs font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 group"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-              </span>
-              LIVE TV
-              <PlayCircle size={14} className="group-hover:scale-110 transition-transform" />
-            </motion.button>
-            <div className="h-4 w-[1px] bg-gray-300 mx-1 hidden md:block"></div>
+              {/* Logo + Brand Name */}
+              <div 
+                className="flex items-center gap-2 cursor-pointer group" 
+                onClick={() => onNavigate('/')}
+              >
+                <img 
+                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJzBFxNLxCVm42e70gZrnyPMtqQ3piIxLnst-pNg7QZ-VnhzqA83dsxumwtFhBw77Pwf-YntlyB86rQWqIdoIrxe5Oe5aoMKS6lqjhFFL47Aql1u5UUs8dhquSy8dIko7xmfKwo61hWPKX0w6L80OTZQSWg7JTAVhBjZn2MS_B8V9K6EGv-500KIDb054e/s1434/sami%20logo%205.jpeg" 
+                  alt="Sami TV Logo" 
+                  className="h-10 sm:h-12 w-auto object-contain rounded-lg drop-shadow-sm group-hover:scale-105 transition-transform"
+                  referrerPolicy="no-referrer"
+                />
+
+                <div className="flex flex-col">
+                  <span className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-sami-red transition-colors">
+                    SAMI TV
+                  </span>
+                  <span className="text-[9px] font-extrabold text-slate-500 tracking-normal leading-none mt-0.5">
+                    সত্যের সাথে সবসময়
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Search & Live Button */}
+            <div className="flex items-center gap-1.5">
+              <button 
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="p-1.5 text-slate-700 hover:text-sami-red transition-colors cursor-pointer"
+              >
+                <Search size={20} className="stroke-[2.5px]" />
+              </button>
+
+              <button 
+                onClick={() => onNavigate('/live')}
+                className="flex items-center gap-1 bg-sami-red text-white px-2.5 py-1 rounded-full text-xs font-bold hover:bg-red-700 transition-all shadow-md shadow-red-500/20 group cursor-pointer"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                <span>লাইভ</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Sub-bar Row: Date & Socials */}
+          <div className="flex items-center justify-between border-t border-gray-100 pt-1.5 text-[11px] sm:text-xs text-slate-600 font-bold">
+            <div className="flex items-center gap-1 text-slate-700">
+              <Calendar size={14} className="text-sami-red stroke-[2.5px]" />
+              <span>{bnDate}</span>
+            </div>
+
             <div className="flex items-center gap-2">
               {[
-                { icon: Facebook, color: 'bg-[#1877F2]', href: 'https://www.facebook.com/samitvbd' },
-                { icon: Youtube, color: 'bg-[#FF0000]', href: 'https://www.youtube.com/@stv2026Banglades' },
-                { icon: Twitter, color: 'bg-[#1DA1F2]', href: '#' },
-                { icon: Linkedin, color: 'bg-[#0A66C2]', href: '#' }
+                { icon: Facebook, color: 'text-[#1877F2]', href: 'https://www.facebook.com/samitvbd' },
+                { icon: Twitter, color: 'text-[#1DA1F2]', href: '#' },
+                { icon: Youtube, color: 'text-[#FF0000]', href: 'https://www.youtube.com/@stv2026Banglades' },
+                { icon: Instagram, color: 'text-[#E4405F]', href: '#' }
               ].map((social, i) => (
-                <motion.a 
+                <a 
                   key={i}
                   href={social.href} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.05 * i, ease: "easeOut" }}
-                  whileHover={{ scale: 1.15, rotate: 8 }}
-                  className={`w-7 h-7 flex items-center justify-center rounded-full ${social.color} text-white hover:opacity-80 transition-all`}
+                  className={`p-0.5 hover:opacity-80 transition-all ${social.color}`}
                 >
-                  <social.icon size={14} />
-                </motion.a>
+                  <social.icon size={15} />
+                </a>
               ))}
             </div>
-            <div className="h-4 w-[1px] bg-gray-300 mx-1"></div>
-            <button 
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="p-1 text-gray-700 hover:text-sami-red transition-colors"
-            >
-              <Search size={22} className="stroke-[2.5px]" />
-            </button>
-          </motion.div>
+          </div>
         </div>
       </div>
+
+      {/* 3-Dot Click Category Modal Drawer */}
+      <AnimatePresence>
+        {categoryDrawerOpen && (
+          <div className="fixed inset-0 z-[90] flex items-start justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              transition={{ duration: 0.25 }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-2xl max-h-[85vh] overflow-y-auto p-5 sm:p-6"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-sami-red text-white flex items-center justify-center font-black shadow-md shadow-red-500/20">
+                    <Grid size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">সকল খবর ও বিষয়শ্রেণী</h3>
+                    <p className="text-[11px] font-bold text-slate-500">SAMI TV ক্যাটাগরি মেন্যু</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setCategoryDrawerOpen(false)}
+                  className="p-2 text-slate-400 hover:text-slate-800 bg-slate-100 rounded-full transition-colors cursor-pointer"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Categories Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {allCategoriesList.map((cat, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      onNavigate(cat.href);
+                      setCategoryDrawerOpen(false);
+                    }}
+                    className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 hover:bg-sami-red hover:text-white border border-slate-200/80 transition-all font-extrabold text-xs text-slate-800 group shadow-xs cursor-pointer"
+                  >
+                    <span className="truncate">{cat.name}</span>
+                    <ChevronRight size={15} className="text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-transform shrink-0" />
+                  </button>
+                ))}
+              </div>
+
+              {/* Footer Quick Action */}
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500">
+                <span>© SAMI TV</span>
+                <button
+                  onClick={() => {
+                    onNavigate('/admin');
+                    setCategoryDrawerOpen(false);
+                  }}
+                  className="text-sami-red hover:underline font-black"
+                >
+                  সাংবাদিক ও এডমিন পোর্টাল →
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Search Overlay */}
       <AnimatePresence>
@@ -133,8 +241,8 @@ export const Header: React.FC<{
         )}
       </AnimatePresence>
       
-      {/* Main Header Row: Logo & Ad */}
-      <div className="container mx-auto px-4 py-6 flex flex-col lg:flex-row items-center justify-between gap-8 max-w-7xl">
+      {/* Main Header Row: Logo & Ad (Hidden on mobile) */}
+      <div className="hidden lg:flex container mx-auto px-4 py-6 flex-row items-center justify-between gap-8 max-w-[1650px]">
         {/* Logo Section */}
         <div className="flex items-center gap-8">
           <motion.div 
@@ -177,19 +285,19 @@ export const Header: React.FC<{
           </motion.div>
         </div>
         
-        {/* Header Ad Slot (Commercial Advertisement Space) */}
+        {/* Header Ad Slot (Commercial Advertisement Space) - Hidden on mobile */}
         <motion.div 
           onClick={() => onNavigate('/contact')}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex-grow w-full lg:max-w-[728px] h-[90px] bg-transparent overflow-hidden group relative cursor-pointer select-none"
+          className="hidden lg:block flex-grow w-full lg:max-w-[728px] h-[90px] bg-transparent overflow-hidden group relative cursor-pointer select-none"
           title="বিজ্ঞাপন"
         >
           {/* Breathing image with continuous animation */}
           <motion.img 
-            src="https://tpc.googlesyndication.com/simgad/7099438121384168982" 
-            alt="Advertisement" 
+            src="https://globaltvbd.com/storage/advertisements/01KVZ4HKPS9DT08924H9Q9Y4GZ.jpg" 
+            alt="Sponsored Ad" 
             animate={{
               scale: [1, 1.015, 1],
             }}

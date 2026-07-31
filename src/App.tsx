@@ -3,7 +3,6 @@ import { Routes, Route, useNavigate, useLocation, useParams } from 'react-router
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
 import { SAMILogo } from './components/SAMILogo';
-import { BreakingNews } from './components/BreakingNews';
 import { HeroSection } from './components/HeroSection';
 import { Sidebar } from './components/Sidebar';
 import { AboutUs } from './components/AboutUs';
@@ -18,7 +17,9 @@ import { ContactUs } from './components/ContactUs';
 import ComingSoon from './components/ComingSoon';
 import AppDownload from './components/AppDownload';
 import { FestivalPoster } from './components/FestivalPoster';
+import { Archive } from './components/Archive';
 import { Footer } from './components/Footer';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { motion, AnimatePresence } from 'motion/react';
@@ -42,7 +43,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-sami-red selection:text-white">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-sami-red selection:text-white pb-14 lg:pb-0">
       <div className="print:hidden">
         <Header onNavigate={handleNavigate} currentPage={location.pathname} />
         <Navbar 
@@ -50,10 +51,9 @@ export default function App() {
           currentPage={location.pathname} 
           currentCategory={currentCategory} 
         />
-        <BreakingNews />
       </div>
       
-      <main className={(location.pathname === '/download-app' || location.pathname === '/family') ? "flex-grow w-full" : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl"}>
+      <main className={(location.pathname === '/download-app' || location.pathname === '/family' || location.pathname === '/admin') ? "flex-grow w-full" : "flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-[1650px]"}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -74,7 +74,7 @@ export default function App() {
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/android-tv" element={<ComingSoon />} />
               <Route path="/download-app" element={<AppDownload />} />
-              <Route path="/festival-poster" element={<FestivalPoster onNavigate={handleNavigate} />} />
+              <Route path="/archive" element={<Archive onNewsClick={handleNewsClick} onNavigate={handleNavigate} />} />
               <Route path="/news/:newsId" element={<NewsDetail news={selectedNews} onBack={() => handleNavigate('/')} onNewsClick={handleNewsClick} />} />
               <Route path="/category/:category" element={<CategoryWrapper onNavigate={handleNavigate} onNewsClick={handleNewsClick} setCurrentCategory={setCurrentCategory} />} />
               <Route path="*" element={
@@ -98,6 +98,11 @@ export default function App() {
       <footer className="mt-auto print:hidden">
         <Footer onNavigate={handleNavigate} />
       </footer>
+
+      {/* Sticky Mobile Bottom Navigation */}
+      {location.pathname !== '/admin' && (
+        <MobileBottomNav onNavigate={handleNavigate} currentPage={location.pathname} />
+      )}
     </div>
   );
 }

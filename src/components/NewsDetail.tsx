@@ -179,7 +179,7 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
+    <div className="max-w-[1650px] mx-auto px-4 sm:px-6 lg:px-8 bg-white min-h-screen">
       {/* Reading Progress Bar */}
       <motion.div 
         className="fixed top-0 left-0 right-0 h-1 bg-red-600 z-[70] origin-left"
@@ -418,135 +418,143 @@ export const NewsDetail: React.FC<NewsDetailProps> = ({ news: initialNews, onBac
         </aside>
       </div>
 
-      {/* Hidden Digital Edition Card for Save functionality */}
+      {/* Hidden Digital Edition Card for Save functionality - Fixed 1 A4 Page Ratio (800px x 1130px) */}
       <div className="fixed left-[-9999px] top-0 pointer-events-none">
-        <div ref={saveRef} className="w-[800px] bg-white p-0 overflow-hidden font-sans text-black shadow-2xl border border-gray-100">
-          {/* Header Branding */}
-          <div className="bg-red-700 p-1"></div>
-          <div className="p-8 pb-4 text-center border-b border-gray-50 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-3 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
-              Digital Edition
-            </div>
-            
-            <div className="mb-4">
-              <img 
-                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJzBFxNLxCVm42e70gZrnyPMtqQ3piIxLnst-pNg7QZ-VnhzqA83dsxumwtFhBw77Pwf-YntlyB86rQWqIdoIrxe5Oe5aoMKS6lqjhFFL47Aql1u5UUs8dhquSy8dIko7xmfKwo61hWPKX0w6L80OTZQSWg7JTAVhBjZn2MS_B8V9K6EGv-500KIDb054e/s1434/sami%20logo%205.jpeg"
-                alt="SAMI TV"
-                className="h-20 mx-auto object-contain"
-                crossOrigin="anonymous"
-              />
-            </div>
-            
-            <div className="mb-2">
-              <h2 className="text-xl font-black text-gray-900 tracking-tight leading-none">SAMI MULTIMEDIA LTD.</h2>
-              <h3 className="text-sm font-bold text-gray-600 tracking-wider">SAMI NETWORK BANGLADESH</h3>
-            </div>
-            
-            <div className="flex items-center justify-center gap-3 py-2">
-              <div className="h-px w-10 bg-red-200"></div>
-              <span className="text-[12px] font-bold text-red-700 italic">বাংলায় কথা বলে...</span>
-              <div className="h-px w-10 bg-red-200"></div>
-            </div>
-          </div>
-
-          <div className="px-10 py-8 bg-gray-50/30">
-            <h1 className="text-[32px] font-black text-gray-900 leading-[1.3] mb-6 tracking-tight">
-              {news.title}
-            </h1>
-
-            <div className="flex items-center justify-between gap-4 mb-8 text-[12px] text-gray-500 font-bold border-y border-gray-100 py-3">
-               <div className="flex items-center gap-4">
-                  <span className="flex items-center gap-1.5"><Calendar size={12} className="text-red-500" /> {new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                  <span className="flex items-center gap-1.5"><User size={12} className="text-red-500" /> {news.journalistName || 'বিশেষ প্রতিনিধি'}</span>
-               </div>
-               <div className="text-red-600 uppercase tracking-tighter">www.jamalpur-television.web.app</div>
+        <div ref={saveRef} className="w-[800px] h-[1130px] bg-white p-0 overflow-hidden font-sans text-black shadow-2xl border border-gray-100 flex flex-col justify-between">
+          <div>
+            {/* Header Branding - SAMI TV logo on side & SAMI MULTIMEDIA LTD. */}
+            <div className="bg-sami-red h-2"></div>
+            <div className="px-8 py-4 border-b-2 border-sami-red bg-gradient-to-r from-slate-50 via-white to-red-50/30 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <img 
+                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJzBFxNLxCVm42e70gZrnyPMtqQ3piIxLnst-pNg7QZ-VnhzqA83dsxumwtFhBw77Pwf-YntlyB86rQWqIdoIrxe5Oe5aoMKS6lqjhFFL47Aql1u5UUs8dhquSy8dIko7xmfKwo61hWPKX0w6L80OTZQSWg7JTAVhBjZn2MS_B8V9K6EGv-500KIDb054e/s1434/sami%20logo%205.jpeg"
+                  alt="SAMI TV"
+                  className="h-16 w-auto object-contain rounded-lg border border-gray-200 shadow-sm"
+                  crossOrigin="anonymous"
+                />
+                <div>
+                  <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-none">SAMI MULTIMEDIA LTD.</h2>
+                  <h3 className="text-xs font-bold text-gray-600 tracking-wider mt-1">SAMI NETWORK BANGLADESH</h3>
+                  <p className="text-[11px] font-bold text-sami-red italic mt-0.5">বাংলায় কথা বলে...</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="bg-sami-red text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                  Digital Edition • A4
+                </span>
+                <p className="text-[10px] font-black text-sami-red mt-1.5 uppercase tracking-tighter">www.jamalpur-television.web.app</p>
+              </div>
             </div>
 
-            <div className="mb-8 rounded-xl overflow-hidden shadow-xl ring-1 ring-black/5 bg-gray-100 aspect-video">
-              <img 
-                src={news.imageUrl} 
-                className="w-full h-full object-cover" 
-                alt="" 
-                crossOrigin="anonymous"
-              />
-            </div>
+            {/* News Content Body */}
+            <div className="px-8 py-5">
+              <h1 className="text-[23px] font-black text-gray-900 leading-[1.3] mb-3 tracking-tight line-clamp-2">
+                {news.title}
+              </h1>
 
-            <div className="flex gap-8">
+              <div className="flex items-center justify-between gap-4 mb-4 text-[11px] text-gray-700 font-bold border-y border-gray-200 py-2 px-3 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1.5"><Calendar size={13} className="text-sami-red" /> {new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  <span className="flex items-center gap-1.5"><User size={13} className="text-sami-red" /> {news.journalistName || 'বিশেষ প্রতিনিধি, জামালপুর'}</span>
+                  {news.category && <span className="bg-red-100 text-sami-red px-2 py-0.5 rounded text-[10px] font-black">{news.category}</span>}
+                </div>
+                <div className="text-slate-500 font-bold text-[10px]">সামি টেলিভিশন অফিশিয়াল পেপার</div>
+              </div>
+
+              {/* News Featured Image */}
+              <div className="mb-4 rounded-xl overflow-hidden shadow-md border border-gray-200 h-[240px] w-full bg-slate-100">
+                <img 
+                  src={news.imageUrl} 
+                  className="w-full h-full object-cover" 
+                  alt="" 
+                  crossOrigin="anonymous"
+                />
+              </div>
+
+              {/* News Text in 2 columns - Clamped to 510px height to perfectly fit A4 */}
               <div 
-                className="w-full relative"
-                style={{ fontSize: '15px', lineHeight: '1.8', color: '#1a1a1a', fontWeight: '500' }}
+                className="news-text-content relative text-justify leading-[1.7] text-gray-800 font-medium text-[12.5px] max-h-[510px] overflow-hidden"
               >
-                <div className="columns-2 gap-8 text-justify">
+                <div className="columns-2 gap-6 space-y-2.5">
                   {news.content?.split('\n').filter((p: string) => p.trim() !== '').map((paragraph: string, idx: number) => (
-                    <p key={idx} className="mb-4">{paragraph.trim()}</p>
+                    <p key={idx} className="mb-2 text-justify indent-2 break-inside-avoid-column">{paragraph.trim()}</p>
                   ))}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-gray-900 px-10 py-6 flex items-center justify-between text-white overflow-hidden relative">
-            <div className="absolute top-0 left-0 w-full h-full opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-            <div className="relative z-10">
-               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">প্রকাশিত হয়েছে</p>
-               <p className="text-xs font-black">{new Date().toLocaleDateString('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          {/* Footer Branding Bar */}
+          <div className="bg-gray-900 px-8 py-3 flex items-center justify-between text-white border-t-2 border-sami-red">
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-0.5">SAMI MULTIMEDIA LTD. • ডিজিটাল সংস্করণ</p>
+              <p className="text-[11px] font-black text-gray-200">{new Date().toLocaleDateString('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
             </div>
-            <div className="relative z-10 text-right">
-               <div className="flex items-center gap-2 justify-end mb-1">
-                  <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-red-100">Live Edition</span>
-               </div>
-               <p className="text-[9px] text-gray-500 font-bold italic">© ২০২৬ সামী মাল্টিমিডিয়া লিমিটেড</p>
+            <div className="text-right">
+              <div className="flex items-center gap-1.5 justify-end mb-0.5">
+                <span className="w-2 h-2 rounded-full bg-sami-red animate-pulse"></span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-red-200">Official Digital Clip</span>
+              </div>
+              <p className="text-[10px] text-gray-400 font-bold">© ২০২৬ সামী মাল্টিমিডিয়া লিমিটেড | সর্বস্বত্ব সংরক্ষিত</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Professional Print Template (Improved) */}
+      {/* Professional Print Template (Single A4 Page with Side Logo) */}
       <div className="fixed left-[-9999px] top-0 print:static print:left-0 print:w-full">
-        <div ref={printRef} className="w-[850px] mx-auto bg-white p-12 font-sans text-black">
-          <div className="text-center border-b-[3px] border-black pb-10 mb-10">
-            <div className="mb-4">
-              <img 
-                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJzBFxNLxCVm42e70gZrnyPMtqQ3piIxLnst-pNg7QZ-VnhzqA83dsxumwtFhBw77Pwf-YntlyB86rQWqIdoIrxe5Oe5aoMKS6lqjhFFL47Aql1u5UUs8dhquSy8dIko7xmfKwo61hWPKX0w6L80OTZQSWg7JTAVhBjZn2MS_B8V9K6EGv-500KIDb054e/s1434/sami%20logo%205.jpeg"
-                alt="SAMI TV"
-                className="h-24 mx-auto"
-              />
+        <div ref={printRef} className="w-[800px] max-h-[1100px] mx-auto bg-white p-8 font-sans text-black overflow-hidden flex flex-col justify-between">
+          <div>
+            {/* Header Branding: SAMI TV logo on side & SAMI MULTIMEDIA LTD. */}
+            <div className="flex items-center justify-between border-b-2 border-sami-red pb-4 mb-4">
+              <div className="flex items-center gap-4">
+                <img 
+                  src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjJzBFxNLxCVm42e70gZrnyPMtqQ3piIxLnst-pNg7QZ-VnhzqA83dsxumwtFhBw77Pwf-YntlyB86rQWqIdoIrxe5Oe5aoMKS6lqjhFFL47Aql1u5UUs8dhquSy8dIko7xmfKwo61hWPKX0w6L80OTZQSWg7JTAVhBjZn2MS_B8V9K6EGv-500KIDb054e/s1434/sami%20logo%205.jpeg"
+                  alt="SAMI TV"
+                  className="h-16 w-auto object-contain rounded-md border border-gray-200"
+                />
+                <div>
+                  <h1 className="text-2xl font-black text-gray-900 leading-none">SAMI MULTIMEDIA LTD.</h1>
+                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mt-1">SAMI NETWORK BANGLADESH</p>
+                  <p className="text-[11px] font-bold text-sami-red italic mt-0.5">বাংলায় কথা বলে...</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="bg-sami-red text-white text-[10px] font-black uppercase px-3 py-1 rounded-full">
+                  1 Page A4 Print
+                </span>
+                <p className="text-[10px] font-bold text-gray-500 mt-1">www.jamalpur-television.web.app</p>
+              </div>
             </div>
-            <h1 className="text-4xl font-black text-gray-900 mb-2 uppercase tracking-tight">SAMI MULTIMEDIA LTD.</h1>
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-[0.25em] mb-4">SAMI NETWORK BANGLADESH</p>
-            <div className="h-[2px] w-20 bg-red-600 mx-auto mb-4"></div>
-            <p className="text-[12px] font-bold text-red-700 italic">বাংলায় কথা বলে...</p>
-          </div>
-          
-          <h2 className="text-[34px] font-black mb-8 leading-[1.25] text-gray-900">{news.title}</h2>
-          
-          <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg text-sm font-bold text-gray-600 mb-10 border border-gray-100">
-            <div className="flex gap-6">
-              <span className="flex items-center gap-2"><User size={16} /> প্রতিনিধি: {news.journalistName || 'নিউজ ডেস্ক'}</span>
-              <span className="flex items-center gap-2"><Calendar size={16} /> {new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            
+            <h2 className="text-[22px] font-black mb-3 leading-[1.3] text-gray-900 line-clamp-2">{news.title}</h2>
+            
+            <div className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg text-xs font-bold text-gray-700 mb-4 border border-gray-200">
+              <div className="flex gap-5">
+                <span className="flex items-center gap-1.5"><User size={14} className="text-sami-red" /> প্রতিনিধি: {news.journalistName || 'বিশেষ প্রতিনিধি'}</span>
+                <span className="flex items-center gap-1.5"><Calendar size={14} className="text-sami-red" /> {new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              </div>
+              <div className="text-sami-red font-black text-[11px] uppercase">Official News Paper</div>
             </div>
-            <div className="text-red-700 font-black">Digital Edition</div>
-          </div>
-          
-          <div className="mb-10">
-            <img src={news.imageUrl} className="w-full h-auto rounded-xl shadow-lg" alt="" />
-            <p className="mt-4 text-xs text-gray-400 font-bold italic text-right">ছবি: {news.journalistName || 'প্রতিনিধি'}</p>
+            
+            <div className="mb-4 rounded-lg overflow-hidden border border-gray-200 h-[220px] bg-slate-100">
+              <img src={news.imageUrl} className="w-full h-full object-cover" alt="" />
+            </div>
+
+            <div className="text-[12px] leading-[1.65] text-gray-900 text-justify columns-2 gap-6 max-h-[480px] overflow-hidden">
+              {news.content?.split('\n').filter((p: string) => p.trim() !== '').map((paragraph: string, idx: number) => (
+                <p key={idx} className="mb-2 text-justify indent-2 break-inside-avoid-column">{paragraph.trim()}</p>
+              ))}
+            </div>
           </div>
 
-          <div className="text-[17px] leading-[1.8] text-gray-800 whitespace-pre-wrap text-justify columns-2 gap-10">
-            {news.content}
-          </div>
-          
-          <div className="mt-24 pt-10 border-t-2 border-gray-100 flex justify-between items-end">
-            <div className="text-gray-400 space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">SAMI MULTIMEDIA LTD.</p>
-              <p className="text-[9px] font-bold">Jamalpur, Bangladesh</p>
-              <p className="text-[9px] font-bold">www.jamalpur-television.web.app</p>
+          <div className="pt-4 mt-4 border-t border-gray-300 flex justify-between items-center text-[10px] text-gray-600 font-bold">
+            <div>
+              <p className="font-black text-gray-800">SAMI MULTIMEDIA LTD. • জামালপুর, বাংলাদেশ</p>
+              <p className="text-gray-500">www.jamalpur-television.web.app</p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-600 mb-2">Digital Edition</p>
-              <p className="text-[9px] text-gray-400 font-bold italic">© ২০২৬ সামী মাল্টিমিডিয়া লিমিটেড</p>
+              <p className="text-sami-red font-black">© ২০২৬ সামী মাল্টিমিডিয়া লিমিটেড</p>
             </div>
           </div>
         </div>

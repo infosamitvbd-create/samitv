@@ -1,13 +1,13 @@
 import React from 'react';
-import { Facebook, Youtube, Twitter, Instagram, Mail, Phone, MapPin, Layout, Tv } from 'lucide-react';
+import { Facebook, Youtube, Twitter, Instagram, Mail, Phone, MapPin, Layout, Tv, UserCheck, Lock } from 'lucide-react';
 import { SAMILogo } from './SAMILogo';
 
 export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#111111] text-white pt-8 pb-4 mt-auto border-t border-white/5 text-xs sm:text-[13px]">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <footer className="bg-[#111111] text-white pt-8 pb-4 mt-auto border-t border-white/5 text-xs sm:text-[13px] hidden md:block">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[1650px]">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
           {/* Brand Column */}
           <div className="md:col-span-4 space-y-3 text-center md:text-left">
@@ -129,16 +129,21 @@ export const Footer: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
         </div>
 
         {/* Bottom Bar: Ultra Slim */}
-        <div className="pt-3.5 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 text-[11px] text-gray-500 font-bold">
+        <div className="pt-3.5 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-gray-500 font-bold">
           <p>© {currentYear} সামি টেলিভিশন। সর্বস্বত্ব সংরক্ষিত।</p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap justify-center">
             <p className="font-sans">DEVELOPED BY <a href="https://mahmudulhasansami12.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-red-500 transition-colors cursor-pointer">Emran Hasan Sami</a></p>
             <span className="text-gray-700">|</span>
             <button 
-              onClick={() => onNavigate('/admin')}
-              className="text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+              onClick={() => {
+                sessionStorage.setItem('sami_login_mode', 'admin');
+                onNavigate('/admin');
+              }}
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer py-0.5 px-1.5 rounded hover:bg-white/5"
+              title="অ্যাডমিন প্যানেল"
             >
-              🔒 অ্যাডমিন
+              <Lock size={11} className="text-gray-400" />
+              <span>অ্যাডমিন</span>
             </button>
           </div>
         </div>

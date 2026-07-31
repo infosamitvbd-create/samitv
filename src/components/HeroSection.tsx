@@ -51,195 +51,147 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNewsClick, onNavigat
   const sliderNews = newsList.slice(0, 5);
   const featured = sliderNews[currentIndex] || newsList[0];
 
-  // Column 2 Components: Latest 4 news
+  // Column 2 Components: Latest news
   const latestNews = newsList.slice(0, 4);
-  const bnNumerals = ['১', '২', '৩', '৪'];
 
   return (
     <motion.div 
       id="home_upper_layout" 
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-      className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+      transition={{ duration: 0.5 }}
+      className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch"
     >
       
-      {/* COLUMN 1: Slider (span-8) */}
-      <div id="col_editor_choice" className="lg:col-span-8 flex flex-col justify-between">
-        {/* Carousel Card Container with constant height on desktop */}
-        <div 
-          onClick={() => onNewsClick(featured)}
-          className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-[0_4px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] transition-all duration-500 md:h-[370px] flex flex-col md:flex-row items-stretch group cursor-pointer"
-        >
-          {/* Left Text Block */}
-          <div className="flex-1 p-6 md:p-8 flex flex-col justify-between bg-white bg-gradient-to-br from-white via-white to-slate-50/30">
-            <div className="flex-grow flex flex-col justify-center min-h-[190px]">
-              <AnimatePresence mode="wait">
-                <motion.div 
-                  key={currentIndex}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-4"
-                >
-                  {/* Feature Badge with flashing red live circle */}
-                  <div className="flex items-center gap-1.5 bg-red-50 text-[#D92B2B] font-extrabold text-[11px] px-2.5 py-1 rounded-full border border-red-100/60 w-fit">
-                    <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                    <span>বাছাইকৃত খবর</span>
-                    <span className="relative flex h-1.5 w-1.5 ml-0.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-600"></span>
-                    </span>
+      {/* COLUMN 1: Main Featured News Slider (span-8) */}
+      <div id="col_editor_choice" className="lg:col-span-8 flex flex-col h-full">
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={featured?.id || currentIndex}
+            initial={{ opacity: 0.8, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0.8, x: -10 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => onNewsClick(featured)}
+            className="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-300 p-3 sm:p-5 flex flex-row items-center sm:items-stretch justify-between gap-3 sm:gap-6 group cursor-pointer h-full min-h-[140px] sm:min-h-[300px]"
+          >
+            {/* Left Text Block */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between h-full w-full py-0.5 sm:py-1">
+              <div className="space-y-1.5 sm:space-y-3">
+                <h3 className="text-xs sm:text-xl font-black text-slate-900 leading-snug group-hover:text-sami-red transition-colors line-clamp-3 sm:line-clamp-4">
+                  {featured?.title}
+                </h3>
+                
+                <p className="hidden sm:block text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-4 font-medium">
+                  {featured?.content 
+                    ? featured.content.replace(/<[^>]*>/g, '').slice(0, 200) + "..." 
+                    : "দেশ-বিদেশের সর্বশেষ সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে SAMI TV।"}
+                </p>
+              </div>
+              
+              {/* Bottom Info & Slider Dots */}
+              <div className="pt-2 sm:pt-3 border-t border-slate-100 mt-2 sm:mt-3 flex flex-col gap-1.5 sm:gap-2 shrink-0">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold text-slate-500">
+                    <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
+                    <span>{new Date(featured?.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
 
-                  <h3 className="text-[18px] md:text-[21px] font-black text-gray-900 leading-[1.38] group-hover:text-[#D92B2B] transition-colors duration-300 line-clamp-3">
-                    {featured?.title}
-                  </h3>
-                  
-                  <p className="text-gray-500 text-[13px] md:text-[14px] leading-relaxed line-clamp-3 font-medium">
-                    {featured?.content 
-                      ? featured.content.replace(/<[^>]*>/g, '').slice(0, 160) + "..." 
-                      : "দেশ-বিদেশের সর্বশেষ সংবাদ নির্ভুল ও বস্তুনিষ্ঠভাবে প্রকাশ করে সামী টিভি।"}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            
-            {/* Bottom Controls / Date Info */}
-            <div className="pt-4 border-t border-gray-100 mt-4 flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
-                <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                <span>{new Date(featured?.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-              </div>
+                  <span className="text-[10px] sm:text-xs font-bold text-sami-red group-hover:translate-x-1 transition-transform shrink-0">
+                    বিস্তারিত &gt;
+                  </span>
+                </div>
 
-              {/* Dot Indicators */}
-              <div className="flex gap-1.5 items-center">
-                {sliderNews.map((_, i) => (
-                  <button 
-                    key={i}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setCurrentIndex(i);
-                    }}
-                    className={`transition-all duration-300 rounded-full h-1.5 ${
-                      currentIndex === i 
-                        ? 'w-6 bg-[#D92B2B]' 
-                        : 'w-1.5 bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    aria-label={`Slide ${i + 1}`}
-                  />
-                ))}
+                {/* Dot Indicators */}
+                {sliderNews.length > 1 && (
+                  <div className="flex gap-1.5 items-center pt-0.5">
+                    {sliderNews.map((_, i) => (
+                      <button 
+                        key={i}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentIndex(i);
+                        }}
+                        className={`transition-all duration-300 rounded-full ${
+                          currentIndex === i 
+                            ? 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-sami-red' 
+                            : 'w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400'
+                        }`}
+                        aria-label={`Slide ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Right Image Block */}
-          <div className="w-full md:w-[46%] overflow-hidden relative shrink-0 aspect-video md:aspect-auto min-h-[220px] md:min-h-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full h-full absolute inset-0"
-              >
-                <img 
-                  src={featured?.imageUrl} 
-                  alt={featured?.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
-                  referrerPolicy="no-referrer"
-                />
-              </motion.div>
-            </AnimatePresence>
-            {/* Gradient Overlay for aesthetic look */}
-            <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/10 via-transparent to-transparent pointer-events-none z-10" />
-          </div>
-        </div>
+            {/* Right Image Block */}
+            <div className="w-24 sm:w-[46%] h-20 sm:h-auto shrink-0 rounded-lg sm:rounded-xl overflow-hidden bg-slate-100 relative border border-slate-100">
+              <img 
+                src={featured?.imageUrl} 
+                alt={featured?.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* COLUMN 2: সর্বশেষ খবর (span-4) */}
-      <div id="col_latest_news" className="lg:col-span-4 flex flex-col justify-between bg-white border border-gray-200/90 rounded-2xl p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] h-full">
-        {/* Header with Red Pulsing Symbol and Details page button */}
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-2">
+      <div id="col_latest_news" className="lg:col-span-4 flex flex-col bg-white border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm h-full justify-between">
+        {/* Header with Red Circle and More button */}
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2.5">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D92B2B]"></span>
-            </span>
-            <h2 className="text-[16px] font-black text-gray-900 tracking-tight">সর্বশেষ খবর</h2>
+            <span className="w-2.5 h-2.5 rounded-full bg-sami-red inline-block"></span>
+            <h2 className="text-base font-extrabold text-slate-900 tracking-tight">সর্বশেষ খবর</h2>
           </div>
           <button 
             onClick={() => onNavigate && onNavigate('/category/all')} 
-            className="text-[11.5px] font-black text-[#D92B2B] hover:text-[#ae2020] transition-colors flex items-center gap-0.5 group"
+            className="text-xs font-bold text-sami-red hover:text-red-700 transition-colors flex items-center gap-0.5 group cursor-pointer"
           >
-            আরও খবর 
-            <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            <span>আরও</span>
+            <span className="font-black text-sami-red group-hover:translate-x-0.5 transition-transform">&gt;&gt;&gt;</span>
           </button>
         </div>
 
-        {/* Vertical News Items Column with Staggered Entrance Animation */}
-        <motion.div 
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.08,
-                delayChildren: 0.1
-              }
-            }
-          }}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col gap-1 flex-grow justify-between"
-        >
-          {latestNews.map((news, i) => (
-            <motion.div 
+        {/* Vertical News List */}
+        <div className="flex flex-col gap-2.5">
+          {latestNews.map((news) => (
+            <div 
               key={news.id} 
               onClick={() => onNewsClick(news)}
-              variants={{
-                hidden: { opacity: 0, y: 12 },
-                visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 16 } }
-              }}
-              whileHover={{ x: 4, transition: { duration: 0.2 } }}
-              className="flex items-center gap-3 py-2.5 border-b border-gray-100/80 last:border-0 hover:bg-slate-50/60 rounded-xl px-1.5 -mx-1.5 transition-all duration-300 cursor-pointer group"
+              className="flex items-center gap-2.5 pb-2.5 border-b border-slate-100 last:border-0 last:pb-0 group cursor-pointer"
             >
-              {/* Bengali Ranking digit */}
-              <span className="text-xl md:text-2xl font-black text-gray-200 group-hover:text-red-500 transition-colors duration-300 w-6 shrink-0 select-none text-center font-mono">
-                {bnNumerals[i]}
-              </span>
-
-              {/* Thumbnail Left */}
-              <div className="w-[64px] h-[45px] shrink-0 bg-slate-100 rounded-lg overflow-hidden border border-gray-100 shadow-xs relative">
+              <div className="w-20 h-14 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
                 <img 
                   src={news.imageUrl} 
                   alt="" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                   referrerPolicy="no-referrer"
                 />
               </div>
 
-              {/* Title & Info Right */}
-              <div className="flex-1 min-w-0 pr-1 flex flex-col gap-1">
-                <h4 className="text-[12px] font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-[#D92B2B] transition-colors duration-300">
+              <div className="flex-1 min-w-0 flex flex-col gap-1">
+                <h4 className="text-xs font-bold text-slate-800 leading-snug line-clamp-2 group-hover:text-sami-red transition-colors">
                   {news.title}
                 </h4>
-                <div className="flex items-center gap-2 text-[9px] font-bold text-[#9CA3AF]">
-                  <span className="flex items-center gap-0.5">
-                    <Clock className="w-2.5 h-2.5" />
-                    {new Date(news.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('bn-BD')}
-                  </span>
-                  <span className="text-gray-200">|</span>
-                  <span className="text-[#D92B2B] bg-red-50 text-[8px] px-1 py-0.25 rounded-xs font-black">
-                    {news.category || 'জাতীয়'}
-                  </span>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500">
+                  <div className="flex items-center gap-0.5">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <span>{new Date(news.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('bn-BD', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                  </div>
+                  {news.location && (
+                    <>
+                      <span className="text-slate-300">|</span>
+                      <span className="text-sami-red font-bold">{news.location}</span>
+                    </>
+                  )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
     </motion.div>
